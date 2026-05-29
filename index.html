@@ -2,37 +2,24 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Events Café — Gestion Événements</title>
-<meta name="theme-color" content="#150f0a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Events Café">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventPro — Gestion Événements</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Fonds : noir & marron café */
-  --bg0: #0c0805;
-  --bg1: #150f0a;
-  --bg2: #1e1610;
-  --bg3: #281d14;
-  --bg4: #34261a;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(214,158,90,0.15);
-  --text1: #f6efe6;
-  --text2: #b9a892;
-  --text3: #6f5d49;
-  /* Café (accent chaud à la place du bleu) */
-  --accent: #c8884b;
-  --accent2: #e0a96d;
-  --coffee: #6f4e37;
-  --coffee2: #4e342e;
-  /* Jaune / or (conservé) */
-  --gold: #f5a623;
+  --bg0: #0a0b0e;
+  --bg1: #111318;
+  --bg2: #181c24;
+  --bg3: #1e2330;
+  --bg4: #252c3a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text1: #f0f2f7;
+  --text2: #9ba3b8;
+  --text3: #5c6478;
+  --accent: #3b82f6;
+  --accent2: #60a5fa;
+  --gold: #f59e0b;
   --gold2: #fbbf24;
   --green: #10b981;
   --green2: #34d399;
@@ -61,12 +48,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* SIDEBAR */
 .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
-.logo-brand{display:flex;align-items:center;gap:11px;}
-.logo-bean{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--coffee),var(--coffee2));position:relative;display:inline-flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(245,166,35,.35);}
-.logo-bean::after{content:'';position:absolute;width:2.5px;height:22px;background:var(--gold);border-radius:3px;transform:rotate(18deg);opacity:.85;}
-.logo-text{font-family:var(--font-head);font-size:19px;font-weight:700;letter-spacing:-.5px;line-height:1;}
+.logo-text{font-family:var(--font-head);font-size:20px;font-weight:700;letter-spacing:-.5px;}
 .logo-text span{color:var(--gold);}
-.logo-sub{font-size:10px;color:var(--accent2);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase;}
 .nav-section{padding:16px 12px 8px;font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;font-weight:500;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;margin:2px 8px;transition:all .2s;position:relative;}
 .nav-item:hover{background:var(--bg3);color:var(--text1);}
@@ -260,29 +244,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @media(max-width:820px){
   .sidebar{width:64px;min-width:64px;}
   .logo-text,.logo-sub,.nav-section,.nav-item span:not(.nav-icon):not(.nav-badge),.sync-status span,#last-sync{display:none;}
-  .logo-brand{justify-content:center;gap:0;}
   .nav-item{justify-content:center;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .form-row{grid-template-columns:1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
-}
-/* TÉLÉPHONE */
-@media(max-width:560px){
-  .content{padding:16px 14px;}
-  .topbar{padding:12px 14px;flex-wrap:wrap;gap:8px;}
-  .topbar-title{font-size:16px;}
-  .topbar-actions{width:100%;}
-  .topbar-actions .btn{flex:1;justify-content:center;}
-  .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
-  .stat-value{font-size:22px;}
-  .cal-grid{gap:2px;}
-  .cal-cell{min-height:54px;padding:3px;border-radius:6px;}
-  .ev-chip{font-size:8px;padding:1px 3px;}
-  .cal-dh{font-size:9px;}
-  .modal{max-height:92vh;}
-  .mat-grid{grid-template-columns:1fr;}
-  .ev-footer{gap:5px;}
-  .ev-footer .btn-xs,.ev-footer .status-sel{flex:1;justify-content:center;text-align:center;}
 }
 </style>
 </head>
@@ -290,22 +255,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 
 <div id="loading-screen" class="loading-overlay">
-  <div class="loading-logo">Events<span> Café</span></div>
+  <div class="loading-logo">Event<span>Pro</span></div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-  <div style="font-size:12px;color:var(--text3)">Call · Install · Smile</div>
+  <div style="font-size:12px;color:var(--text3)">Connexion Firebase...</div>
 </div>
 
 <div class="wrapper" id="app" style="display:none">
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="logo">
-      <div class="logo-brand">
-        <span class="logo-bean" aria-hidden="true"></span>
-        <div>
-          <div class="logo-text">Events<span> Café</span></div>
-          <div class="logo-sub">Call · Install · Smile</div>
-        </div>
-      </div>
+      <div class="logo-text">Event<span>Pro</span></div>
+      <div class="logo-sub">Gestion Événements</div>
     </div>
     <div class="nav-section">Navigation</div>
     <div class="nav-item active" onclick="showTab('calendar',this)">
@@ -500,7 +460,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 <script>
 // ============================================================
-// EVENTS CAFÉ — Données temps réel via Firebase Realtime Database
+// EVENTPRO — Données temps réel via Firebase Realtime Database
 // ============================================================
 const STOCK_META = [
   {id:'fontaine_eau', label:'Fontaine à eau', icon:'💧', color:'#0ea5e9'},
