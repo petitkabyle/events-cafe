@@ -2,8 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Events Café — Gestion Événements</title>
+<meta name="theme-color" content="#150f0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Events Café">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -257,6 +265,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .stats-row{grid-template-columns:1fr 1fr;}
   .form-row{grid-template-columns:1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
+}
+/* TÉLÉPHONE */
+@media(max-width:560px){
+  .content{padding:16px 14px;}
+  .topbar{padding:12px 14px;flex-wrap:wrap;gap:8px;}
+  .topbar-title{font-size:16px;}
+  .topbar-actions{width:100%;}
+  .topbar-actions .btn{flex:1;justify-content:center;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .stat-value{font-size:22px;}
+  .cal-grid{gap:2px;}
+  .cal-cell{min-height:54px;padding:3px;border-radius:6px;}
+  .ev-chip{font-size:8px;padding:1px 3px;}
+  .cal-dh{font-size:9px;}
+  .modal{max-height:92vh;}
+  .mat-grid{grid-template-columns:1fr;}
+  .ev-footer{gap:5px;}
+  .ev-footer .btn-xs,.ev-footer .status-sel{flex:1;justify-content:center;text-align:center;}
 }
 </style>
 </head>

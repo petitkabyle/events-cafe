@@ -1,0 +1,15 @@
+{
+  "name": "Events Café — Gestion",
+  "short_name": "Events Café",
+  "description": "Planning, stock et demandes clients — Events Café",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0805",
+  "theme_color": "#150f0a",
+  "lang": "fr",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

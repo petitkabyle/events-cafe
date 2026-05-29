@@ -40,3 +40,14 @@ Tout est détaillé dans **GUIDE_INSTALLATION.md**.
 L'API Google Sheets nécessite une configuration payante/complexe pour l'écriture.
 Firebase Realtime Database est **gratuit** (jusqu'à ~100 connexions simultanées et
 1 Go), **instantané**, et parfait pour un usage à deux + formulaire client.
+
+
+## 📱 Sur téléphone
+
+L'app est responsive et **installable** (icône sur l'écran d'accueil, plein écran).
+Voir le guide dédié : **GUIDE_TELEPHONE.md**.
+- iPhone (Safari) : Partager → « Sur l'écran d'accueil »
+- Android (Chrome) : menu ⋮ → « Installer l'application »
+
+Toi et ton frère pouvez l'installer chacun : les données restent synchronisées en
+temps réel via Firebase.
