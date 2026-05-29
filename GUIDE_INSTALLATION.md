@@ -1,15 +1,13 @@
-# ☕ Events Café — Guide d'installation
+# EventPro — Guide d'installation (Firebase + mise en ligne)
 
-Ton système est composé de **2 outils connectés à la même base cloud** :
+Objectif : que toi et ton frère utilisiez la **même** appli en temps réel, et que
+le **formulaire client** envoie ses demandes directement dans votre tableau.
 
-| Fichier | Pour qui ? | Rôle |
-|---|---|---|
-| **index.html** | Toi + ton frère | L'application de gestion (calendrier, événements, stock, demandes) |
-| **formulaire.html** | Tes clients | Le formulaire de demande (fichier séparé) |
+Il y a **2 outils** :
+- `index.html` — le tableau de bord (vous deux)
+- `formulaire.html` — le formulaire (vos clients)
 
-Les deux partagent **firebase-config.js** et **data.js**. Quand un client remplit le formulaire, sa demande arrive **automatiquement** dans l'onglet « Demandes » de l'app. Quand toi ou ton frère modifiez quelque chose, **l'autre le voit en temps réel**. 🔥
-
-> 💡 **Pourquoi ça marche enfin à deux ?** Les données ne sont plus enregistrées sur ton PC : elles vivent dans **Firebase** (le cloud gratuit de Google). Tout le monde lit/écrit au même endroit.
+Les deux partagent `firebase-config.js`. **Tu ne configures Firebase qu'une fois.**
 
 ---
 
@@ -17,9 +15,9 @@ Les deux partagent **firebase-config.js** et **data.js**. Quand un client rempli
 
 1. Va sur **https://console.firebase.google.com**
 2. Connecte-toi avec un compte Google
-3. Clique **« Créer un projet »** → nom : `events-cafe` → continue
-4. Google Analytics : **désactive** (pas besoin) → **Créer le projet**
-5. Attends ~30 s, puis **Continuer**
+3. **« Créer un projet »** → nom : `eventpro` → Continuer
+4. Google Analytics : **désactive** → **Créer le projet**
+5. Attends ~30 s puis **Continuer**
 
 ---
 
@@ -34,103 +32,81 @@ Les deux partagent **firebase-config.js** et **data.js**. Quand un client rempli
 ```json
 {
   "rules": {
-    "events":   { ".read": true, ".write": true },
-    "demandes": { ".read": true, ".write": true }
+    "events": { ".read": true, ".write": true },
+    "stock":  { ".read": true, ".write": true }
   }
 }
 ```
 
-> ⚠️ Mode ouvert = simple pour démarrer. Pour sécuriser plus tard, voir la section « Sécurité » en bas.
-
+> ⚠️ Le mode test laisse la base ouverte (simple pour démarrer). Voir la section
+> « Sécurité » en bas pour la fermer plus tard.
 
 ---
 
 ## Étape 3 — Récupérer tes clés
 
-1. En haut à gauche : **icône engrenage ⚙️ → Paramètres du projet**
-2. Descends jusqu'à **« Vos applications »**
-3. Clique sur l'icône **`</>`** (Web)
-4. Surnom : `Events Café Web` → **Enregistrer l'application**
-5. Firebase affiche un bloc `const firebaseConfig = { ... }` → **copie les valeurs**
+1. Icône **engrenage ⚙️ → Paramètres du projet**
+2. Section **« Vos applications »** → clique sur l'icône **`</>`** (Web)
+3. Surnom : `EventPro` → **Enregistrer l'application**
+4. Firebase affiche un bloc `const firebaseConfig = { ... }` → **copie ces valeurs**
 
 ---
 
-## Étape 4 — Coller tes clés dans le projet
+## Étape 4 — Coller tes clés
 
 Ouvre **firebase-config.js** et remplace les valeurs par les tiennes :
 
 ```js
-const firebaseConfig = {
-  apiKey:            "AIza............",
-  authDomain:        "events-cafe.firebaseapp.com",
-  databaseURL:       "https://events-cafe-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "events-cafe",
-  storageBucket:     "events-cafe.appspot.com",
-  messagingSenderId: "123456789012",
-  appId:             "1:1234...:web:abcd..."
+window.FIREBASE_CONFIG = {
+  apiKey:            "AIza...",
+  authDomain:        "eventpro.firebaseapp.com",
+  databaseURL:       "https://eventpro-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "eventpro",
+  storageBucket:     "eventpro.appspot.com",
+  messagingSenderId: "1234567890",
+  appId:             "1:1234:web:abcd"
 };
 ```
 
-> 📌 La ligne **databaseURL** est la plus importante. Vérifie qu'elle correspond bien à ta base.
-
-Un seul fichier à modifier : il est utilisé **à la fois** par l'app et par le formulaire.
+> 📌 La ligne **databaseURL** est la plus importante (sans elle, pas de synchro).
+> Édite ce fichier directement sur GitHub : ouvre-le → crayon ✏️ → colle → « Commit ».
 
 ---
 
-## Étape 5 — Mettre en ligne (gratuit) pour partager avec ton frère
+## Étape 5 — Mettre en ligne (gratuit)
 
-Tu as deux options simples et gratuites :
+### Option A — GitHub Pages (déjà sur ton dépôt)
+1. Sur `https://github.com/petitkabyle/events-cafe` → **Settings → Pages**
+2. **Branch : main**, dossier **/ (root)** → **Save**
+3. Après ~1 min, ton URL apparaît :
+   - Tableau de bord : `https://petitkabyle.github.io/events-cafe/`
+   - Formulaire client : `https://petitkabyle.github.io/events-cafe/formulaire.html`
 
-### Option A — Netlify Drop (la plus rapide, sans compte technique)
+### Option B — Netlify Drop
 1. Va sur **https://app.netlify.com/drop**
-2. Glisse-dépose **tout le dossier `events-cafe`**
-3. En quelques secondes tu obtiens une URL type `https://events-cafe-xyz.netlify.app`
-4. Ton app de gestion = `…netlify.app/index.html`
-5. Ton formulaire client = `…netlify.app/formulaire.html`
-
-### Option B — GitHub Pages
-1. Crée un dépôt GitHub, dépose les fichiers du dossier `events-cafe`
-2. **Settings → Pages → Branch : main → Save**
-3. Ton URL : `https://ton-pseudo.github.io/events-cafe/`
-
-> Je peux pousser le projet sur GitHub pour toi (voir en bas).
-
+2. Glisse-dépose le dossier → tu obtiens une URL instantanée.
 
 ---
 
-## Étape 6 — Utilisation au quotidien
+## Étape 6 — Utilisation
 
-### Toi & ton frère (app de gestion)
-- **Tableau de bord** : événements de la semaine, stock en alerte, demandes à traiter
-- **Calendrier** : vue mensuelle, repère les chevauchements d'un coup d'œil
-- **Événements** : recherche, filtre par statut, change le statut (À préparer → Livré → Récupéré) directement dans le tableau
-- **Stock** : se recalcule tout seul (« Loué » = somme du matériel des événements **Livré**)
-- **Demandes** : chaque demande client arrive ici → bouton 📅 pour la **transférer dans le planning** en un clic
-
-### Tes clients (formulaire)
-- Tu leur envoies le lien `…/formulaire.html` (bouton « 🔗 Copier le lien du formulaire » dans l'onglet Demandes)
-- Ils remplissent → la demande tombe dans ton app
-
-### Sur mobile
-- Ouvre l'URL dans le navigateur → menu ⋮ → **« Ajouter à l'écran d'accueil »** : ça s'utilise comme une vraie app.
+- **Toi & ton frère** : ouvrez l'URL du tableau de bord. Créez/modifiez des
+  événements, changez les statuts, gérez le stock. Tout se synchronise en direct.
+- **Le bouton « 🔗 Lien formulaire »** (en haut) copie l'adresse du formulaire à
+  envoyer aux clients.
+- **Tes clients** : remplissent le formulaire → la demande apparaît chez vous.
+- **Sur mobile** : ouvre l'URL → menu du navigateur → « Ajouter à l'écran d'accueil ».
 
 ---
 
-## Modifier ton stock / tes clients
+## Sécurité (optionnel, à faire après le lancement)
 
-Tout est centralisé dans **data.js** :
-- `MATERIEL` : ajoute/retire du matériel, change `total` et `maintenance`
-- `CLIENTS`, `SALONS`, `VILLES`, `TYPES_EVENT` : tes listes déroulantes
+Le mode test expire/laisse la base ouverte. Pour la protéger :
+- active **Firebase Authentication** (email/mot de passe) et passe les règles à
+  `".read": "auth != null"`, `".write": "auth != null"`,
+- ou garde l'URL privée (ne la partage qu'avec ton frère et tes clients).
 
----
-
-## Sécurité (optionnel, recommandé plus tard)
-
-Le mode test laisse la base ouverte. Pour la fermer après ton lancement, tu peux :
-- activer **Firebase Authentication** (email/mot de passe) et restreindre les règles à `auth != null`,
-- ou garder une URL privée que tu ne partages qu'avec ton frère et tes clients.
-
-Dis-moi si tu veux que je t'ajoute l'authentification (connexion par mot de passe).
+Dis-moi si tu veux que j'ajoute une page de connexion (mot de passe) — c'est faisable.
 
 ---
 
@@ -138,14 +114,9 @@ Dis-moi si tu veux que je t'ajoute l'authentification (connexion par mot de pass
 
 ```
 events-cafe/
-├── index.html          ← app de gestion (toi + ton frère)
+├── index.html          ← tableau de bord (vous deux)
 ├── formulaire.html     ← formulaire client (à partager)
-├── app.js              ← logique de l'app
-├── form.js             ← logique du formulaire
-├── data.js             ← ton matériel / clients (modifiable)
 ├── firebase-config.js  ← tes clés Firebase (à remplir)
-├── style.css           ← thème Events Café (marron / blanc / noir)
+├── README.md
 └── GUIDE_INSTALLATION.md
 ```
-
-Bon démarrage ! ☕🚀
