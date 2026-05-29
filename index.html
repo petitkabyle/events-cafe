@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events Café — Gestion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="cup">☕</div>
+        <div>
+          <div class="brand-name">Events Café</div>
+          <div class="brand-sub">Gestion Pro</div>
+        </div>
+      </div>
+      <nav class="menu">
+        <button class="active" data-sec="dashboard"><span class="ic">📊</span> Tableau de bord</button>
+        <button data-sec="calendrier"><span class="ic">📅</span> Calendrier</button>
+        <button data-sec="evenements"><span class="ic">🎪</span> Événements</button>
+        <button data-sec="stock"><span class="ic">📦</span> Stock</button>
+        <button data-sec="demandes"><span class="ic">📥</span> Demandes <span id="demBadge"></span></button>
+        <button data-sec="nouveau"><span class="ic">➕</span> Nouvel événement</button>
+      </nav>
+      <div class="sidebar-foot">Events Café · v2.0<br />Synchronisé via Firebase 🔥</div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button class="burger" id="burger">☰</button>
+          <div>
+            <h1 id="secTitle">Tableau de bord</h1>
+            <p id="secSub">Vue d'ensemble de ton activité</p>
+          </div>
+        </div>
+        <div class="sync-pill off" id="syncPill"><span class="dot"></span><span id="syncTxt">Hors ligne — config requise</span></div>
+      </div>
+
+      <div id="setupBanner" class="setup-banner">
+        ⚙️ <span>Firebase n'est pas encore configuré. Ouvre <b>firebase-config.js</b> et colle tes clés (voir le guide). En attendant, tu peux tester en local.</span>
+      </div>
+
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="section active" id="dashboard">
+        <div class="stats">
+          <div class="stat accent"><div class="ic">📅</div><h3>Cette semaine</h3><div class="num" id="kpiWeek">0</div></div>
+          <div class="stat"><div class="ic">🚚</div><h3>Matériel sur le terrain</h3><div class="num" id="kpiLivre">0</div></div>
+          <div class="stat"><div class="ic">⚠️</div><h3>Stock en alerte</h3><div class="num" id="kpiStock">0</div></div>
+          <div class="stat"><div class="ic">📥</div><h3>Demandes à traiter</h3><div class="num" id="kpiDem">0</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>🔥 Prochains événements</h2><button class="btn btn-ghost btn-sm" data-go="calendrier">Voir le calendrier</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Période</th><th>Événement</th><th>Client</th><th>Stand</th><th>Ville</th><th>Statut</th></tr></thead>
+              <tbody id="dashUpcoming"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>⚠️ Stock à surveiller</h2><button class="btn btn-ghost btn-sm" data-go="stock">Gérer le stock</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Matériel</th><th>Disponible</th><th>Loué</th><th>Libre</th><th>Niveau</th></tr></thead>
+              <tbody id="dashStock"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== CALENDRIER ===== -->
+      <section class="section" id="calendrier">
+        <div class="panel">
+          <div class="cal-head">
+            <button class="btn btn-ghost btn-sm" id="calPrev">← Préc.</button>
+            <h2 id="calLabel">—</h2>
+            <button class="btn btn-ghost btn-sm" id="calNext">Suiv. →</button>
+          </div>
+          <div class="cal-grid" id="calDows"></div>
+          <div class="cal-grid" id="calBody" style="margin-top:6px;"></div>
+          <div style="margin-top:16px; display:flex; gap:16px; flex-wrap:wrap; font-size:.82em; color:var(--coffee-2);">
+            <span><span class="badge b-prep">À préparer</span></span>
+            <span><span class="badge b-livre">Livré / sur place</span></span>
+            <span><span class="badge b-recup">Récupéré</span></span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===== ÉVÉNEMENTS ===== -->
+      <section class="section" id="evenements">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>🎪 Tous les événements</h2>
+            <button class="btn btn-primary btn-sm" data-go="nouveau">➕ Nouvel événement</button>
+          </div>
+          <div class="filters">
+            <input type="text" id="evSearch" placeholder="🔍 Rechercher (client, salon, stand...)" style="flex:1; min-width:200px;" />
+            <select id="evFilterStatut">
+              <option value="">Tous les statuts</option>
+              <option value="À préparer">À préparer</option>
+              <option value="Livré">Livré</option>
+              <option value="Récupéré">Récupéré</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Période</th><th>Événement</th><th>Client</th><th>Stand</th><th>Ville</th><th>Matériel</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody id="evBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== STOCK ===== -->
+      <section class="section" id="stock">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>📦 Stock en temps réel</h2>
+            <p class="muted" style="font-size:.85em;">Le « Loué » se calcule automatiquement depuis les événements marqués « Livré ».</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Matériel</th><th>Total</th><th>Maintenance</th><th>Disponible</th><th>Loué</th><th>Libre</th><th>Niveau</th></tr></thead>
+              <tbody id="stockBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DEMANDES ===== -->
+      <section class="section" id="demandes">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>📥 Demandes clients (formulaire)</h2>
+            <button class="btn btn-gold btn-sm" id="copyFormLink">🔗 Copier le lien du formulaire</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Reçue le</th><th>Client</th><th>Contact</th><th>Type</th><th>Montage → Démontage</th><th>Matériel</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody id="demBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===== NOUVEAU / ÉDITION ===== -->
+      <section class="section" id="nouveau">
+        <div class="panel">
+          <div class="panel-head"><h2 id="formTitle">➕ Nouvel événement</h2></div>
+          <form id="eventForm">
+            <input type="hidden" name="id" />
+            <div class="form-grid">
+              <div class="form-section-title">📋 Informations générales</div>
+              <div class="field"><label>Nom de l'événement <span class="req">*</span></label><input name="nom" required placeholder="Ex : Stand Société X" /></div>
+              <div class="field"><label>Salon / Contexte <span class="req">*</span></label><select name="salon" id="selSalon" required></select></div>
+              <div class="field"><label>Client <span class="req">*</span></label><select name="client" id="selClient" required></select></div>
+              <div class="field"><label>Ville <span class="req">*</span></label><select name="ville" id="selVille" required></select></div>
+              <div class="field"><label>Stand / Emplacement</label><input name="stand" placeholder="Ex : Stand 12" /></div>
+              <div class="field"><label>Contact sur place</label><input name="contact" placeholder="Nom + téléphone" /></div>
+              <div class="field"><label>Date de montage <span class="req">*</span></label><input type="date" name="dateDebut" required /></div>
+              <div class="field"><label>Date de démontage <span class="req">*</span></label><input type="date" name="dateFin" required /></div>
+
+              <div class="form-section-title">📦 Matériel loué</div>
+              <div class="field-full"><div class="qty-grid" id="qtyGrid"></div></div>
+
+              <div class="form-section-title">📝 Notes</div>
+              <div class="field field-full"><textarea name="notes" rows="3" placeholder="Infos d'accès, horaires précis, demandes spéciales..."></textarea></div>
+            </div>
+            <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary">✅ Enregistrer</button>
+              <button type="button" class="btn btn-ghost" id="formReset">↺ Réinitialiser</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL DÉTAIL ===== -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="modal-head"><h2 id="modalTitle">Détail</h2><button class="close-x" id="modalClose">✕</button></div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <!-- Firebase + scripts -->
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events Café — Demande de location</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { display: block; }
+    .form-page { max-width: 820px; margin: 0 auto; padding: 30px 20px 60px; }
+    .form-hero {
+      background: linear-gradient(135deg, var(--coffee), var(--espresso));
+      color: var(--cream); border-radius: var(--radius); padding: 38px 34px; margin-bottom: 26px;
+      box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+    }
+    .form-hero::after { content:'☕'; position:absolute; right:-10px; bottom:-30px; font-size:160px; opacity:.08; }
+    .form-hero .brand-name { font-size: 2.3em; color: var(--white); }
+    .form-hero .brand-sub { letter-spacing: 4px; }
+    .form-hero p { margin-top: 12px; color: var(--cream-2); max-width: 560px; line-height: 1.6; }
+    .form-card { background: var(--white); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow); border: 1px solid var(--cream-2); }
+    .success-box { display:none; text-align:center; padding: 50px 30px; }
+    .success-box .big { font-size: 4em; }
+    .success-box h2 { font-size: 1.8em; color: var(--coffee); margin: 14px 0; }
+    .success-box p { color: var(--coffee-2); max-width: 420px; margin: 0 auto 22px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="form-page">
+    <div class="form-hero">
+      <div class="brand">
+        <div class="cup">☕</div>
+        <div><div class="brand-name">Events Café</div><div class="brand-sub">Location événementielle</div></div>
+      </div>
+      <p>Besoin de matériel pour votre événement ? Remplissez ce formulaire : frigos, fontaines à eau, machines à café, mobilier… Nous revenons vers vous sous 24 h avec un devis personnalisé. ☕</p>
+    </div>
+
+    <div class="form-card" id="card">
+      <div id="setupNote" class="setup-banner" style="display:none;">⚙️ Le formulaire n'est pas encore connecté à Firebase. Les demandes ne seront pas envoyées tant que la config n'est pas remplie.</div>
+      <form id="demandeForm">
+        <div class="form-grid">
+          <div class="form-section-title">👤 Vos coordonnées</div>
+          <div class="field"><label>Nom / Société <span class="req">*</span></label><input name="client" required placeholder="Ex : Société Dupont" /></div>
+          <div class="field"><label>Personne à contacter <span class="req">*</span></label><input name="contact" required placeholder="Prénom Nom" /></div>
+          <div class="field"><label>Téléphone <span class="req">*</span></label><input name="tel" required placeholder="06 12 34 56 78" /></div>
+          <div class="field"><label>Email <span class="req">*</span></label><input type="email" name="email" required placeholder="contact@exemple.fr" /></div>
+        </div>
+
+
+        <div class="form-grid">
+          <div class="form-section-title">🎪 Votre événement</div>
+          <div class="field"><label>Type d'événement <span class="req">*</span></label><select name="typeEvent" id="selType" required></select></div>
+          <div class="field"><label>Salon / Contexte</label><select name="salon" id="selSalon"></select></div>
+          <div class="field"><label>Ville <span class="req">*</span></label><select name="ville" id="selVille" required></select></div>
+          <div class="field"><label>Lieu précis / Stand</label><input name="lieu" placeholder="Ex : Palais des Festivals, stand 12" /></div>
+          <div class="field"><label>Date de montage <span class="req">*</span></label><input type="date" name="dateMontage" required /></div>
+          <div class="field"><label>Date de démontage <span class="req">*</span></label><input type="date" name="dateDemontage" required /></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-section-title">📦 Matériel souhaité</div>
+          <div class="field-full"><div class="qty-grid" id="qtyGrid"></div></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-section-title">📝 Précisions</div>
+          <div class="field field-full"><label>Informations complémentaires</label><textarea name="notes" rows="3" placeholder="Nombre de personnes attendues, contraintes d'accès, demandes spéciales..."></textarea></div>
+        </div>
+
+        <button type="submit" class="btn btn-gold" style="width:100%; margin-top:24px; justify-content:center; font-size:1.05em;">📨 Envoyer ma demande</button>
+        <p style="text-align:center; font-size:.78em; color:var(--latte); margin-top:14px;">🔒 Vos données servent uniquement au traitement de votre demande.</p>
+      </form>
+    </div>
+
+    <div class="form-card success-box" id="success">
+      <div class="big">☕✅</div>
+      <h2>Merci, c'est envoyé !</h2>
+      <p>Votre demande a bien été reçue par l'équipe Events Café. Nous revenons vers vous très vite avec un devis personnalisé.</p>
+      <button class="btn btn-primary" onclick="location.reload()">Nouvelle demande</button>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
+  <script type="module" src="form.js"></script>
+</body>
+</html>
