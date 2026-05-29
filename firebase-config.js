@@ -11,11 +11,11 @@
 // ============================================================
 
 window.FIREBASE_CONFIG = {
-  apiKey:            "COLLE_TON_API_KEY_ICI",
-  authDomain:        "ton-projet.firebaseapp.com",
-  databaseURL:       "https://ton-projet-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "ton-projet",
-  storageBucket:     "ton-projet.appspot.com",
-  messagingSenderId: "000000000000",
-  appId:             "1:000000000000:web:xxxxxxxxxxxxxxxx"
+apiKey: "AIzaSyD2PH3pKwKAhGYdk5tFMOf1KcDPQeihTAw",
+  authDomain: "eventpro-7c85a.firebaseapp.com",
+  databaseURL: "https://eventpro-7c85a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "eventpro-7c85a",
+  storageBucket: "eventpro-7c85a.firebasestorage.app",
+  messagingSenderId: "650169758409",
+  appId: "1:650169758409:web:60d5606939dbbf11b6d318"
 };
