@@ -3,26 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demande de Location — EventPro</title>
+<title>Demande de Location — Events Café</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg0: #07080b;
-  --bg1: #0e1016;
-  --bg2: #141720;
-  --bg3: #1a1f2e;
-  --bg4: #212638;
+  /* Fonds : noir & marron café */
+  --bg0: #0c0805;
+  --bg1: #150f0a;
+  --bg2: #1e1610;
+  --bg3: #281d14;
+  --bg4: #34261a;
   --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.11);
-  --border3: rgba(255,255,255,0.18);
-  --text1: #eef0f7;
-  --text2: #8b93ac;
-  --text3: #4a5168;
-  --gold: #f59e0b;
+  --border2: rgba(214,158,90,0.14);
+  --border3: rgba(214,158,90,0.24);
+  --text1: #f6efe6;
+  --text2: #b9a892;
+  --text3: #6f5d49;
+  /* Jaune / or (conservé) */
+  --gold: #f5a623;
   --gold2: #fbbf24;
   --gold3: #fde68a;
-  --accent: #3b82f6;
-  --accent2: #60a5fa;
+  /* Café (nouvel accent chaud à la place du bleu) */
+  --coffee: #6f4e37;
+  --coffee2: #4e342e;
+  --accent: #c8884b;
+  --accent2: #e0a96d;
   --green: #10b981;
   --green2: #34d399;
   --font-head: 'Syne', sans-serif;
@@ -36,10 +41,17 @@ body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);min-h
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 
 /* HERO */
-.hero{position:relative;overflow:hidden;padding:80px 40px 60px;text-align:center;}
-.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(245,158,11,.12) 0%,transparent 70%);pointer-events:none;}
-.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,158,11,.4),transparent);}
-.hero-logo{font-family:var(--font-head);font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:20px;}
+.hero{position:relative;overflow:hidden;padding:72px 40px 56px;text-align:center;}
+.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(245,166,35,.14) 0%,transparent 70%);pointer-events:none;}
+.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,166,35,.5),transparent);}
+/* Logo grain de café */
+.hero-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:18px;}
+.bean{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--coffee),var(--coffee2));position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 0 2px rgba(245,166,35,.35);}
+.bean::after{content:'';position:absolute;width:3px;height:30px;background:var(--gold);border-radius:3px;transform:rotate(18deg);opacity:.85;}
+.brand-name{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.brand-name span{color:var(--gold);}
+.brand-slogan{font-family:var(--font-head);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);margin-top:3px;}
+.hero-logo{font-family:var(--font-head);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:18px;}
 .hero-logo span{color:var(--gold);}
 .hero-title{font-family:var(--font-head);font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px;}
 .hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -155,9 +167,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <div class="hero">
   <div class="hero-glow"></div>
   <div class="hero-line"></div>
-  <div class="hero-logo">Event<span>Pro</span> · Services événementiels</div>
+  <div class="hero-brand">
+    <div class="bean" aria-hidden="true"></div>
+    <div style="text-align:left">
+      <div class="brand-name">Events<span> Café</span></div>
+      <div class="brand-slogan">Call · Install · Smile</div>
+    </div>
+  </div>
   <h1 class="hero-title">Votre demande de<br><em>location de matériel</em></h1>
-  <p class="hero-sub">Remplissez ce formulaire pour nous soumettre votre demande. Nous reviendrons vers vous dans les 24h.</p>
+  <p class="hero-sub">Remplissez ce formulaire pour nous soumettre votre demande. Notre équipe revient vers vous sous 24h. ☕</p>
   <div class="hero-badges">
     <span class="hero-badge">💧 Fontaines à eau</span>
     <span class="hero-badge">☕ Machines à café</span>

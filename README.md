@@ -1,4 +1,4 @@
-# EventPro — Gestion d'événements
+# Events Café — Gestion d'événements
 
 Application web pour gérer tes prestations événementielles (calendrier, stock en
 temps réel) **et** un formulaire client séparé. Tout est synchronisé entre toi,

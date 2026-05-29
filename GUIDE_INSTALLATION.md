@@ -1,4 +1,4 @@
-# EventPro — Guide d'installation (Firebase + mise en ligne)
+# Events Café — Guide d'installation (Firebase + mise en ligne)
 
 Objectif : que toi et ton frère utilisiez la **même** appli en temps réel, et que
 le **formulaire client** envoie ses demandes directement dans votre tableau.
@@ -47,7 +47,7 @@ Les deux partagent `firebase-config.js`. **Tu ne configures Firebase qu'une fois
 
 1. Icône **engrenage ⚙️ → Paramètres du projet**
 2. Section **« Vos applications »** → clique sur l'icône **`</>`** (Web)
-3. Surnom : `EventPro` → **Enregistrer l'application**
+3. Surnom : `Events Café` → **Enregistrer l'application**
 4. Firebase affiche un bloc `const firebaseConfig = { ... }` → **copie ces valeurs**
 
 ---

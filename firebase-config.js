@@ -1,5 +1,5 @@
 // ============================================================
-//  EVENTPRO — Configuration Firebase (PARTAGÉE)
+//  EVENTS CAFÉ — Configuration Firebase (PARTAGÉE)
 // ============================================================
 //  👉 Remplace les valeurs ci-dessous par celles de TON projet
 //     Firebase (voir GUIDE_INSTALLATION.md).
