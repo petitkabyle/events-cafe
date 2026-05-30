@@ -19,3 +19,26 @@ apiKey: "AIzaSyD2PH3pKwKAhGYdk5tFMOf1KcDPQeihTAw",
   messagingSenderId: "650169758409",
   appId: "1:650169758409:web:60d5606939dbbf11b6d318"
 };
+
+// ============================================================
+//  📧 NOTIFICATIONS PAR EMAIL (EmailJS)
+// ============================================================
+//  Renseigne ici les MÊMES valeurs que dans l'onglet "Réglages"
+//  du tableau de bord. C'est la méthode la plus fiable : ainsi
+//  le FORMULAIRE client peut envoyer l'email même quand le
+//  tableau de bord est fermé (et sans dépendre des règles de
+//  sécurité Firebase).
+//
+//  👉 Remplace les 5 valeurs "COLLE_..." ci-dessous, puis
+//     enregistre le fichier. (Si tu laisses "COLLE_", c'est
+//     ignoré et l'app retombe sur la config Firebase/Réglages.)
+// ============================================================
+window.EMAILJS_CONFIG = {
+  pubkey:   "COLLE_TA_PUBLIC_KEY",     // EmailJS Public Key
+  service:  "COLLE_TON_SERVICE_ID",    // ex: service_xxxxxxx
+  template: "COLLE_TON_TEMPLATE_ID",   // ex: template_xxxxxxx
+  email1:   "",                        // 1re adresse de réception (toi)
+  name1:    "",                        // prénom associé (ex: Marc)
+  email2:   "",                        // 2e adresse de réception (ton frère)
+  name2:    ""                         // prénom associé (ex: Kevin)
+};
