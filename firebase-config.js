@@ -34,11 +34,11 @@ apiKey: "AIzaSyD2PH3pKwKAhGYdk5tFMOf1KcDPQeihTAw",
 //     ignoré et l'app retombe sur la config Firebase/Réglages.)
 // ============================================================
 window.EMAILJS_CONFIG = {
-  pubkey:   "COLLE_TA_PUBLIC_KEY",     // EmailJS Public Key
-  service:  "COLLE_TON_SERVICE_ID",    // ex: service_xxxxxxx
-  template: "COLLE_TON_TEMPLATE_ID",   // ex: template_xxxxxxx
-  email1:   "",                        // 1re adresse de réception (toi)
-  name1:    "",                        // prénom associé (ex: Marc)
-  email2:   "",                        // 2e adresse de réception (ton frère)
-  name2:    ""                         // prénom associé (ex: Kevin)
+  pubkey:   "FkbFqxL3Y14WCz_MB",        // EmailJS Public Key
+  service:  "service_5ljac5p",          // Service ID
+  template: "template_9c71r47",         // Template ID
+  email1:   "soane.mansouri@gmail.com", // 1re adresse de réception (toi)
+  name1:    "Soane Mansouri",           // prénom associé
+  email2:   "",                          // 2e adresse (ton frère) — à configurer plus tard
+  name2:    ""                           // prénom associé
 };
