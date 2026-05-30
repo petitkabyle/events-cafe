@@ -594,6 +594,15 @@ let activityLog = JSON.parse(localStorage.getItem('ep_activity')||'[]');
 let unreadCount = parseInt(localStorage.getItem('ep_unread')||'0');
 let notifPrefs = JSON.parse(localStorage.getItem('ep_notif_prefs')||'{"form":true,"new":true,"edit":true,"stock":true,"rendu":true}');
 let ejsCfg = JSON.parse(localStorage.getItem('ep_ejs')||'{}');
+// Si la config email est définie dans firebase-config.js (window.EMAILJS_CONFIG),
+// elle est prioritaire et partagée avec le formulaire (100% fiable).
+(function(){
+  const c = window.EMAILJS_CONFIG;
+  if(c && c.pubkey && !String(c.pubkey).includes('COLLE') && c.service && c.template){
+    ejsCfg = Object.assign({}, c);
+    try{ localStorage.setItem('ep_ejs', JSON.stringify(ejsCfg)); }catch(e){}
+  }
+})();
 
 // ══════════════════════════════════════════════════════
 // FIREBASE

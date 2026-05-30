@@ -394,7 +394,16 @@ let db = null, fbReady = false;
 // ---------- EmailJS : notification automatique à l'équipe ----------
 // La config est définie dans le dashboard (onglet Réglages) puis partagée via Firebase.
 let emailCfg = {};
+// Config définie en dur dans firebase-config.js (window.EMAILJS_CONFIG) — 100% fiable,
+// ne dépend PAS des règles de sécurité Firebase. C'est la source prioritaire.
+function fileEmailCfg(){
+  const c = window.EMAILJS_CONFIG;
+  if(c && c.pubkey && !String(c.pubkey).includes('COLLE') && c.service && c.template) return c;
+  return null;
+}
 function loadEmailCfg(){
+  const f = fileEmailCfg();
+  if(f){ emailCfg = f; if(typeof emailjs!=='undefined'){ try{emailjs.init(f.pubkey);}catch(e){} } return; }
   if(!fbReady) return;
   db.ref('config/emailjs').once('value').then(snap=>{
     const v = snap.val();
@@ -402,6 +411,8 @@ function loadEmailCfg(){
   }).catch(()=>{});
 }
 async function ensureEmailCfg(){
+  const f = fileEmailCfg();
+  if(f){ emailCfg = f; return emailCfg; }
   if(emailCfg && emailCfg.pubkey) return emailCfg;
   if(!fbReady) return emailCfg;
   try{ const snap = await db.ref('config/emailjs').once('value'); const v = snap.val(); if(v) emailCfg = v; }catch(e){}
@@ -413,8 +424,11 @@ function emMaterialText(mat){
 }
 async function sendFormEmail(row, mat){
   await ensureEmailCfg();
-  if(typeof emailjs==='undefined') return;
-  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template) return;
+  if(typeof emailjs==='undefined'){ console.warn('EmailJS non chargé sur le formulaire'); return; }
+  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template){
+    console.warn('EmailJS : config absente (ni window.EMAILJS_CONFIG ni config/emailjs dans Firebase). Email non envoyé.');
+    return;
+  }
   const message =
 `Un client vient de remplir le formulaire de réservation 🎉
 
@@ -436,6 +450,7 @@ ${emMaterialText(mat)}
     { email: emailCfg.email1, name: emailCfg.name1 },
     { email: emailCfg.email2, name: emailCfg.name2 }
   ].filter(r => r.email);
+  if(!recipients.length){ console.warn('EmailJS : aucune adresse de réception configurée'); return; }
   try{
     emailjs.init(emailCfg.pubkey);
     for(const r of recipients){
@@ -447,7 +462,9 @@ ${emMaterialText(mat)}
         time: new Date().toLocaleString('fr-FR')
       });
     }
-  }catch(e){ console.error('Email form error', e); }
+    console.log('Email formulaire envoyé à', recipients.map(r=>r.email).join(', '));
+    showToast('Équipe notifiée par email ✓','success');
+  }catch(e){ console.error('Erreur envoi email formulaire :', e); }
 }
 
 // ---------- Grille matériel ----------
