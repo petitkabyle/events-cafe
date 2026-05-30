@@ -361,6 +361,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- Firebase (compat) + config -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="firebase-config.js"></script>
 
 
@@ -389,6 +390,65 @@ let db = null, fbReady = false;
     catch(e){ console.error('Firebase init error', e); }
   }
 })();
+
+// ---------- EmailJS : notification automatique à l'équipe ----------
+// La config est définie dans le dashboard (onglet Réglages) puis partagée via Firebase.
+let emailCfg = {};
+function loadEmailCfg(){
+  if(!fbReady) return;
+  db.ref('config/emailjs').once('value').then(snap=>{
+    const v = snap.val();
+    if(v){ emailCfg = v; if(v.pubkey && typeof emailjs!=='undefined'){ try{emailjs.init(v.pubkey);}catch(e){} } }
+  }).catch(()=>{});
+}
+async function ensureEmailCfg(){
+  if(emailCfg && emailCfg.pubkey) return emailCfg;
+  if(!fbReady) return emailCfg;
+  try{ const snap = await db.ref('config/emailjs').once('value'); const v = snap.val(); if(v) emailCfg = v; }catch(e){}
+  return emailCfg;
+}
+function emMaterialText(mat){
+  const list = Object.entries(mat||{}).map(([k,v])=>{ const si=STOCK_META.find(s=>s.id===k); if(!si||!v)return null; return `   • ${v}× ${si.label}`; }).filter(Boolean);
+  return list.length ? list.join('\n') : '   • (aucun matériel précisé)';
+}
+async function sendFormEmail(row, mat){
+  await ensureEmailCfg();
+  if(typeof emailjs==='undefined') return;
+  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template) return;
+  const message =
+`Un client vient de remplir le formulaire de réservation 🎉
+
+🏢 Client : ${row.client}
+📞 Contact : ${row.contact||'—'}
+🎪 Salon / événement : ${row.salon||'—'}
+🪧 Stand : ${row.stand||'—'}
+📍 Lieu : ${row.lieu||'—'}
+🏷️ Type : ${row.type||'—'}
+📦 Montage : ${formatDate(row.start)}
+📤 Retour : ${formatDate(row.end)}
+☕ Matériel souhaité :
+${emMaterialText(mat)}
+📝 Précisions : ${row.notes||'—'}
+🔎 Connu via : ${row.source||'—'}
+
+➡️ Connecte-toi au dashboard pour confirmer la demande.`;
+  const recipients = [
+    { email: emailCfg.email1, name: emailCfg.name1 },
+    { email: emailCfg.email2, name: emailCfg.name2 }
+  ].filter(r => r.email);
+  try{
+    emailjs.init(emailCfg.pubkey);
+    for(const r of recipients){
+      await emailjs.send(emailCfg.service, emailCfg.template, {
+        to_email: r.email,
+        to_name: r.name || 'Équipe',
+        subject: '[Events Café] 📋 Nouvelle demande client — ' + row.client,
+        message: message,
+        time: new Date().toLocaleString('fr-FR')
+      });
+    }
+  }catch(e){ console.error('Email form error', e); }
+}
 
 // ---------- Grille matériel ----------
 function buildMatGrid(){
@@ -476,6 +536,7 @@ async function submitForm(){
   try {
     if(fbReady){ const r = db.ref('events').push(); await r.set(Object.assign({id:r.key}, row)); }
     else { const pending = JSON.parse(localStorage.getItem('ep_events')||'[]'); pending.push(Object.assign({id:'loc_'+Date.now()}, row)); localStorage.setItem('ep_events', JSON.stringify(pending)); }
+    sendFormEmail(row, mat);  // 📧 notifie l'équipe par email (fiable même dashboard fermé)
     showSuccess(row, mat);
   } catch(e){ console.error(e); showToast('Erreur lors de l\'envoi, réessayez','error'); }
   btn.style.pointerEvents=''; btn.style.opacity='';
@@ -513,6 +574,7 @@ function showToast(msg, type='info'){
 // INIT
 buildMatGrid();
 updateProgress();
+loadEmailCfg();
 </script>
 </body>
 </html>

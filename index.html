@@ -466,7 +466,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             📋 <strong>Setup EmailJS (5 min, gratuit) :</strong><br>
             1. <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> → Créer un compte gratuit<br>
             2. <strong>Email Services</strong> → Connecter Gmail ou Outlook → copier le <strong>Service ID</strong><br>
-            3. <strong>Email Templates</strong> → Créer un template avec les variables : <code style="color:var(--gold2)">{{subject}}</code> <code style="color:var(--gold2)">{{message}}</code> <code style="color:var(--gold2)">{{to_email}}</code> → copier le <strong>Template ID</strong><br>
+            3. <strong>Email Templates</strong> → dans le champ <strong>"To Email"</strong> mets <code style="color:var(--gold2)">{{to_email}}</code>, puis utilise dans le contenu : <code style="color:var(--gold2)">{{subject}}</code> <code style="color:var(--gold2)">{{message}}</code> <code style="color:var(--gold2)">{{to_name}}</code> <code style="color:var(--gold2)">{{time}}</code> → copier le <strong>Template ID</strong><br>
             4. <strong>Account → General</strong> → copier la <strong>Public Key</strong>
           </div>
           <div class="config-grid" style="margin-bottom:12px;">
@@ -647,10 +647,10 @@ function startRealtime(){
           const isForm = ev.origin==='formulaire' || ev.source==='formulaire';
           if(isForm && notifPrefs.form){
             pushNotif('📋','Nouveau formulaire client',`${ev.client} — ${ev.salon} (${formatDate(ev.start)} → ${formatDate(ev.end)})`,'form');
-            sendEmailBoth('🆕 Nouveau formulaire client',`Client : ${ev.client}\nSalon : ${ev.salon}\nStand : ${ev.stand||'—'}\nDates : ${ev.start} → ${ev.end}\nContact : ${ev.contact||'—'}`);
+            // 📧 L'email "formulaire" est envoyé directement par formulaire.html (fiable même dashboard fermé)
           } else if(!isForm && notifPrefs.new){
             pushNotif('➕','Nouvel événement',`${ev.client} — ${ev.salon} ajouté`,'new');
-            sendEmailBoth('➕ Nouvel événement créé',`Client : ${ev.client}\nSalon : ${ev.salon}\nDates : ${ev.start} → ${ev.end}`);
+            // 📧 L'email "nouvel événement" est envoyé par saveEvent() (au moment de la création)
           }
         } else {
           const changed = JSON.stringify(old) !== JSON.stringify(ev);
@@ -659,7 +659,7 @@ function startRealtime(){
               const msg = `${ev.client} — statut : "${old.status}" → "${ev.status}"`;
               if(ev.status==='matériel rendu' && notifPrefs.rendu){
                 pushNotif('✅','Matériel rendu',msg,'rendu');
-                sendEmailBoth('✅ Matériel rendu',msg);
+                // 📧 L'email "matériel rendu" est envoyé par quickStatus()/saveEvent()
               } else if(notifPrefs.edit){
                 pushNotif('✏️','Événement modifié',msg,'edit');
               }
@@ -695,6 +695,22 @@ function startRealtime(){
       renderAll();
     }
   });
+
+  // Config EmailJS partagée : permet au formulaire d'envoyer les emails (même dashboard fermé)
+  db.ref('config/emailjs').once('value').then(snap=>{
+    const v = snap.val();
+    if(v && v.pubkey){
+      // Une config existe dans Firebase -> on l'adopte (synchro entre les 2 appareils)
+      ejsCfg = v;
+      localStorage.setItem('ep_ejs', JSON.stringify(ejsCfg));
+      if(typeof emailjs!=='undefined'){ try{emailjs.init(ejsCfg.pubkey);}catch(e){} }
+      try{ loadEmailConfig(); }catch(e){}
+    } else if(ejsCfg && ejsCfg.pubkey){
+      // Migration : on pousse la config locale existante vers Firebase pour la partager
+      try{ db.ref('config/emailjs').set(ejsCfg); }catch(e){}
+    }
+  }).catch(()=>{});
+
   renderFbStatus();
 }
 
@@ -794,6 +810,7 @@ function checkStockAlerts(){
     if(critical && !_stockAlerted[si.id]){
       _stockAlerted[si.id] = true;
       pushNotif('⚠️','Stock critique',`${si.label} : seulement ${avail} unité(s) disponible(s) sur ${total}`,'stock');
+      sendEmailBoth('⚠️ Stock critique — '+si.label, `Le stock de « ${si.label} » est CRITIQUE.\n\n📊 Disponible : ${avail} sur ${total}\n📦 Actuellement en location : ${(locked[si.id]||0)}\n\n➡️ Pense à réapprovisionner ou à vérifier les locations en cours.`);
     } else if(!critical && _stockAlerted[si.id]){
       // l'article est repassé au-dessus du seuil : on réarme l'alerte
       _stockAlerted[si.id] = false;
@@ -908,6 +925,7 @@ function saveEmailConfig(){
   };
   localStorage.setItem('ep_ejs', JSON.stringify(ejsCfg));
   if(ejsCfg.pubkey && typeof emailjs!=='undefined'){ try{emailjs.init(ejsCfg.pubkey);}catch(e){} }
+  if(fbReady){ try{ db.ref('config/emailjs').set(ejsCfg); }catch(e){} }  // partage avec le formulaire
   showToast('Configuration email sauvegardée ✓','success');
 }
 
@@ -929,6 +947,28 @@ async function sendEmailTo(toEmail, toName, subject, message){
 async function sendEmailBoth(subject, message){
   if(ejsCfg.email1) await sendEmailTo(ejsCfg.email1, ejsCfg.name1||'Équipe', subject, message);
   if(ejsCfg.email2) await sendEmailTo(ejsCfg.email2, ejsCfg.name2||'Équipe', subject, message);
+}
+
+// ── Mise en forme des emails (contenu personnalisé par type) ──
+function emFmtDate(d){ if(!d) return '—'; try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}catch(e){return d;} }
+function emMaterial(ev){
+  const list=Object.entries(ev.material||{}).map(([k,v])=>{const si=STOCK_META.find(s=>s.id===k); if(!si||!parseInt(v))return null; return `   • ${v}× ${si.label}`;}).filter(Boolean);
+  return list.length ? list.join('\n') : '   • (aucun matériel précisé)';
+}
+function emEventDetails(ev){
+  return [
+    `🏢 Client : ${ev.client||'—'}`,
+    `📞 Contact : ${ev.contact||'—'}`,
+    `🎪 Salon / événement : ${ev.salon||'—'}`,
+    `🪧 Stand : ${ev.stand||'—'}`,
+    `📍 Lieu : ${ev.lieu||'—'}`,
+    `🏷️ Type : ${ev.type||'—'}`,
+    `📦 Montage : ${emFmtDate(ev.start)}`,
+    `📤 Retour : ${emFmtDate(ev.end)}`,
+    `🚦 Statut : ${ev.status||'—'}`,
+    `☕ Matériel :\n${emMaterial(ev)}`,
+    ev.notes ? `📝 Notes : ${ev.notes}` : null
+  ].filter(Boolean).join('\n');
 }
 
 async function testEmail(){
@@ -1078,12 +1118,23 @@ function renderAll(){renderStats();renderCalendar();applyFilters();renderStock()
 // ══════════════════════════════════════════════════════
 function quickStatus(id,val){
   if(!val)return;
+  const ev=findEv(id); const oldStatus=ev?ev.status:'';
   persistUpdate(id,{status:val});
   showToast('Statut mis à jour : '+val,'success');
+  if(ev){
+    const merged=Object.assign({},ev,{status:val});
+    if(val==='matériel rendu'){
+      if(notifPrefs.rendu) sendEmailBoth('✅ Matériel rendu — '+ev.client, `Le matériel de cet événement a été marqué comme RENDU.\n(Ancien statut : ${oldStatus})\n\n`+emEventDetails(merged));
+    } else if(notifPrefs.edit){
+      sendEmailBoth('🔄 Statut mis à jour — '+ev.client, `Le statut a changé : « ${oldStatus} » → « ${val} »\n\n`+emEventDetails(merged));
+    }
+  }
 }
 function deleteEvent(id){
   if(!confirm('Supprimer cet événement ?'))return;
+  const ev=findEv(id);
   persistDelete(id); showToast('Événement supprimé','info');
+  if(ev && notifPrefs.edit) sendEmailBoth('🗑️ Événement supprimé — '+ev.client, 'Cet événement a été retiré du planning :\n\n'+emEventDetails(ev));
 }
 function saveStockConfig(){
   STOCK_META.forEach(si=>{const el=document.getElementById('sc-'+si.id);if(el)STOCK_DEFAULTS[si.id]=Math.max(0,parseInt(el.value)||0);});
@@ -1139,8 +1190,13 @@ async function saveEvent(){
   const btn=document.getElementById('modal-save-btn');const old=btn.textContent;
   btn.innerHTML='<div class="loader"></div>';btn.disabled=true;
   try{
-    if(editingId){await persistUpdate(editingId,data);showToast('Mis à jour ✓','success');}
-    else{await persistNew(data);showToast('Créé ✓','success');}
+    if(editingId){
+      await persistUpdate(editingId,data);showToast('Mis à jour ✓','success');
+      if(notifPrefs.edit) sendEmailBoth('✏️ Événement modifié — '+data.client, 'Un événement vient d\'être mis à jour sur le dashboard :\n\n'+emEventDetails(data));
+    } else {
+      await persistNew(data);showToast('Créé ✓','success');
+      if(notifPrefs.new) sendEmailBoth('➕ Nouvel événement — '+data.client, 'Un nouvel événement a été ajouté au planning :\n\n'+emEventDetails(data));
+    }
     closeModal();
   }catch(e){console.error(e);showToast('Erreur enregistrement','error');}
   btn.innerHTML=old;btn.disabled=false;
