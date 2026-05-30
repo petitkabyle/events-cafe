@@ -2,51 +2,34 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EventPro — Gestion Événements</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Events Café — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg0: #0a0b0e;
-  --bg1: #111318;
-  --bg2: #181c24;
-  --bg3: #1e2330;
-  --bg4: #252c3a;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text1: #f0f2f7;
-  --text2: #9ba3b8;
-  --text3: #5c6478;
-  --accent: #3b82f6;
-  --accent2: #60a5fa;
-  --gold: #f59e0b;
-  --gold2: #fbbf24;
-  --green: #10b981;
-  --green2: #34d399;
-  --orange: #f97316;
-  --red: #ef4444;
-  --purple: #8b5cf6;
-  --teal: #14b8a6;
-  --pink: #ec4899;
-  --font-head: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --r: 10px;
-  --r2: 14px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+:root{
+  --bg0:#0a0b0e;--bg1:#111318;--bg2:#181c24;--bg3:#1e2330;--bg4:#252c3a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text1:#f0f2f7;--text2:#9ba3b8;--text3:#5c6478;
+  --accent:#3b82f6;--accent2:#60a5fa;
+  --gold:#f59e0b;--gold2:#fbbf24;
+  --green:#10b981;--green2:#34d399;
+  --orange:#f97316;--red:#ef4444;
+  --purple:#8b5cf6;--teal:#14b8a6;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --r:10px;--r2:14px;--shadow:0 4px 24px rgba(0,0,0,.4);
+  --sidebar-w:220px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);min-height:100vh;font-size:14px;line-height:1.5;}
-
-/* BACKGROUND GRAIN */
+html,body{height:100%;}
+body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);font-size:14px;line-height:1.5;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
 
-/* LAYOUT */
+/* ── LAYOUT ── */
 .wrapper{position:relative;z-index:1;display:flex;min-height:100vh;}
-.sidebar{width:220px;min-width:220px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;}
-.main{flex:1;overflow:auto;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;}
 
-
-/* SIDEBAR */
+/* ── SIDEBAR ── */
 .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
 .logo-text{font-family:var(--font-head);font-size:20px;font-weight:700;letter-spacing:-.5px;}
 .logo-text span{color:var(--gold);}
@@ -56,44 +39,38 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .nav-item:hover{background:var(--bg3);color:var(--text1);}
 .nav-item.active{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(59,130,246,.08));color:var(--accent2);border:1px solid rgba(59,130,246,.2);}
 .nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:2px;}
-.nav-icon{font-size:16px;width:18px;text-align:center;}
+.nav-icon{font-size:16px;width:18px;text-align:center;flex-shrink:0;}
 .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500;}
 .nav-badge.warn{background:var(--orange);}
+.nav-badge.red{background:var(--red);animation:badgepulse 1.5s infinite;}
+@keyframes badgepulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
 .sync-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);transition:all .3s;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.sync-dot.syncing{animation:blink .8s infinite;}
 
-/* TOP BAR */
-.topbar{background:var(--bg1);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+/* ── TOPBAR ── */
+.topbar{background:var(--bg1);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.hamburger{display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:36px;height:36px;cursor:pointer;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:var(--text2);}
 .topbar-title{font-family:var(--font-head);font-size:18px;font-weight:600;}
-.topbar-actions{display:flex;align-items:center;gap:10px;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;transition:all .2s;}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;transition:all .2s;white-space:nowrap;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover{background:#2563eb;}
 .btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);}
 .btn-ghost:hover{background:var(--bg4);color:var(--text1);}
-.btn-gold{background:linear-gradient(135deg,var(--gold),#d97706);color:#0a0b0e;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#d97706);color:#0a0b0e;font-weight:600;}
 .btn-gold:hover{filter:brightness(1.1);}
+.notif-btn-wrap{position:relative;}
+.notif-red-dot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;animation:badgepulse 1.5s infinite;border:1.5px solid var(--bg1);}
 
-/* CONTENT */
-.content{padding:24px 28px;}
+/* ── CONTENT ── */
+.content{padding:24px;flex:1;}
 .section{display:none;}.section.active{display:block;}
 
-/* CONFIG PANEL */
-.config-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:20px;}
-.config-title{font-family:var(--font-head);font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-.config-sub{font-size:12px;color:var(--text2);margin-bottom:16px;}
-.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.cfg-group{display:flex;flex-direction:column;gap:4px;}
-.cfg-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:500;}
-.cfg-input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text1);font-family:var(--font-body);font-size:13px;}
-.cfg-input:focus{outline:none;border-color:var(--accent);}
-.cfg-note{font-size:11px;color:var(--text3);margin-top:8px;padding:8px 12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;line-height:1.6;}
-.cfg-note a{color:var(--gold);text-decoration:none;}
-
-
-/* STATS ROW */
+/* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
 .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s;}
 .stat-card:hover{border-color:var(--border2);}
@@ -107,8 +84,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .stat-sub{font-size:12px;color:var(--text3);}
 .stat-icon{position:absolute;right:14px;top:14px;font-size:22px;opacity:.3;}
 
-/* CALENDAR */
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+/* ── CALENDAR ── */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
 .cal-title{font-family:var(--font-head);font-size:18px;font-weight:600;}
 .cal-nav{display:flex;gap:6px;}
 .cal-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:6px 14px;cursor:pointer;color:var(--text2);font-size:13px;font-family:var(--font-body);transition:all .2s;}
@@ -116,121 +93,168 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .cal-days-row{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;}
 .cal-dh{text-align:center;font-size:10px;color:var(--text3);padding:6px 0;text-transform:uppercase;letter-spacing:.8px;font-weight:500;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-cell{min-height:80px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px;cursor:pointer;transition:all .2s;position:relative;}
+.cal-cell{min-height:78px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px;cursor:pointer;transition:all .2s;}
 .cal-cell:hover{background:var(--bg3);border-color:var(--border2);}
 .cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px rgba(59,130,246,.3);}
-.cal-cell.other{opacity:.3;}
-.cal-cell.selected{background:var(--bg3);border-color:var(--border2);}
+.cal-cell.other{opacity:.28;}
 .day-num{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:3px;}
 .cal-cell.today .day-num{color:var(--accent2);background:rgba(59,130,246,.15);border-radius:4px;padding:0 4px;display:inline-block;}
 .ev-chip{font-size:9px;padding:2px 5px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;border-left:2px solid;}
-
-/* EVENT LIST */
 .ev-list-header{display:flex;align-items:center;justify-content:space-between;margin:20px 0 12px;}
 .ev-list-title{font-family:var(--font-head);font-size:15px;font-weight:600;}
+
+/* ── FILTERS ── */
 .filters-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
-.filter-input{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text1);font-family:var(--font-body);font-size:12px;width:180px;}
+.filter-input{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text1);font-family:var(--font-body);font-size:12px;flex:1;min-width:130px;}
 .filter-input::placeholder{color:var(--text3);}
 .filter-input:focus{outline:none;border-color:var(--accent);}
-.filter-sel{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text2);font-family:var(--font-body);font-size:12px;cursor:pointer;}
+.filter-sel{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text2);font-family:var(--font-body);font-size:12px;cursor:pointer;}
 .filter-sel:focus{outline:none;border-color:var(--accent);}
+.filter-sel option{background:var(--bg2);}
 
-
-.ev-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:8px;transition:all .2s;position:relative;overflow:hidden;}
+/* ── EVENT CARD ── */
+.ev-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:15px 18px;margin-bottom:8px;transition:all .2s;position:relative;overflow:hidden;}
 .ev-card:hover{border-color:var(--border2);background:var(--bg3);}
 .ev-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
 .ev-card.confirme::before{background:var(--accent);}
 .ev-card.en-cours::before{background:var(--gold);}
 .ev-card.termine::before{background:var(--green);}
 .ev-card.rendu::before{background:var(--text3);}
-.ev-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.ev-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;}
 .ev-name{font-family:var(--font-head);font-size:14px;font-weight:600;}
 .ev-client{font-size:12px;color:var(--text2);margin-top:1px;}
-.badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:.3px;}
+.badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;}
 .badge-blue{background:rgba(59,130,246,.15);color:var(--accent2);border:1px solid rgba(59,130,246,.25);}
 .badge-gold{background:rgba(245,158,11,.15);color:var(--gold2);border:1px solid rgba(245,158,11,.25);}
 .badge-green{background:rgba(16,185,129,.15);color:var(--green2);border:1px solid rgba(16,185,129,.25);}
 .badge-gray{background:rgba(255,255,255,.07);color:var(--text3);border:1px solid var(--border);}
-.badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25);}
-.ev-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:8px;}
-.ev-meta span{display:flex;align-items:center;gap:4px;}
-.mat-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
-.mat-chip{font-size:11px;padding:3px 10px;border-radius:5px;font-weight:500;}
-.ev-footer{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.btn-xs{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;color:var(--text2);font-family:var(--font-body);transition:all .2s;display:inline-flex;align-items:center;gap:4px;}
+.ev-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:8px;}
+.mat-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.mat-chip{font-size:11px;padding:3px 9px;border-radius:5px;font-weight:500;}
+.ev-notes{font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic;}
+.ev-footer{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.btn-xs{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;color:var(--text2);font-family:var(--font-body);transition:all .2s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
 .btn-xs:hover{background:var(--bg4);color:var(--text1);}
-.btn-xs.danger:hover{border-color:var(--red);color:var(--red);}
 .btn-xs.success{border-color:rgba(16,185,129,.3);color:var(--green2);}
 .btn-xs.success:hover{background:rgba(16,185,129,.1);}
+.btn-xs.danger:hover{border-color:var(--red);color:var(--red);}
 .status-sel{font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font-body);cursor:pointer;}
-.status-sel:focus{outline:none;}
-.ev-notes{font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic;}
+.status-sel option{background:var(--bg2);}
 
-/* STOCK */
-.stock-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;}
-.stock-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;transition:all .2s;position:relative;}
+/* ── STOCK ── */
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:24px;}
+.stock-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;transition:border-color .2s;}
 .stock-card:hover{border-color:var(--border2);}
 .stock-card-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .stock-nums{display:flex;align-items:baseline;gap:6px;margin-bottom:6px;}
 .stock-avail{font-family:var(--font-head);font-size:24px;font-weight:700;}
 .stock-total{font-size:12px;color:var(--text3);}
 .stock-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:6px;}
-.stock-bar-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.stock-bar-fill{height:100%;border-radius:2px;transition:width .5s;}
 .stock-status{font-size:11px;font-weight:500;}
 .stock-locked{font-size:11px;color:var(--text3);margin-top:2px;}
 
+/* ── ACTIVITY ── */
+.activity-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:13px 16px;margin-bottom:7px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s;}
+.activity-item:hover{border-color:var(--border2);}
+.activity-item.unread{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04);}
+.activity-ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.activity-body{flex:1;min-width:0;}
+.activity-title{font-size:13px;font-weight:500;color:var(--text1);margin-bottom:2px;}
+.activity-msg{font-size:12px;color:var(--text2);line-height:1.5;}
+.activity-time{font-size:10px;color:var(--text3);white-space:nowrap;margin-top:3px;}
+.activity-unread{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px;}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
-.modal{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:580px;max-width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);}
-.modal-head{padding:20px 24px 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg1);padding-bottom:16px;border-bottom:1px solid var(--border);}
+/* ── NOTIF PANEL ── */
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;display:none;}
+.notif-overlay.open{display:block;}
+.notif-panel{position:fixed;top:0;right:0;bottom:0;width:340px;background:var(--bg1);border-left:1px solid var(--border2);z-index:200;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.notif-panel.open{transform:translateX(0);}
+.notif-panel-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.notif-panel-title{font-family:var(--font-head);font-size:17px;font-weight:600;}
+.notif-close{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;width:28px;height:28px;cursor:pointer;color:var(--text2);font-size:15px;display:flex;align-items:center;justify-content:center;}
+.notif-scroll{flex:1;overflow-y:auto;padding:12px;}
+.notif-section{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:10px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:13px;color:var(--text2);}
+.toggle{position:relative;width:38px;height:20px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{position:absolute;inset:0;background:var(--bg4);border-radius:10px;transition:.3s;border:1px solid var(--border2);}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent);}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--text3);border-radius:50%;transition:.3s;}
+.toggle input:checked~.toggle-thumb{left:20px;background:#fff;}
+.push-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-body);font-size:12px;cursor:pointer;width:100%;margin-bottom:4px;transition:all .2s;}
+.push-btn:hover{background:var(--bg4);color:var(--text1);}
+.push-btn.active{border-color:rgba(16,185,129,.3);color:var(--green2);}
+.notif-panel-foot{padding:12px;border-top:1px solid var(--border);flex-shrink:0;}
+.notif-foot-btn{width:100%;padding:8px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:all .2s;}
+.notif-foot-btn:hover{background:var(--bg4);color:var(--text1);}
+
+/* ── CONFIG ── */
+.config-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:20px;}
+.config-title{font-family:var(--font-head);font-size:15px;font-weight:600;margin-bottom:4px;}
+.config-sub{font-size:12px;color:var(--text2);margin-bottom:14px;}
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cfg-group{display:flex;flex-direction:column;gap:4px;}
+.cfg-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:500;}
+.cfg-input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text1);font-family:var(--font-body);font-size:13px;width:100%;}
+.cfg-input:focus{outline:none;border-color:var(--accent);}
+.cfg-note{font-size:11px;color:var(--text3);margin-top:10px;padding:10px 12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;line-height:1.7;}
+.cfg-note a{color:var(--gold);text-decoration:none;}
+.cfg-note strong{color:var(--gold2);}
+.cfg-divider{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.email-block{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:8px;}
+.email-block-title{font-size:11px;color:var(--accent2);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:580px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);}
+.modal-head{padding:20px 24px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg1);z-index:1;}
 .modal-title{font-family:var(--font-head);font-size:16px;font-weight:700;}
 .modal-close{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;width:30px;height:30px;cursor:pointer;color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;}
 .modal-close:hover{color:var(--text1);}
-.modal-body{padding:20px 24px 24px;}
+.modal-body{padding:20px 24px;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
 .form-row.single{grid-template-columns:1fr;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:500;}
-.form-input,.form-select,.form-textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text1);font-family:var(--font-body);font-size:13px;transition:border-color .2s;}
+.form-input,.form-select,.form-textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text1);font-family:var(--font-body);font-size:13px;transition:border-color .2s;width:100%;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);}
 .form-select option{background:var(--bg2);}
-.form-textarea{resize:vertical;min-height:60px;}
-.form-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:500;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+.form-textarea{resize:vertical;min-height:58px;}
+.form-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:500;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .mat-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;transition:border-color .2s;}
 .mat-item:hover{border-color:var(--border2);}
 .mat-item-label{font-size:10px;color:var(--text2);margin-bottom:6px;line-height:1.3;}
 .mat-qty{display:flex;align-items:center;justify-content:center;gap:8px;}
-.mat-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.mat-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .mat-btn:hover{background:var(--accent);border-color:var(--accent);}
-.mat-val{min-width:22px;text-align:center;font-weight:600;font-size:14px;color:var(--text1);}
-.modal-footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
-.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+.mat-val{min-width:22px;text-align:center;font-weight:600;font-size:14px;}
+.modal-footer{padding:12px 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.loader{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;max-width:300px;}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;max-width:290px;}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green2);}
 .toast.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
 .toast.info{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--accent2);}
 
-/* EMPTY STATE */
-.empty{text-align:center;padding:40px 20px;color:var(--text3);}
-.empty-icon{font-size:36px;margin-bottom:12px;opacity:.5;}
-.empty-text{font-size:14px;}
+/* ── EMPTY ── */
+.empty{text-align:center;padding:36px 16px;color:var(--text3);}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.45;}
+.empty-text{font-size:13px;}
 
-/* LOADING */
+/* ── LOADING ── */
 .loading-overlay{position:fixed;inset:0;background:var(--bg0);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
-.loading-logo{font-family:var(--font-head);font-size:32px;font-weight:700;color:var(--text1);}
+.loading-logo{font-family:var(--font-head);font-size:32px;font-weight:700;}
 .loading-logo span{color:var(--gold);}
 .loading-bar{width:200px;height:2px;background:var(--bg3);border-radius:1px;overflow:hidden;}
 .loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));animation:loading 1.5s ease-in-out infinite;}
 @keyframes loading{0%{width:0;margin-left:0}50%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}
 
-/* EVENT COLORS */
+/* ── EV COLORS ── */
 .c1{background:rgba(59,130,246,.18);color:#93c5fd;border-color:#3b82f6;}
 .c2{background:rgba(245,158,11,.18);color:#fcd34d;border-color:#f59e0b;}
 .c3{background:rgba(16,185,129,.18);color:#6ee7b7;border-color:#10b981;}
@@ -240,54 +264,67 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .c7{background:rgba(236,72,153,.18);color:#f9a8d4;border-color:#ec4899;}
 .c8{background:rgba(249,115,22,.18);color:#fdba74;border-color:#f97316;}
 
-/* RESPONSIVE */
+/* ── MOBILE ── */
+.mob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;display:none;}
+.mob-overlay.open{display:block;}
+
 @media(max-width:820px){
-  .sidebar{width:64px;min-width:64px;}
-  .logo-text,.logo-sub,.nav-section,.nav-item span:not(.nav-icon):not(.nav-badge),.sync-status span,#last-sync{display:none;}
-  .nav-item{justify-content:center;}
-  .stats-row{grid-template-columns:1fr 1fr;}
+  :root{--sidebar-w:0px;}
+  .sidebar{transform:translateX(-240px);width:240px;min-width:240px;}
+  .sidebar.mob-open{transform:translateX(0);}
+  .main{margin-left:0 !important;}
+  .hamburger{display:flex !important;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .stat-value{font-size:22px;}
+  .stat-icon{font-size:18px;}
+  .content{padding:14px;}
+  .topbar{padding:11px 14px;}
+  .topbar-title{font-size:16px;}
   .form-row{grid-template-columns:1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
+  .cal-cell{min-height:60px;}
+  .ev-footer{gap:4px;}
+  .config-grid{grid-template-columns:1fr;}
+  .notif-panel{width:min(340px,100vw);}
+  .btn .btn-label{display:none;}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stock-grid{grid-template-columns:1fr 1fr;}
+  .mat-grid{grid-template-columns:1fr 1fr;}
+  .cal-dh{font-size:8px;padding:4px 0;}
+  .cal-cell{min-height:52px;padding:3px;}
+  .ev-chip{font-size:8px;}
+  .topbar-actions .btn-ghost:not(.notif-btn-wrap .btn-ghost){display:none;}
 }
 </style>
 </head>
 <body>
 
-
 <div id="loading-screen" class="loading-overlay">
-  <div class="loading-logo">Event<span>Pro</span></div>
+  <div class="loading-logo">Events <span>Café</span></div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
-  <div style="font-size:12px;color:var(--text3)">Connexion Firebase...</div>
+  <div style="font-size:12px;color:var(--text3);margin-top:4px;">Connexion Firebase...</div>
 </div>
+
+<div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
 
 <div class="wrapper" id="app" style="display:none">
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="logo">
-      <div class="logo-text">Event<span>Pro</span></div>
+      <div class="logo-text">Events <span>Café</span></div>
       <div class="logo-sub">Gestion Événements</div>
     </div>
     <div class="nav-section">Navigation</div>
-    <div class="nav-item active" onclick="showTab('calendar',this)">
-      <span class="nav-icon">📅</span> <span>Calendrier</span>
-      <span class="nav-badge" id="nav-badge-cal">0</span>
-    </div>
-    <div class="nav-item" onclick="showTab('events',this)">
-      <span class="nav-icon">🗂️</span> <span>Événements</span>
-    </div>
-    <div class="nav-item" onclick="showTab('stock',this)">
-      <span class="nav-icon">📦</span> <span>Stock</span>
-      <span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span>
-    </div>
+    <div class="nav-item active" onclick="showTab('calendar',this);closeSidebar()"><span class="nav-icon">📅</span><span>Calendrier</span><span class="nav-badge" id="nav-badge-cal">0</span></div>
+    <div class="nav-item" onclick="showTab('events',this);closeSidebar()"><span class="nav-icon">🗂️</span><span>Événements</span></div>
+    <div class="nav-item" onclick="showTab('stock',this);closeSidebar()"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
+    <div class="nav-item" onclick="showTab('activity',this);closeSidebar();markAllRead()"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
     <div class="nav-section">Paramètres</div>
-    <div class="nav-item" onclick="showTab('config',this)">
-      <span class="nav-icon">⚙️</span> <span>Configuration</span>
-    </div>
+    <div class="nav-item" onclick="showTab('config',this);closeSidebar()"><span class="nav-icon">⚙️</span><span>Configuration</span></div>
     <div class="sidebar-bottom">
-      <div class="sync-status">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">Synchronisé</span>
-      </div>
+      <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Connexion...</span></div>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;" id="last-sync">—</div>
     </div>
   </div>
@@ -295,70 +332,52 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div class="topbar-title" id="page-title">📅 Calendrier</div>
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title" id="page-title">📅 Calendrier</div>
+      </div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" onclick="copyFormLink()">🔗 Lien formulaire</button>
-        <button class="btn btn-gold" onclick="openAddModal()">＋ Nouvel événement</button>
+        <div class="notif-btn-wrap">
+          <button class="btn btn-ghost" onclick="toggleNotifPanel()">🔔 <span class="btn-label">Alertes</span></button>
+          <div class="notif-red-dot" id="notif-red-dot"></div>
+        </div>
+        <button class="btn btn-ghost" onclick="copyFormLink()">🔗 <span class="btn-label">Formulaire</span></button>
+        <button class="btn btn-gold" onclick="openAddModal()">＋ <span class="btn-label">Nouvel événement</span></button>
       </div>
     </div>
 
     <div class="content">
-
-      <!-- STATS -->
       <div class="stats-row" id="stats-row"></div>
 
-
-      <!-- CALENDAR TAB -->
+      <!-- CALENDAR -->
       <div id="tab-calendar" class="section active">
         <div class="cal-header">
           <div class="cal-title" id="cal-month-label"></div>
           <div class="cal-nav">
             <button class="cal-btn" onclick="prevMonth()">← Préc.</button>
-            <button class="cal-btn" onclick="goToday()">Aujourd'hui</button>
+            <button class="cal-btn" onclick="goToday()">Auj.</button>
             <button class="cal-btn" onclick="nextMonth()">Suiv. →</button>
           </div>
         </div>
-        <div class="cal-days-row">
-          <div class="cal-dh">Lun</div><div class="cal-dh">Mar</div>
-          <div class="cal-dh">Mer</div><div class="cal-dh">Jeu</div>
-          <div class="cal-dh">Ven</div><div class="cal-dh">Sam</div>
-          <div class="cal-dh">Dim</div>
-        </div>
+        <div class="cal-days-row"><div class="cal-dh">Lun</div><div class="cal-dh">Mar</div><div class="cal-dh">Mer</div><div class="cal-dh">Jeu</div><div class="cal-dh">Ven</div><div class="cal-dh">Sam</div><div class="cal-dh">Dim</div></div>
         <div class="cal-grid" id="cal-grid"></div>
-
-        <div class="ev-list-header">
-          <div class="ev-list-title" id="cal-list-title">Tous les événements actifs</div>
-        </div>
+        <div class="ev-list-header"><div class="ev-list-title" id="cal-list-title">Événements actifs &amp; à venir</div></div>
         <div id="cal-ev-list"></div>
       </div>
 
-      <!-- EVENTS TAB -->
+      <!-- EVENTS -->
       <div id="tab-events" class="section">
         <div class="filters-row">
           <input class="filter-input" type="text" placeholder="🔍  Client, salon, stand..." id="search-input" oninput="applyFilters()">
-          <select class="filter-sel" id="filter-status" onchange="applyFilters()">
-            <option value="">Tous les statuts</option>
-            <option value="confirmé">Confirmé</option>
-            <option value="en cours">En cours</option>
-            <option value="terminé">Terminé</option>
-            <option value="matériel rendu">Matériel rendu</option>
-          </select>
-          <select class="filter-sel" id="filter-type" onchange="applyFilters()">
-            <option value="">Tous les types</option>
-            <option>Festival / Cinéma</option>
-            <option>Salon professionnel</option>
-            <option>Conférence / Congrès</option>
-            <option>Sportif</option>
-            <option>Corporate / Entreprise</option>
-            <option>Autre</option>
-          </select>
+          <select class="filter-sel" id="filter-status" onchange="applyFilters()"><option value="">Tous les statuts</option><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">Matériel rendu</option></select>
+          <select class="filter-sel" id="filter-type" onchange="applyFilters()"><option value="">Tous les types</option><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select>
         </div>
         <div id="events-list"></div>
       </div>
 
-      <!-- STOCK TAB -->
+      <!-- STOCK -->
       <div id="tab-stock" class="section">
-        <div class="stock-header-row">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div style="font-family:var(--font-head);font-size:15px;font-weight:600">Inventaire en temps réel</div>
           <div style="font-size:12px;color:var(--text3)">Mis à jour automatiquement selon les locations actives</div>
         </div>
@@ -367,541 +386,697 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div id="stock-active-list"></div>
       </div>
 
+      <!-- ACTIVITY LOG -->
+      <div id="tab-activity" class="section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div style="font-family:var(--font-head);font-size:15px;font-weight:600">Journal d'activité</div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="clearActivity()">🗑 Effacer tout</button>
+        </div>
+        <div id="activity-list"></div>
+      </div>
 
-      <!-- CONFIG TAB -->
+      <!-- CONFIG -->
       <div id="tab-config" class="section">
         <div class="config-panel">
           <div class="config-title">🔥 Connexion Firebase</div>
-          <div class="config-sub">Les données sont partagées en temps réel entre toi, ton frère et le formulaire client, via Firebase (gratuit).</div>
+          <div class="config-sub">Les données sont partagées en temps réel entre toi, ton frère et le formulaire client.</div>
           <div id="fb-status-box"></div>
           <div class="cfg-note">
             📋 <strong>Comment connecter (une seule fois) :</strong><br>
             1. Crée un projet gratuit sur <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a><br>
             2. Active <strong>Realtime Database</strong> (mode test)<br>
             3. Copie tes clés dans le fichier <strong>firebase-config.js</strong><br>
-            4. Recharge la page — le voyant passe au vert ✅<br>
-            <em>Tout est détaillé dans le fichier GUIDE_INSTALLATION.md.</em>
+            4. Recharge la page — le voyant passe au vert ✅
           </div>
-          <div style="margin-top:14px;display:flex;gap:8px;">
-            <button class="btn btn-ghost" onclick="copyFormLink()">🔗 Copier le lien du formulaire client</button>
+        </div>
+
+        <div class="config-panel">
+          <div class="config-title">🔔 Notifications par email</div>
+          <div class="config-sub">Recevez un email sur <strong>deux adresses</strong> quand un client remplit le formulaire, ou quand un événement est créé / modifié. Via EmailJS (gratuit, 200 emails/mois).</div>
+          <div class="cfg-note" style="margin-bottom:14px;">
+            📋 <strong>Setup EmailJS (5 min, gratuit) :</strong><br>
+            1. <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> → Créer un compte gratuit<br>
+            2. <strong>Email Services</strong> → Connecter Gmail ou Outlook → copier le <strong>Service ID</strong><br>
+            3. <strong>Email Templates</strong> → Créer un template avec les variables : <code style="color:var(--gold2)">{{subject}}</code> <code style="color:var(--gold2)">{{message}}</code> <code style="color:var(--gold2)">{{to_email}}</code> → copier le <strong>Template ID</strong><br>
+            4. <strong>Account → General</strong> → copier la <strong>Public Key</strong>
+          </div>
+          <div class="config-grid" style="margin-bottom:12px;">
+            <div class="cfg-group"><label class="cfg-label">EmailJS Public Key</label><input class="cfg-input" id="cfg-ejs-pubkey" placeholder="user_xxxxxxxxxxxx"></div>
+            <div class="cfg-group"><label class="cfg-label">Service ID</label><input class="cfg-input" id="cfg-ejs-service" placeholder="service_xxxxxxx"></div>
+            <div class="cfg-group" style="grid-column:1/-1"><label class="cfg-label">Template ID</label><input class="cfg-input" id="cfg-ejs-template" placeholder="template_xxxxxxx"></div>
+          </div>
+          <div class="cfg-divider">📬 Adresses email de réception</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div class="email-block">
+              <div class="email-block-title">👤 Email n°1 (toi)</div>
+              <div class="cfg-group"><label class="cfg-label">Prénom / Nom</label><input class="cfg-input" id="cfg-email1-name" placeholder="ex: Marc" style="margin-bottom:6px;"></div>
+              <div class="cfg-group"><label class="cfg-label">Adresse email</label><input class="cfg-input" id="cfg-email1" placeholder="toi@email.com" type="email"></div>
+            </div>
+            <div class="email-block">
+              <div class="email-block-title">👤 Email n°2 (ton frère)</div>
+              <div class="cfg-group"><label class="cfg-label">Prénom / Nom</label><input class="cfg-input" id="cfg-email2-name" placeholder="ex: Kevin" style="margin-bottom:6px;"></div>
+              <div class="cfg-group"><label class="cfg-label">Adresse email</label><input class="cfg-input" id="cfg-email2" placeholder="frere@email.com" type="email"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="saveEmailConfig()">💾 Sauvegarder</button>
+            <button class="btn btn-ghost" onclick="testEmail()" style="font-size:12px;">📧 Envoyer email de test</button>
           </div>
         </div>
 
         <div class="config-panel">
           <div class="config-title">📦 Stock total (modifiable)</div>
-          <div class="config-sub">Définis tes quantités totales de matériel disponible. Sauvegardé dans Firebase pour toi et ton frère.</div>
+          <div class="config-sub">Définis tes quantités totales. Partagées entre toi et ton frère via Firebase.</div>
           <div id="stock-config-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;"></div>
           <button class="btn btn-primary" onclick="saveStockConfig()">💾 Mettre à jour le stock</button>
         </div>
       </div>
-
     </div>
+  </div>
+</div>
+
+<!-- NOTIF PANEL -->
+<div class="notif-overlay" id="notif-overlay" onclick="closeNotifPanel()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-head">
+    <span class="notif-panel-title">🔔 Notifications</span>
+    <button class="notif-close" onclick="closeNotifPanel()">✕</button>
+  </div>
+  <div class="notif-scroll">
+    <div class="notif-section">Alertes actives</div>
+    <div class="toggle-row">Nouveau formulaire client <label class="toggle"><input type="checkbox" id="tog-form" checked onchange="saveNotifPrefs()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="toggle-row">Nouvel événement créé <label class="toggle"><input type="checkbox" id="tog-new" checked onchange="saveNotifPrefs()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="toggle-row">Modification par votre frère <label class="toggle"><input type="checkbox" id="tog-edit" checked onchange="saveNotifPrefs()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="toggle-row">Stock critique <label class="toggle"><input type="checkbox" id="tog-stock" checked onchange="saveNotifPrefs()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="toggle-row">Matériel rendu <label class="toggle"><input type="checkbox" id="tog-rendu" checked onchange="saveNotifPrefs()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    <div class="notif-section" style="margin-top:16px;">Notifications navigateur (push)</div>
+    <button class="push-btn" id="push-btn" onclick="requestPush()">🔔 Activer les notifications push</button>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Recevez des alertes même quand l'onglet est en arrière-plan, sur ordinateur et téléphone.</div>
+    <div class="notif-section" style="margin-top:16px;">Historique récent</div>
+    <div id="notif-history"></div>
+  </div>
+  <div class="notif-panel-foot">
+    <button class="notif-foot-btn" onclick="markAllRead();renderBadges()">✓ Tout marquer comme lu</button>
   </div>
 </div>
 
 <!-- MODAL EVENT -->
 <div class="overlay" id="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title" id="modal-title-text">Nouvel événement</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
+    <div class="modal-head"><span class="modal-title" id="modal-title-text">Nouvel événement</span><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Client / Société *</label><input class="form-input" id="m-client" type="text" placeholder="Groupe Publicis"></div>
-        <div class="form-group"><label class="form-label">Contact</label><input class="form-input" id="m-contact" type="text" placeholder="email ou tél."></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Nom du salon / événement *</label><input class="form-input" id="m-salon" type="text" placeholder="Festival de Cannes"></div>
-        <div class="form-group"><label class="form-label">Type d'événement</label>
-          <select class="form-select" id="m-type">
-            <option>Festival / Cinéma</option><option>Salon professionnel</option>
-            <option>Conférence / Congrès</option><option>Sportif</option>
-            <option>Corporate / Entreprise</option><option>Autre</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Stand(s)</label><input class="form-input" id="m-stand" type="text" placeholder="Stand B12 - Palais"></div>
-        <div class="form-group"><label class="form-label">Ville / Lieu</label><input class="form-input" id="m-lieu" type="text" placeholder="Cannes"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Date de montage *</label><input class="form-input" id="m-start" type="date"></div>
-        <div class="form-group"><label class="form-label">Date de démontage / retour *</label><input class="form-input" id="m-end" type="date"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Statut</label>
-          <select class="form-select" id="m-status">
-            <option value="confirmé">Confirmé</option>
-            <option value="en cours">En cours</option>
-            <option value="terminé">Terminé</option>
-            <option value="matériel rendu">Matériel rendu ✓</option>
-          </select>
-        </div>
-        <div class="form-group"><label class="form-label">Notes internes</label><input class="form-input" id="m-notes" type="text" placeholder="Accès, horaires..."></div>
-      </div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Client / Société *</label><input class="form-input" id="m-client" type="text" placeholder="Groupe Publicis"></div><div class="form-group"><label class="form-label">Contact</label><input class="form-input" id="m-contact" type="text" placeholder="email ou tél."></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Nom du salon / événement *</label><input class="form-input" id="m-salon" type="text" placeholder="Festival de Cannes"></div><div class="form-group"><label class="form-label">Type d'événement</label><select class="form-select" id="m-type"><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Stand(s) *</label><input class="form-input" id="m-stand" type="text" placeholder="Stand B12 - Palais"></div><div class="form-group"><label class="form-label">Ville / Lieu</label><input class="form-input" id="m-lieu" type="text" placeholder="Cannes"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">📦 Date de montage *</label><input class="form-input" id="m-start" type="date"></div><div class="form-group"><label class="form-label">📤 Retour matériel *</label><input class="form-input" id="m-end" type="date"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="m-status"><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">Matériel rendu ✓</option></select></div><div class="form-group"><label class="form-label">Notes internes</label><input class="form-input" id="m-notes" type="text" placeholder="Accès, horaires..."></div></div>
       <div class="form-section-title">📦 Matériel loué</div>
       <div class="mat-grid" id="modal-mat-grid"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
-      <button class="btn btn-primary" onclick="saveEvent()" id="modal-save-btn">Créer l'événement</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="saveEvent()" id="modal-save-btn">Créer l'événement</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase (compat) + config -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="firebase-config.js"></script>
 
-
 <script>
-// ============================================================
-// EVENTPRO — Données temps réel via Firebase Realtime Database
-// ============================================================
+// ══════════════════════════════════════════════════════
+// CONSTANTES
+// ══════════════════════════════════════════════════════
 const STOCK_META = [
-  {id:'fontaine_eau', label:'Fontaine à eau', icon:'💧', color:'#0ea5e9'},
-  {id:'bonbonne', label:'Bonbonnes (lot 6)', icon:'🫙', color:'#0369a1'},
-  {id:'gobelet', label:'Gobelets (lot 100)', icon:'🥤', color:'#38bdf8'},
-  {id:'nespresso', label:'Machine Nespresso', icon:'☕', color:'#8b5cf6'},
-  {id:'covim', label:'Machine Covim', icon:'☕', color:'#7c3aed'},
-  {id:'lavazza', label:'Machine Lavazza', icon:'☕', color:'#6d28d9'},
-  {id:'cafe_pods', label:'Café (boîte 50)', icon:'📦', color:'#f59e0b'},
-  {id:'frigo_petit', label:'Frigo 50L', icon:'🧊', color:'#14b8a6'},
-  {id:'frigo_grand', label:'Frigo 200L', icon:'🧊', color:'#0d9488'},
+  {id:'fontaine_eau',label:'Fontaine à eau',icon:'💧',color:'#0ea5e9'},
+  {id:'bonbonne',label:'Bonbonnes (lot 6)',icon:'🫙',color:'#0369a1'},
+  {id:'gobelet',label:'Gobelets (lot 100)',icon:'🥤',color:'#38bdf8'},
+  {id:'nespresso',label:'Machine Nespresso',icon:'☕',color:'#8b5cf6'},
+  {id:'covim',label:'Machine Covim',icon:'☕',color:'#7c3aed'},
+  {id:'lavazza',label:'Machine Lavazza',icon:'☕',color:'#6d28d9'},
+  {id:'cafe_pods',label:'Café (boîte 50)',icon:'📦',color:'#f59e0b'},
+  {id:'frigo_petit',label:'Frigo 50L',icon:'🧊',color:'#14b8a6'},
+  {id:'frigo_grand',label:'Frigo 200L',icon:'🧊',color:'#0d9488'},
 ];
-
-let STOCK_DEFAULTS = JSON.parse(localStorage.getItem('ep_stock') || 'null') || {
-  fontaine_eau:40, bonbonne:80, gobelet:60,
-  nespresso:10, covim:8, lavazza:8, cafe_pods:100,
-  frigo_petit:15, frigo_grand:8,
-};
-
 const EV_COLORS = ['c1','c2','c3','c4','c5','c6','c7','c8'];
 const STATUS_CLASSES = {'confirmé':'badge-blue','en cours':'badge-gold','terminé':'badge-green','matériel rendu':'badge-gray'};
 const STATUS_CARD_CLASSES = {'confirmé':'confirme','en cours':'en-cours','terminé':'termine','matériel rendu':'rendu'};
 
-let events = [];
-let editingId = null;
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth();
-
-// ---------- Firebase init ----------
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let STOCK_DEFAULTS = JSON.parse(localStorage.getItem('ep_stock')||'null') || {fontaine_eau:40,bonbonne:80,gobelet:60,nespresso:10,covim:8,lavazza:8,cafe_pods:100,frigo_petit:15,frigo_grand:8};
+let events = [], editingId = null;
+let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
 let db = null, fbReady = false;
+let prevEventsSnapshot = {};
+let isFirstLoad = true;
+let activityLog = JSON.parse(localStorage.getItem('ep_activity')||'[]');
+let unreadCount = parseInt(localStorage.getItem('ep_unread')||'0');
+let notifPrefs = JSON.parse(localStorage.getItem('ep_notif_prefs')||'{"form":true,"new":true,"edit":true,"stock":true,"rendu":true}');
+let ejsCfg = JSON.parse(localStorage.getItem('ep_ejs')||'{}');
+
+// ══════════════════════════════════════════════════════
+// FIREBASE
+// ══════════════════════════════════════════════════════
 (function initFirebase(){
   const cfg = window.FIREBASE_CONFIG;
   if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
-    try { firebase.initializeApp(cfg); db = firebase.database(); fbReady = true; }
-    catch(e){ console.error('Firebase init error', e); }
+    try{firebase.initializeApp(cfg); db=firebase.database(); fbReady=true;}
+    catch(e){console.error('Firebase init',e);}
   }
 })();
+const findEv = id => events.find(e => String(e.id)===String(id));
 
-const findEv = (id) => events.find(e => String(e.id) === String(id));
-
-
-// ---------- Démarrage temps réel ----------
 function startRealtime(){
-  if(!fbReady){ setSyncStatus('local'); loadLocal(); renderFbStatus(); return; }
+  if(!fbReady){setSyncStatus('local');loadLocal();renderFbStatus();return;}
   setSyncStatus('syncing');
-  // Événements
   db.ref('events').on('value', snap => {
-    const val = snap.val() || {};
-    events = Object.keys(val).map(k => { const e = val[k] || {}; e.id = k; e.material = e.material || {}; return e; });
+    const val = snap.val()||{};
+    const newEvs = Object.keys(val).map(k=>{const e={...val[k]};e.id=k;e.material=e.material||{};return e;});
+
+    if(!isFirstLoad){
+      // Détection nouveaux / modifiés
+      newEvs.forEach(ev => {
+        const old = prevEventsSnapshot[ev.id];
+        if(!old){
+          const isForm = ev.source==='formulaire';
+          if(isForm && notifPrefs.form){
+            pushNotif('📋','Nouveau formulaire client',`${ev.client} — ${ev.salon} (${formatDate(ev.start)} → ${formatDate(ev.end)})`,'form');
+            sendEmailBoth('🆕 Nouveau formulaire client',`Client : ${ev.client}\nSalon : ${ev.salon}\nStand : ${ev.stand||'—'}\nDates : ${ev.start} → ${ev.end}\nContact : ${ev.contact||'—'}`);
+          } else if(!isForm && notifPrefs.new){
+            pushNotif('➕','Nouvel événement',`${ev.client} — ${ev.salon} ajouté`,'new');
+            sendEmailBoth('➕ Nouvel événement créé',`Client : ${ev.client}\nSalon : ${ev.salon}\nDates : ${ev.start} → ${ev.end}`);
+          }
+        } else {
+          const changed = JSON.stringify(old) !== JSON.stringify(ev);
+          if(changed){
+            if(ev.status !== old.status){
+              const msg = `${ev.client} — statut : "${old.status}" → "${ev.status}"`;
+              if(ev.status==='matériel rendu' && notifPrefs.rendu){
+                pushNotif('✅','Matériel rendu',msg,'rendu');
+                sendEmailBoth('✅ Matériel rendu',msg);
+              } else if(notifPrefs.edit){
+                pushNotif('✏️','Événement modifié',msg,'edit');
+              }
+            } else if(notifPrefs.edit){
+              pushNotif('✏️','Événement modifié',`${ev.client} — ${ev.salon} mis à jour`,'edit');
+            }
+          }
+        }
+      });
+      // Détection supprimés
+      Object.keys(prevEventsSnapshot).forEach(id=>{
+        if(!newEvs.find(e=>e.id===id) && notifPrefs.edit){
+          pushNotif('🗑️','Événement supprimé',`${prevEventsSnapshot[id].client} — ${prevEventsSnapshot[id].salon}`,'edit');
+        }
+      });
+    }
+
+    prevEventsSnapshot = {};
+    newEvs.forEach(ev=>{prevEventsSnapshot[ev.id]=JSON.parse(JSON.stringify(ev));});
+    events = newEvs;
+    isFirstLoad = false;
     setSyncStatus('ok'); setLastSync(); renderAll();
-  }, err => { console.error(err); setSyncStatus('error'); loadLocal(); });
-  // Stock partagé
-  db.ref('stock').on('value', snap => {
+  }, err=>{console.error(err); setSyncStatus('error'); loadLocal();});
+
+  db.ref('stock').on('value', snap=>{
     const val = snap.val();
-    if(val){ STOCK_DEFAULTS = Object.assign({}, STOCK_DEFAULTS, val); localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS)); renderAll(); }
+    if(val){
+      STOCK_DEFAULTS = Object.assign({},STOCK_DEFAULTS,val);
+      localStorage.setItem('ep_stock',JSON.stringify(STOCK_DEFAULTS));
+      checkStockAlerts();
+      renderAll();
+    }
   });
   renderFbStatus();
 }
 
-// ---------- Mode local (sans Firebase configuré) ----------
 function loadLocal(){
   const raw = localStorage.getItem('ep_events');
-  if(raw){ try { events = JSON.parse(raw); } catch { events = []; } }
-  else {
-    events = [
-      {id:'demo1', client:'Groupe Publicis', salon:'Festival de Cannes', stand:'Stand B12 - Palais', type:'Festival / Cinéma', lieu:'Cannes', start:'2026-05-14', end:'2026-05-25', status:'en cours', notes:'Accès dès 7h', material:{fontaine_eau:3, bonbonne:6, gobelet:2, nespresso:2, cafe_pods:4}, contact:''},
-      {id:'demo2', client:'Orange Business', salon:'Festival de Cannes', stand:'Stand A3 - Debussy', type:'Festival / Cinéma', lieu:'Cannes', start:'2026-05-16', end:'2026-05-23', status:'en cours', notes:'', material:{fontaine_eau:2, nespresso:1, cafe_pods:2, frigo_petit:2}, contact:''},
-      {id:'demo3', client:'TechVision SAS', salon:'VivaTech Paris', stand:'Hall 2 - V42', type:'Salon professionnel', lieu:'Paris', start:'2026-06-11', end:'2026-06-14', status:'confirmé', notes:'Livraison J-1', material:{fontaine_eau:4, bonbonne:9, gobelet:3, nespresso:3, covim:1, cafe_pods:8, frigo_grand:1}, contact:''},
-    ];
-  }
+  if(raw){try{events=JSON.parse(raw);}catch{events=[];}}
+  else{events=[
+    {id:'demo1',client:'Groupe Publicis',salon:'Festival de Cannes',stand:'Stand B12 - Palais',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-14',end:'2026-05-25',status:'en cours',notes:'Accès dès 7h',material:{fontaine_eau:3,bonbonne:6,gobelet:2,nespresso:2,cafe_pods:4},contact:''},
+    {id:'demo2',client:'Orange Business',salon:'Festival de Cannes',stand:'Stand A3 - Debussy',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-16',end:'2026-05-23',status:'en cours',notes:'',material:{fontaine_eau:2,nespresso:1,cafe_pods:2,frigo_petit:2},contact:''},
+    {id:'demo3',client:'TechVision SAS',salon:'VivaTech Paris',stand:'Hall 2 - V42',type:'Salon professionnel',lieu:'Paris',start:'2026-06-11',end:'2026-06-14',status:'confirmé',notes:'Livraison J-1',material:{fontaine_eau:4,bonbonne:9,gobelet:3,nespresso:3,covim:1,cafe_pods:8,frigo_grand:1},contact:''},
+    {id:'demo4',client:'BNP Paribas',salon:'Forum Banque',stand:'Allée B08',type:'Conférence / Congrès',lieu:'Paris La Défense',start:'2026-06-03',end:'2026-06-05',status:'confirmé',notes:'',material:{fontaine_eau:2,nespresso:2,lavazza:1,cafe_pods:5},contact:''},
+  ];}
+  isFirstLoad = false;
   renderAll();
 }
-function saveLocal(){ localStorage.setItem('ep_events', JSON.stringify(events)); }
+function saveLocal(){localStorage.setItem('ep_events',JSON.stringify(events));}
 
-// ---------- Couche persistance (Firebase OU local) ----------
 async function persistNew(data){
-  if(fbReady){ const r = db.ref('events').push(); await r.set(Object.assign({id:r.key}, data)); }
-  else { events.push(Object.assign({id:'loc_'+Date.now()}, data)); saveLocal(); renderAll(); }
+  if(fbReady){const r=db.ref('events').push(); await r.set({id:r.key,...data});}
+  else{events.push({id:'loc_'+Date.now(),...data}); saveLocal(); renderAll();}
 }
-async function persistUpdate(id, patch){
-  if(fbReady){ await db.ref('events/'+id).update(patch); }
-  else { const ev = findEv(id); if(ev) Object.assign(ev, patch); saveLocal(); renderAll(); }
+async function persistUpdate(id,patch){
+  if(fbReady){await db.ref('events/'+id).update(patch);}
+  else{const ev=findEv(id);if(ev)Object.assign(ev,patch); saveLocal(); renderAll();}
 }
 async function persistDelete(id){
-  if(fbReady){ await db.ref('events/'+id).remove(); }
-  else { events = events.filter(e => String(e.id)!==String(id)); saveLocal(); renderAll(); }
+  if(fbReady){await db.ref('events/'+id).remove();}
+  else{events=events.filter(e=>String(e.id)!==String(id)); saveLocal(); renderAll();}
 }
 
-
-// ---------- Statut de synchro ----------
 function setSyncStatus(s){
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
-  if(s==='ok'){dot.style.background='var(--green)';dot.style.boxShadow='0 0 6px var(--green)';label.textContent='Synchronisé';}
-  else if(s==='syncing'){dot.style.background='var(--gold)';dot.style.boxShadow='0 0 6px var(--gold)';label.textContent='Sync...';}
-  else if(s==='error'){dot.style.background='var(--red)';dot.style.boxShadow='0 0 6px var(--red)';label.textContent='Hors ligne';}
-  else{dot.style.background='var(--text3)';dot.style.boxShadow='none';label.textContent='Mode local';}
+  const dot=document.getElementById('sync-dot'), lbl=document.getElementById('sync-label');
+  dot.className='sync-dot';
+  if(s==='ok'){dot.style.cssText='background:var(--green);box-shadow:0 0 6px var(--green)';lbl.textContent='Synchronisé';}
+  else if(s==='syncing'){dot.classList.add('syncing');dot.style.cssText='background:var(--gold);box-shadow:0 0 6px var(--gold)';lbl.textContent='Sync...';}
+  else if(s==='error'){dot.style.cssText='background:var(--red);box-shadow:0 0 6px var(--red)';lbl.textContent='Hors ligne';}
+  else{dot.style.cssText='background:var(--text3);box-shadow:none';lbl.textContent='Mode local';}
 }
-function setLastSync(){
-  const now = new Date();
-  document.getElementById('last-sync').textContent = `Màj ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
-}
+function setLastSync(){document.getElementById('last-sync').textContent='Màj '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
 function renderFbStatus(){
-  const box = document.getElementById('fb-status-box');
-  if(!box) return;
-  box.innerHTML = fbReady
-    ? `<div style="padding:12px 14px;border-radius:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green2);font-size:13px;">✅ Connecté à Firebase — synchronisation temps réel active.</div>`
-    : `<div style="padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:var(--gold2);font-size:13px;">⚠️ Firebase non configuré — mode local (démo). Renseigne <strong>firebase-config.js</strong> pour activer le partage avec ton frère.</div>`;
+  const box=document.getElementById('fb-status-box');if(!box)return;
+  box.innerHTML=fbReady
+    ?`<div style="padding:10px 14px;border-radius:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green2);font-size:12px;margin-bottom:12px;">✅ Firebase connecté — synchronisation temps réel active</div>`
+    :`<div style="padding:10px 14px;border-radius:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:var(--gold2);font-size:12px;margin-bottom:12px;">⚠️ Mode local — renseigne <strong>firebase-config.js</strong> pour activer le partage temps réel</div>`;
 }
 function copyFormLink(){
-  const url = location.href.replace(/index\.html.*$/,'').replace(/[^/]*$/,'') + 'formulaire.html';
-  const clean = (location.origin + location.pathname).replace(/index\.html$/,'').replace(/\/$/,'') + '/formulaire.html';
-  const link = clean;
-  if(navigator.clipboard){ navigator.clipboard.writeText(link).then(()=>showToast('Lien du formulaire copié ✓','success')).catch(()=>showToast(link,'info')); }
+  const link=(location.origin+location.pathname).replace(/[^\/]*$/,'')+'formulaire.html';
+  if(navigator.clipboard)navigator.clipboard.writeText(link).then(()=>showToast('Lien copié ✓','success')).catch(()=>showToast(link,'info'));
   else showToast(link,'info');
 }
 
-// ============================================================
-// RENDER
-// ============================================================
-function getEvColor(ev){ return EV_COLORS[events.indexOf(ev) % EV_COLORS.length]; }
-
-function getLockedStock(){
-  const locked = {};
-  STOCK_META.forEach(si => locked[si.id] = 0);
-  events.forEach(ev => {
-    if(ev.status === 'matériel rendu') return;
-    Object.entries(ev.material || {}).forEach(([k,v]) => { locked[k] = (locked[k]||0) + (parseInt(v)||0); });
-  });
-  return locked;
+// ══════════════════════════════════════════════════════
+// NOTIFICATIONS & ACTIVITÉ
+// ══════════════════════════════════════════════════════
+function pushNotif(icon, title, msg, type){
+  const entry = {icon, title, msg, type, time:new Date().toISOString(), read:false};
+  activityLog.unshift(entry);
+  if(activityLog.length > 100) activityLog = activityLog.slice(0,100);
+  localStorage.setItem('ep_activity', JSON.stringify(activityLog));
+  unreadCount++;
+  localStorage.setItem('ep_unread', String(unreadCount));
+  renderBadges();
+  renderNotifHistory();
+  if(document.getElementById('tab-activity').classList.contains('active')) renderActivityList();
+  // Notif navigateur push
+  if(Notification.permission==='granted'){
+    try{new Notification('Events Café — '+title,{body:msg,icon:'https://events-cafe.com/wp-content/uploads/2022/08/cropped-Events-Cafe-11.png'});}
+    catch(e){}
+  }
 }
 
+function checkStockAlerts(){
+  if(!notifPrefs.stock) return;
+  const locked = getLockedStock();
+  STOCK_META.forEach(si=>{
+    const avail = STOCK_DEFAULTS[si.id]-(locked[si.id]||0);
+    const pct = STOCK_DEFAULTS[si.id]>0 ? avail/STOCK_DEFAULTS[si.id] : 1;
+    if(pct <= 0.15 && avail >= 0){
+      pushNotif('⚠️','Stock critique',`${si.label} : seulement ${avail} unité(s) disponible(s)`,'stock');
+    }
+  });
+}
+
+function renderBadges(){
+  const dot = document.getElementById('notif-red-dot');
+  const badge = document.getElementById('nav-badge-activity');
+  if(unreadCount > 0){
+    dot.style.display='block';
+    badge.style.display='inline';
+    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+  } else {
+    dot.style.display='none';
+    badge.style.display='none';
+  }
+}
+function markAllRead(){
+  activityLog = activityLog.map(e=>({...e,read:true}));
+  localStorage.setItem('ep_activity',JSON.stringify(activityLog));
+  unreadCount = 0;
+  localStorage.setItem('ep_unread','0');
+  renderBadges();
+  renderNotifHistory();
+}
+function renderNotifHistory(){
+  const el = document.getElementById('notif-history');
+  if(!el) return;
+  const recent = activityLog.slice(0,8);
+  if(!recent.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">Aucune activité récente</div>';return;}
+  el.innerHTML = recent.map(a=>`
+    <div class="activity-item${a.read?'':' unread'}" style="margin-bottom:6px;padding:10px 12px;">
+      <span class="activity-ico">${a.icon}</span>
+      <div class="activity-body">
+        <div class="activity-title">${a.title}</div>
+        <div class="activity-msg">${a.msg}</div>
+        <div class="activity-time">${timeAgo(a.time)}</div>
+      </div>
+      ${!a.read?'<div class="activity-unread"></div>':''}
+    </div>`).join('');
+}
+function renderActivityList(){
+  const el = document.getElementById('activity-list');
+  if(!activityLog.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Aucune activité enregistrée</div></div>';return;}
+  el.innerHTML = activityLog.map(a=>`
+    <div class="activity-item${a.read?'':' unread'}">
+      <span class="activity-ico">${a.icon}</span>
+      <div class="activity-body">
+        <div class="activity-title">${a.title}</div>
+        <div class="activity-msg">${a.msg}</div>
+        <div class="activity-time">${timeAgo(a.time)}</div>
+      </div>
+      ${!a.read?'<div class="activity-unread"></div>':''}
+    </div>`).join('');
+}
+function clearActivity(){
+  if(!confirm('Effacer tout l\'historique d\'activité ?')) return;
+  activityLog = []; localStorage.setItem('ep_activity','[]');
+  unreadCount = 0; localStorage.setItem('ep_unread','0');
+  renderBadges(); renderActivityList(); showToast('Historique effacé','info');
+}
+function timeAgo(iso){
+  const d = Date.now()-new Date(iso).getTime();
+  if(d<60000) return "à l'instant";
+  if(d<3600000) return Math.floor(d/60000)+'min';
+  if(d<86400000) return Math.floor(d/3600000)+'h';
+  return Math.floor(d/86400000)+'j';
+}
+
+// ── Notif panel ──
+function toggleNotifPanel(){
+  document.getElementById('notif-panel').classList.toggle('open');
+  document.getElementById('notif-overlay').classList.toggle('open');
+  renderNotifHistory();
+}
+function closeNotifPanel(){
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('notif-overlay').classList.remove('open');
+}
+function saveNotifPrefs(){
+  notifPrefs={form:document.getElementById('tog-form').checked,new:document.getElementById('tog-new').checked,edit:document.getElementById('tog-edit').checked,stock:document.getElementById('tog-stock').checked,rendu:document.getElementById('tog-rendu').checked};
+  localStorage.setItem('ep_notif_prefs',JSON.stringify(notifPrefs));
+  showToast('Préférences sauvegardées','info');
+}
+function requestPush(){
+  if(!('Notification' in window)){showToast('Navigateur non supporté','error');return;}
+  Notification.requestPermission().then(p=>{
+    if(p==='granted'){
+      const btn=document.getElementById('push-btn');
+      btn.textContent='✅ Notifications push activées';btn.classList.add('active');
+      new Notification('Events Café',{body:'Notifications push activées !'});
+      showToast('Notifications push activées ✓','success');
+    } else showToast('Permission refusée — activez dans les réglages','error');
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// EMAILJS — 2 DESTINATAIRES
+// ══════════════════════════════════════════════════════
+function saveEmailConfig(){
+  ejsCfg = {
+    pubkey: document.getElementById('cfg-ejs-pubkey').value.trim(),
+    service: document.getElementById('cfg-ejs-service').value.trim(),
+    template: document.getElementById('cfg-ejs-template').value.trim(),
+    email1: document.getElementById('cfg-email1').value.trim(),
+    name1: document.getElementById('cfg-email1-name').value.trim(),
+    email2: document.getElementById('cfg-email2').value.trim(),
+    name2: document.getElementById('cfg-email2-name').value.trim(),
+  };
+  localStorage.setItem('ep_ejs', JSON.stringify(ejsCfg));
+  if(ejsCfg.pubkey) emailjs.init(ejsCfg.pubkey);
+  showToast('Configuration email sauvegardée ✓','success');
+}
+
+async function sendEmailTo(toEmail, toName, subject, message){
+  if(!ejsCfg.pubkey || !ejsCfg.service || !ejsCfg.template || !toEmail) return;
+  try{
+    emailjs.init(ejsCfg.pubkey);
+    await emailjs.send(ejsCfg.service, ejsCfg.template, {
+      to_email: toEmail,
+      to_name: toName || toEmail,
+      subject: '[Events Café] '+subject,
+      message: message,
+      time: new Date().toLocaleString('fr-FR'),
+    });
+  } catch(e){ console.error('EmailJS error:',e); }
+}
+
+async function sendEmailBoth(subject, message){
+  if(ejsCfg.email1) await sendEmailTo(ejsCfg.email1, ejsCfg.name1||'Équipe', subject, message);
+  if(ejsCfg.email2) await sendEmailTo(ejsCfg.email2, ejsCfg.name2||'Équipe', subject, message);
+}
+
+async function testEmail(){
+  if(!ejsCfg.pubkey){showToast('Configurez d\'abord EmailJS','error');return;}
+  const msg = 'Ceci est un email de test envoyé depuis votre dashboard Events Café.\n\nSi vous recevez cet email, la configuration est correcte ✅';
+  await sendEmailBoth('🧪 Test de notification', msg);
+  showToast('Emails de test envoyés','success');
+}
+
+function loadEmailConfig(){
+  if(ejsCfg.pubkey) document.getElementById('cfg-ejs-pubkey').value=ejsCfg.pubkey;
+  if(ejsCfg.service) document.getElementById('cfg-ejs-service').value=ejsCfg.service;
+  if(ejsCfg.template) document.getElementById('cfg-ejs-template').value=ejsCfg.template;
+  if(ejsCfg.email1) document.getElementById('cfg-email1').value=ejsCfg.email1;
+  if(ejsCfg.name1) document.getElementById('cfg-email1-name').value=ejsCfg.name1;
+  if(ejsCfg.email2) document.getElementById('cfg-email2').value=ejsCfg.email2;
+  if(ejsCfg.name2) document.getElementById('cfg-email2-name').value=ejsCfg.name2;
+  if(ejsCfg.pubkey) emailjs.init(ejsCfg.pubkey);
+  if(Notification.permission==='granted'){
+    const btn=document.getElementById('push-btn');
+    if(btn){btn.textContent='✅ Notifications push activées';btn.classList.add('active');}
+  }
+  document.getElementById('tog-form').checked=notifPrefs.form!==false;
+  document.getElementById('tog-new').checked=notifPrefs.new!==false;
+  document.getElementById('tog-edit').checked=notifPrefs.edit!==false;
+  document.getElementById('tog-stock').checked=notifPrefs.stock!==false;
+  document.getElementById('tog-rendu').checked=notifPrefs.rendu!==false;
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function getEvColor(ev){return EV_COLORS[events.indexOf(ev)%EV_COLORS.length];}
+function getLockedStock(){
+  const l={};STOCK_META.forEach(s=>l[s.id]=0);
+  events.forEach(ev=>{if(ev.status==='matériel rendu')return;Object.entries(ev.material||{}).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
+  return l;
+}
+function formatDate(d){if(!d)return'—';return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
 
 function renderStats(){
-  const now = new Date().toISOString().slice(0,10);
-  const active = events.filter(ev => ev.status === 'en cours').length;
-  const upcoming = events.filter(ev => ev.status === 'confirmé' && ev.start >= now).length;
-  const locked = getLockedStock();
-  const fontAvail = STOCK_DEFAULTS.fontaine_eau - (locked.fontaine_eau||0);
-  const nespAvail = STOCK_DEFAULTS.nespresso - (locked.nespresso||0);
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card blue">
-      <div class="stat-label">En cours</div>
-      <div class="stat-value" style="color:var(--accent2)">${active}</div>
-      <div class="stat-sub">événements actifs</div>
-      <div class="stat-icon">📅</div>
-    </div>
-    <div class="stat-card gold">
-      <div class="stat-label">À venir</div>
-      <div class="stat-value" style="color:var(--gold2)">${upcoming}</div>
-      <div class="stat-sub">confirmés</div>
-      <div class="stat-icon">✅</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-label">Fontaines dispos</div>
-      <div class="stat-value" style="color:${fontAvail < 8 ? 'var(--orange)' : 'var(--green2)'}">${fontAvail}<span style="font-size:14px;color:var(--text3)"> / ${STOCK_DEFAULTS.fontaine_eau}</span></div>
-      <div class="stat-sub">sur ${STOCK_DEFAULTS.fontaine_eau} total</div>
-      <div class="stat-icon">💧</div>
-    </div>
-    <div class="stat-card orange">
-      <div class="stat-label">Nespresso dispos</div>
-      <div class="stat-value" style="color:${nespAvail < 3 ? 'var(--red)' : 'var(--green2)'}">${nespAvail}<span style="font-size:14px;color:var(--text3)"> / ${STOCK_DEFAULTS.nespresso}</span></div>
-      <div class="stat-sub">sur ${STOCK_DEFAULTS.nespresso} total</div>
-      <div class="stat-icon">☕</div>
-    </div>`;
-  document.getElementById('nav-badge-cal').textContent = active + upcoming;
-  const lowStock = STOCK_META.some(si => {
-    const avail = STOCK_DEFAULTS[si.id] - (locked[si.id]||0);
-    return STOCK_DEFAULTS[si.id] > 0 && avail / STOCK_DEFAULTS[si.id] < 0.2;
-  });
-  document.getElementById('nav-badge-stock').style.display = lowStock ? 'inline' : 'none';
+  const now=new Date().toISOString().slice(0,10);
+  const active=events.filter(ev=>ev.status==='en cours').length;
+  const upcoming=events.filter(ev=>ev.status==='confirmé'&&ev.start>=now).length;
+  const locked=getLockedStock();
+  const fa=STOCK_DEFAULTS.fontaine_eau-(locked.fontaine_eau||0);
+  const na=STOCK_DEFAULTS.nespresso-(locked.nespresso||0);
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card blue"><div class="stat-label">En cours</div><div class="stat-value" style="color:var(--accent2)">${active}</div><div class="stat-sub">événements actifs</div><div class="stat-icon">📅</div></div>
+    <div class="stat-card gold"><div class="stat-label">À venir</div><div class="stat-value" style="color:var(--gold2)">${upcoming}</div><div class="stat-sub">confirmés</div><div class="stat-icon">✅</div></div>
+    <div class="stat-card green"><div class="stat-label">Fontaines dispos</div><div class="stat-value" style="color:${fa<8?'var(--orange)':'var(--green2)'}">${fa}<span style="font-size:13px;color:var(--text3)"> / ${STOCK_DEFAULTS.fontaine_eau}</span></div><div class="stat-sub">sur ${STOCK_DEFAULTS.fontaine_eau} total</div><div class="stat-icon">💧</div></div>
+    <div class="stat-card orange"><div class="stat-label">Nespresso dispos</div><div class="stat-value" style="color:${na<3?'var(--red)':'var(--green2)'}">${na}<span style="font-size:13px;color:var(--text3)"> / ${STOCK_DEFAULTS.nespresso}</span></div><div class="stat-sub">sur ${STOCK_DEFAULTS.nespresso} total</div><div class="stat-icon">☕</div></div>`;
+  document.getElementById('nav-badge-cal').textContent=active+upcoming;
+  const lowStock=STOCK_META.some(si=>{const avail=STOCK_DEFAULTS[si.id]-(getLockedStock()[si.id]||0);return STOCK_DEFAULTS[si.id]>0&&avail/STOCK_DEFAULTS[si.id]<0.2;});
+  document.getElementById('nav-badge-stock').style.display=lowStock?'inline':'none';
 }
 
-
 function renderCalendar(){
-  const label = new Date(currentYear, currentMonth, 1).toLocaleString('fr-FR',{month:'long',year:'numeric'});
-  document.getElementById('cal-month-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const firstDay = new Date(currentYear, currentMonth, 1);
-  let startDow = firstDay.getDay(); startDow = startDow===0?6:startDow-1;
-  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
-  const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
-  const cells = [];
-  for(let i=startDow-1;i>=0;i--) cells.push({day:daysInPrev-i,month:currentMonth-1,year:currentYear,other:true});
-  for(let i=1;i<=daysInMonth;i++) cells.push({day:i,month:currentMonth,year:currentYear,other:false});
-  const rem = 42 - cells.length;
-  for(let i=1;i<=rem;i++) cells.push({day:i,month:currentMonth+1,year:currentYear,other:true});
-  document.getElementById('cal-grid').innerHTML = cells.map(c => {
-    const m = ((c.month%12)+12)%12;
-    const y = c.month<0?c.year-1:(c.month>11?c.year+1:c.year);
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(c.day).padStart(2,'0')}`;
-    const d = new Date(y, m, c.day); d.setHours(0,0,0,0);
-    const isToday = d.getTime()===today.getTime();
-    const dayEvs = events.filter(ev => dateStr >= ev.start && dateStr <= ev.end);
-    const chips = dayEvs.slice(0,3).map(ev => `<div class="ev-chip ${getEvColor(ev)}">${ev.client}</div>`).join('');
-    const more = dayEvs.length>3 ? `<div style="font-size:9px;color:var(--text3);padding:1px 4px">+${dayEvs.length-3}</div>` : '';
-    return `<div class="cal-cell${c.other?' other':''}${isToday?' today':''}" onclick="showDayEvents('${dateStr}')"><div class="day-num">${c.day}</div>${chips}${more}</div>`;
+  const label=new Date(currentYear,currentMonth,1).toLocaleString('fr-FR',{month:'long',year:'numeric'});
+  document.getElementById('cal-month-label').textContent=label.charAt(0).toUpperCase()+label.slice(1);
+  const today=new Date();today.setHours(0,0,0,0);
+  const firstDay=new Date(currentYear,currentMonth,1);
+  let sdow=firstDay.getDay();sdow=sdow===0?6:sdow-1;
+  const dim=new Date(currentYear,currentMonth+1,0).getDate();
+  const dip=new Date(currentYear,currentMonth,0).getDate();
+  const cells=[];
+  for(let i=sdow-1;i>=0;i--)cells.push({d:dip-i,m:currentMonth-1,y:currentYear,o:true});
+  for(let i=1;i<=dim;i++)cells.push({d:i,m:currentMonth,y:currentYear,o:false});
+  const rem=42-cells.length;for(let i=1;i<=rem;i++)cells.push({d:i,m:currentMonth+1,y:currentYear,o:true});
+  document.getElementById('cal-grid').innerHTML=cells.map(c=>{
+    const mm=((c.m%12)+12)%12,yy=c.m<0?c.y-1:(c.m>11?c.y+1:c.y);
+    const ds=`${yy}-${String(mm+1).padStart(2,'0')}-${String(c.d).padStart(2,'0')}`;
+    const dd=new Date(yy,mm,c.d);dd.setHours(0,0,0,0);
+    const isT=dd.getTime()===today.getTime();
+    const devs=events.filter(ev=>ds>=ev.start&&ds<=ev.end);
+    const chips=devs.slice(0,2).map(ev=>`<div class="ev-chip ${getEvColor(ev)}">${ev.client}</div>`).join('');
+    const more=devs.length>2?`<div style="font-size:8px;color:var(--text3);padding:0 3px">+${devs.length-2}</div>`:'';
+    return`<div class="cal-cell${c.o?' other':''}${isT?' today':''}" onclick="showDayEvents('${ds}')"><div class="day-num">${c.d}</div>${chips}${more}</div>`;
   }).join('');
   renderCalEventList();
 }
 
-function showDayEvents(dateStr){
-  const dayEvs = events.filter(ev => dateStr >= ev.start && dateStr <= ev.end);
-  const d = new Date(dateStr+'T12:00:00');
-  document.getElementById('cal-list-title').textContent = dayEvs.length ? `Événements du ${d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}` : `Aucun événement le ${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}`;
-  document.getElementById('cal-ev-list').innerHTML = dayEvs.length ? dayEvs.map(renderEvCard).join('') : '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucun événement ce jour</div></div>';
+function showDayEvents(ds){
+  const devs=events.filter(ev=>ds>=ev.start&&ds<=ev.end);
+  const d=new Date(ds+'T12:00:00');
+  document.getElementById('cal-list-title').textContent=devs.length?`Événements du ${d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}`:`Aucun événement le ${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}`;
+  document.getElementById('cal-ev-list').innerHTML=devs.length?devs.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucun événement ce jour</div></div>';
 }
-
 function renderCalEventList(){
-  const now = new Date().toISOString().slice(0,10);
-  const active = events.filter(ev => ev.status !== 'matériel rendu' && ev.end >= now);
-  active.sort((a,b) => a.start.localeCompare(b.start));
-  document.getElementById('cal-list-title').textContent = 'Événements actifs & à venir';
-  document.getElementById('cal-ev-list').innerHTML = active.length ? active.map(renderEvCard).join('') : '<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Aucun événement actif</div></div>';
+  const now=new Date().toISOString().slice(0,10);
+  const ac=events.filter(ev=>ev.status!=='matériel rendu'&&ev.end>=now).sort((a,b)=>a.start.localeCompare(b.start));
+  document.getElementById('cal-list-title').textContent='Événements actifs & à venir';
+  document.getElementById('cal-ev-list').innerHTML=ac.length?ac.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Aucun événement actif</div></div>';
 }
-
 
 function renderEvCard(ev){
-  const sc = STATUS_CLASSES[ev.status] || 'badge-gray';
-  const cc = STATUS_CARD_CLASSES[ev.status] || 'rendu';
-  const mats = Object.entries(ev.material||{}).map(([k,v]) => {
-    const si = STOCK_META.find(s=>s.id===k); if(!si||!parseInt(v)) return '';
-    return `<span class="mat-chip" style="background:${si.color}22;color:${si.color}">${si.icon} ${v}× ${si.label}</span>`;
-  }).join('');
-  return `<div class="ev-card ${cc}">
-    <div class="ev-top">
-      <div>
-        <div class="ev-name">${ev.salon||''}${ev.stand?` — ${ev.stand}`:''}</div>
-        <div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div>
-      </div>
-      <span class="badge ${sc}">${ev.status||''}</span>
-    </div>
-    <div class="ev-meta">
-      <span>📅 ${formatDate(ev.start)} → ${formatDate(ev.end)}</span>
-      <span>🏷 ${ev.type||'—'}</span>
-      ${ev.contact?`<span>📞 ${ev.contact}</span>`:''}
-    </div>
-    ${mats ? `<div class="mat-chips">${mats}</div>` : ''}
-    ${ev.notes ? `<div class="ev-notes">💬 ${ev.notes}</div>` : ''}
+  const sc=STATUS_CLASSES[ev.status]||'badge-gray';
+  const cc=STATUS_CARD_CLASSES[ev.status]||'rendu';
+  const mats=Object.entries(ev.material||{}).map(([k,v])=>{const si=STOCK_META.find(s=>s.id===k);if(!si||!parseInt(v))return'';return`<span class="mat-chip" style="background:${si.color}22;color:${si.color}">${si.icon} ${v}× ${si.label}</span>`;}).join('');
+  return`<div class="ev-card ${cc}">
+    <div class="ev-top"><div><div class="ev-name">${ev.salon||''}${ev.stand?` — ${ev.stand}`:''}</div><div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div></div><span class="badge ${sc}">${ev.status||''}</span></div>
+    <div class="ev-meta"><span>📅 ${formatDate(ev.start)} → ${formatDate(ev.end)}</span><span>🏷 ${ev.type||'—'}</span>${ev.contact?`<span>📞 ${ev.contact}</span>`:''}</div>
+    ${mats?`<div class="mat-chips">${mats}</div>`:''}
+    ${ev.notes?`<div class="ev-notes">💬 ${ev.notes}</div>`:''}
     <div class="ev-footer">
       <button class="btn-xs" onclick="openEditModal('${ev.id}')">✏️ Modifier</button>
-      <select class="status-sel" onchange="quickStatus('${ev.id}',this.value)">
-        <option value="">— Changer statut —</option>
-        <option value="confirmé">Confirmé</option>
-        <option value="en cours">En cours</option>
-        <option value="terminé">Terminé</option>
-        <option value="matériel rendu">✅ Matériel rendu</option>
-      </select>
+      <select class="status-sel" onchange="quickStatus('${ev.id}',this.value)"><option value="">— Statut —</option><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">✅ Matériel rendu</option></select>
       <button class="btn-xs success" onclick="quickStatus('${ev.id}','matériel rendu')">✅ Rendu</button>
       <button class="btn-xs danger" onclick="deleteEvent('${ev.id}')">🗑</button>
-    </div>
-  </div>`;
+    </div></div>`;
 }
 
 function applyFilters(){
-  const q = (document.getElementById('search-input').value||'').toLowerCase();
-  const st = document.getElementById('filter-status').value;
-  const tp = document.getElementById('filter-type').value;
-  const filtered = events.filter(ev => {
-    if(q && !(ev.client||'').toLowerCase().includes(q) && !(ev.salon||'').toLowerCase().includes(q) && !(ev.stand||'').toLowerCase().includes(q)) return false;
-    if(st && ev.status !== st) return false;
-    if(tp && ev.type !== tp) return false;
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const st=document.getElementById('filter-status').value;
+  const tp=document.getElementById('filter-type').value;
+  const f=events.filter(ev=>{
+    if(q&&!(ev.client||'').toLowerCase().includes(q)&&!(ev.salon||'').toLowerCase().includes(q)&&!(ev.stand||'').toLowerCase().includes(q))return false;
+    if(st&&ev.status!==st)return false;
+    if(tp&&ev.type!==tp)return false;
     return true;
-  });
-  filtered.sort((a,b)=>(a.start||'').localeCompare(b.start||''));
-  document.getElementById('events-list').innerHTML = filtered.length ? filtered.map(renderEvCard).join('') : '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Aucun résultat</div></div>';
+  }).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+  document.getElementById('events-list').innerHTML=f.length?f.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Aucun résultat</div></div>';
 }
 
-
 function renderStock(){
-  const locked = getLockedStock();
-  document.getElementById('stock-grid').innerHTML = STOCK_META.map(si => {
-    const total = STOCK_DEFAULTS[si.id]||0;
-    const avail = total - (locked[si.id]||0);
-    const pct = total>0 ? Math.round((avail/total)*100) : 0;
-    const col = pct > 50 ? 'var(--green)' : pct > 20 ? 'var(--orange)' : 'var(--red)';
-    const statusText = pct > 50 ? 'Disponible' : pct > 20 ? 'Stock limité' : 'Stock critique';
-    return `<div class="stock-card">
-      <div class="stock-card-label">${si.icon} ${si.label}</div>
-      <div class="stock-nums">
-        <div class="stock-avail" style="color:${col}">${avail}</div>
-        <div class="stock-total">/ ${total} total</div>
-      </div>
-      <div class="stock-bar"><div class="stock-bar-fill" style="width:${Math.max(0,pct)}%;background:${col}"></div></div>
-      <div class="stock-status" style="color:${col}">${statusText}</div>
-      <div class="stock-locked">${locked[si.id]||0} en location</div>
-    </div>`;
+  const locked=getLockedStock();
+  document.getElementById('stock-grid').innerHTML=STOCK_META.map(si=>{
+    const total=STOCK_DEFAULTS[si.id]||0,avail=total-(locked[si.id]||0),pct=total>0?Math.round(avail/total*100):0;
+    const col=pct>50?'var(--green)':pct>20?'var(--orange)':'var(--red)';
+    const st=pct>50?'Disponible':pct>20?'Stock limité':'⚠️ Stock critique';
+    return`<div class="stock-card"><div class="stock-card-label">${si.icon} ${si.label}</div><div class="stock-nums"><div class="stock-avail" style="color:${col}">${avail}</div><div class="stock-total">/ ${total} total</div></div><div class="stock-bar"><div class="stock-bar-fill" style="width:${Math.max(0,pct)}%;background:${col}"></div></div><div class="stock-status" style="color:${col}">${st}</div><div class="stock-locked">${locked[si.id]||0} en location</div></div>`;
   }).join('');
-  const active = events.filter(ev => ev.status !== 'matériel rendu');
-  document.getElementById('stock-active-list').innerHTML = active.length ? active.map(renderEvCard).join('') : '<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucun matériel en location</div></div>';
+  const ac=events.filter(ev=>ev.status!=='matériel rendu');
+  document.getElementById('stock-active-list').innerHTML=ac.length?ac.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucun matériel en location</div></div>';
 }
 
 function renderConfig(){
-  renderFbStatus();
-  document.getElementById('stock-config-grid').innerHTML = STOCK_META.map(si =>
-    `<div class="cfg-group">
-      <label class="cfg-label">${si.icon} ${si.label}</label>
-      <input class="cfg-input" id="sc-${si.id}" type="number" min="0" value="${STOCK_DEFAULTS[si.id]||0}">
-    </div>`
-  ).join('');
+  renderFbStatus(); loadEmailConfig();
+  document.getElementById('stock-config-grid').innerHTML=STOCK_META.map(si=>`<div class="cfg-group"><label class="cfg-label">${si.icon} ${si.label}</label><input class="cfg-input" id="sc-${si.id}" type="number" min="0" value="${STOCK_DEFAULTS[si.id]||0}"></div>`).join('');
 }
 
-function renderAll(){ renderStats(); renderCalendar(); applyFilters(); renderStock(); renderConfig(); }
+function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();}
 
-// ============================================================
+// ══════════════════════════════════════════════════════
 // ACTIONS
-// ============================================================
-function quickStatus(id, val){
-  if(!val) return;
-  persistUpdate(id, {status: val});
+// ══════════════════════════════════════════════════════
+function quickStatus(id,val){
+  if(!val)return;
+  persistUpdate(id,{status:val});
   showToast('Statut mis à jour : '+val,'success');
 }
 function deleteEvent(id){
-  if(!confirm('Supprimer cet événement ?')) return;
-  persistDelete(id);
-  showToast('Événement supprimé','info');
+  if(!confirm('Supprimer cet événement ?'))return;
+  persistDelete(id); showToast('Événement supprimé','info');
 }
 function saveStockConfig(){
-  STOCK_META.forEach(si => { const el = document.getElementById('sc-'+si.id); if(el) STOCK_DEFAULTS[si.id] = Math.max(0, parseInt(el.value)||0); });
-  localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS));
-  if(fbReady) db.ref('stock').set(STOCK_DEFAULTS);
-  showToast('Stock mis à jour ✓','success');
-  renderAll();
+  STOCK_META.forEach(si=>{const el=document.getElementById('sc-'+si.id);if(el)STOCK_DEFAULTS[si.id]=Math.max(0,parseInt(el.value)||0);});
+  localStorage.setItem('ep_stock',JSON.stringify(STOCK_DEFAULTS));
+  if(fbReady)db.ref('stock').set(STOCK_DEFAULTS);
+  showToast('Stock mis à jour ✓','success'); renderAll();
 }
 
-
-// ============================================================
+// ══════════════════════════════════════════════════════
 // MODAL
-// ============================================================
-function buildMatGrid(containerId, values={}){
-  document.getElementById(containerId).innerHTML = STOCK_META.map(si =>
-    `<div class="mat-item">
-      <div class="mat-item-label">${si.icon} ${si.label}</div>
-      <div class="mat-qty">
-        <button class="mat-btn" onclick="adjMat('${containerId}','${si.id}',-1)">−</button>
-        <span class="mat-val" id="${containerId}-${si.id}">${values[si.id]||0}</span>
-        <button class="mat-btn" onclick="adjMat('${containerId}','${si.id}',1)">+</button>
-      </div>
-    </div>`
-  ).join('');
+// ══════════════════════════════════════════════════════
+function buildMatGrid(cid,values={}){
+  document.getElementById(cid).innerHTML=STOCK_META.map(si=>`<div class="mat-item"><div class="mat-item-label">${si.icon} ${si.label}</div><div class="mat-qty"><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',-1)">−</button><span class="mat-val" id="${cid}-${si.id}">${values[si.id]||0}</span><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',1)">+</button></div></div>`).join('');
 }
-function adjMat(gid, sid, delta){
-  const el = document.getElementById(`${gid}-${sid}`);
-  if(el) el.textContent = Math.max(0, (parseInt(el.textContent||'0')||0) + delta);
-}
-function getMatValues(containerId){
-  const mat = {};
-  STOCK_META.forEach(si => { const el = document.getElementById(`${containerId}-${si.id}`); if(el){ const v=parseInt(el.textContent||'0'); if(v>0) mat[si.id]=v; } });
-  return mat;
-}
+function adjMat(gid,sid,delta){const el=document.getElementById(`${gid}-${sid}`);if(el)el.textContent=Math.max(0,(parseInt(el.textContent||'0')||0)+delta);}
+function getMatValues(cid){const mat={};STOCK_META.forEach(si=>{const el=document.getElementById(`${cid}-${si.id}`);if(el){const v=parseInt(el.textContent||'0');if(v>0)mat[si.id]=v;}});return mat;}
+
 function openAddModal(){
-  editingId = null;
-  document.getElementById('modal-title-text').textContent = '＋ Nouvel événement';
-  document.getElementById('modal-save-btn').textContent = 'Créer l\'événement';
+  editingId=null;
+  document.getElementById('modal-title-text').textContent='＋ Nouvel événement';
+  document.getElementById('modal-save-btn').textContent='Créer l\'événement';
   ['m-client','m-contact','m-salon','m-stand','m-lieu','m-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('m-start').value=''; document.getElementById('m-end').value='';
+  document.getElementById('m-start').value='';document.getElementById('m-end').value='';
   document.getElementById('m-status').value='confirmé';
   buildMatGrid('modal-mat-grid',{});
   document.getElementById('modal-overlay').style.display='flex';
 }
 function openEditModal(id){
-  const ev = findEv(id); if(!ev) return;
-  editingId = id;
-  document.getElementById('modal-title-text').textContent = '✏️ Modifier l\'événement';
-  document.getElementById('modal-save-btn').textContent = 'Enregistrer';
-  document.getElementById('m-client').value = ev.client||'';
-  document.getElementById('m-contact').value = ev.contact||'';
-  document.getElementById('m-salon').value = ev.salon||'';
-  document.getElementById('m-stand').value = ev.stand||'';
-  document.getElementById('m-lieu').value = ev.lieu||'';
-  document.getElementById('m-start').value = ev.start||'';
-  document.getElementById('m-end').value = ev.end||'';
-  document.getElementById('m-type').value = ev.type||'';
-  document.getElementById('m-status').value = ev.status||'confirmé';
-  document.getElementById('m-notes').value = ev.notes||'';
-  buildMatGrid('modal-mat-grid', ev.material||{});
+  const ev=findEv(id);if(!ev)return;
+  editingId=id;
+  document.getElementById('modal-title-text').textContent='✏️ Modifier l\'événement';
+  document.getElementById('modal-save-btn').textContent='Enregistrer';
+  document.getElementById('m-client').value=ev.client||'';
+  document.getElementById('m-contact').value=ev.contact||'';
+  document.getElementById('m-salon').value=ev.salon||'';
+  document.getElementById('m-stand').value=ev.stand||'';
+  document.getElementById('m-lieu').value=ev.lieu||'';
+  document.getElementById('m-start').value=ev.start||'';
+  document.getElementById('m-end').value=ev.end||'';
+  document.getElementById('m-type').value=ev.type||'';
+  document.getElementById('m-status').value=ev.status||'confirmé';
+  document.getElementById('m-notes').value=ev.notes||'';
+  buildMatGrid('modal-mat-grid',ev.material||{});
   document.getElementById('modal-overlay').style.display='flex';
 }
-function closeModal(){ document.getElementById('modal-overlay').style.display='none'; }
-
-
+function closeModal(){document.getElementById('modal-overlay').style.display='none';}
 async function saveEvent(){
-  const client = document.getElementById('m-client').value.trim();
-  const salon = document.getElementById('m-salon').value.trim();
-  const start = document.getElementById('m-start').value;
-  const end = document.getElementById('m-end').value;
-  if(!client||!salon||!start||!end){ showToast('Champs obligatoires manquants','error'); return; }
-  if(end < start){ showToast('La date de retour doit être après le montage','error'); return; }
-  const data = {
-    client, salon, contact: document.getElementById('m-contact').value,
-    stand: document.getElementById('m-stand').value,
-    lieu: document.getElementById('m-lieu').value,
-    start, end,
-    type: document.getElementById('m-type').value,
-    status: document.getElementById('m-status').value,
-    notes: document.getElementById('m-notes').value,
-    material: getMatValues('modal-mat-grid'),
-  };
-  const btn = document.getElementById('modal-save-btn');
-  const oldTxt = btn.textContent;
-  btn.innerHTML = '<div class="loader"></div>'; btn.disabled = true;
-  try {
-    if(editingId) { await persistUpdate(editingId, data); showToast('Événement mis à jour ✓','success'); }
-    else { await persistNew(data); showToast('Événement créé ✓','success'); }
+  const client=document.getElementById('m-client').value.trim(),salon=document.getElementById('m-salon').value.trim();
+  const start=document.getElementById('m-start').value,end=document.getElementById('m-end').value;
+  if(!client||!salon||!start||!end){showToast('Champs obligatoires manquants','error');return;}
+  if(end<start){showToast('La date de retour doit être après le montage','error');return;}
+  const data={client,salon,contact:document.getElementById('m-contact').value,stand:document.getElementById('m-stand').value,lieu:document.getElementById('m-lieu').value,start,end,type:document.getElementById('m-type').value,status:document.getElementById('m-status').value,notes:document.getElementById('m-notes').value,material:getMatValues('modal-mat-grid')};
+  const btn=document.getElementById('modal-save-btn');const old=btn.textContent;
+  btn.innerHTML='<div class="loader"></div>';btn.disabled=true;
+  try{
+    if(editingId){await persistUpdate(editingId,data);showToast('Mis à jour ✓','success');}
+    else{await persistNew(data);showToast('Créé ✓','success');}
     closeModal();
-  } catch(e){ console.error(e); showToast('Erreur lors de l\'enregistrement','error'); }
-  btn.innerHTML = oldTxt; btn.disabled = false;
+  }catch(e){console.error(e);showToast('Erreur enregistrement','error');}
+  btn.innerHTML=old;btn.disabled=false;
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
-function showTab(name, el){
+// ══════════════════════════════════════════════════════
+// NAV + MOBILE
+// ══════════════════════════════════════════════════════
+function showTab(n,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  if(el) el.classList.add('active');
-  const titles = {calendar:'📅 Calendrier',events:'🗂️ Événements',stock:'📦 Stock',config:'⚙️ Configuration'};
-  document.getElementById('page-title').textContent = titles[name]||name;
-  if(name==='stock') renderStock();
-  if(name==='events') applyFilters();
-  if(name==='config') renderConfig();
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  if(el)el.classList.add('active');
+  const T={calendar:'📅 Calendrier',events:'🗂️ Événements',stock:'📦 Stock',activity:'📋 Activité',config:'⚙️ Configuration'};
+  document.getElementById('page-title').textContent=T[n]||n;
+  if(n==='stock')renderStock();
+  if(n==='events')applyFilters();
+  if(n==='config')renderConfig();
+  if(n==='activity'){renderActivityList();}
 }
-function prevMonth(){ currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCalendar(); }
-function nextMonth(){ currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCalendar(); }
-function goToday(){ currentYear=new Date().getFullYear(); currentMonth=new Date().getMonth(); renderCalendar(); }
+function prevMonth(){currentMonth--;if(currentMonth<0){currentMonth=11;currentYear--;}renderCalendar();}
+function nextMonth(){currentMonth++;if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();}
+function goToday(){currentYear=new Date().getFullYear();currentMonth=new Date().getMonth();renderCalendar();}
 
-// ============================================================
-// UTILS + INIT
-// ============================================================
-function formatDate(d){ if(!d) return '—'; return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
-function showToast(msg, type='info'){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = `toast ${type} show`;
-  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),3000);
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('mob-open');
+  document.getElementById('mob-overlay').classList.toggle('open');
 }
-setTimeout(() => {
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('mob-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════
+// TOAST + INIT
+// ══════════════════════════════════════════════════════
+function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
+
+setTimeout(()=>{
   document.getElementById('loading-screen').style.display='none';
   document.getElementById('app').style.display='flex';
+  if(ejsCfg.pubkey) try{emailjs.init(ejsCfg.pubkey);}catch(e){}
+  loadEmailConfig();
+  renderBadges();
   startRealtime();
-}, 1000);
+},1000);
 </script>
 </body>
 </html>
