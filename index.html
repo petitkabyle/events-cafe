@@ -276,6 +276,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .mob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;display:none;}
 .mob-overlay.open{display:block;}
 
+/* ── BARRE DE NAVIGATION DU BAS (mobile) ── */
+.bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:90;background:rgba(17,19,24,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--border2);padding:6px 4px;padding-bottom:calc(6px + env(safe-area-inset-bottom));justify-content:space-around;align-items:stretch;}
+.bottom-nav-item{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border:none;background:none;color:var(--text3);font-family:var(--font-body);font-size:10px;font-weight:500;white-space:nowrap;border-radius:12px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;transition:color .15s,background .15s;}
+.bottom-nav-item .bn-ico{font-size:21px;line-height:1;}
+.bottom-nav-item.active{color:var(--accent2);}
+.bottom-nav-item:active{background:var(--bg3);}
+.bn-badge{position:absolute;top:0;left:50%;transform:translateX(3px);background:var(--red);color:#fff;font-size:9px;min-width:15px;height:15px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 4px;font-weight:600;}
+/* indicateur de synchronisation dans la barre du haut (mobile) */
+.sync-top{display:none;}
+
 /* ── SAFE AREA (encoche iPhone) ── */
 .topbar{padding-top:calc(14px + env(safe-area-inset-top));padding-left:calc(24px + env(safe-area-inset-left));padding-right:calc(24px + env(safe-area-inset-right));}
 .sidebar{padding-top:env(safe-area-inset-top);}
@@ -283,16 +293,19 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 @media(max-width:820px){
   :root{--sidebar-w:0px;}
-  .sidebar{transform:translateX(-260px);width:min(260px,86vw);min-width:min(260px,86vw);}
-  .sidebar.mob-open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,.6);}
+  /* Navigation mobile = barre du bas : plus de menu coulissant ni de voile sombre */
+  .sidebar{display:none !important;}
+  .mob-overlay{display:none !important;}
+  .hamburger{display:none !important;}
+  .bottom-nav{display:flex;}
+  .topbar-title{display:none;}
+  .sync-top{display:flex;}
   .main{margin-left:0 !important;}
-  .hamburger{display:flex !important;}
   .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
   .stat-value{font-size:22px;}
   .stat-icon{font-size:18px;}
-  .content{padding:14px;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+  .content{padding:14px;padding-bottom:calc(88px + env(safe-area-inset-bottom));}
   .topbar{padding:11px 14px;padding-top:calc(11px + env(safe-area-inset-top));}
-  .topbar-title{font-size:16px;}
   .form-row{grid-template-columns:1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
   .cal-cell{min-height:60px;}
@@ -353,14 +366,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="logo-sub">Gestion Événements</div>
     </div>
     <div class="nav-section">Navigation</div>
-    <div class="nav-item active" onclick="showTab('calendar',this);closeSidebar()"><span class="nav-icon">📅</span><span>Calendrier</span><span class="nav-badge" id="nav-badge-cal">0</span></div>
-    <div class="nav-item" onclick="showTab('events',this);closeSidebar()"><span class="nav-icon">🗂️</span><span>Événements</span></div>
-    <div class="nav-item" onclick="showTab('stock',this);closeSidebar()"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
-    <div class="nav-item" onclick="showTab('activity',this);closeSidebar();markAllRead()"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
+    <div class="nav-item active" data-tab="calendar" onclick="showTab('calendar')"><span class="nav-icon">📅</span><span>Calendrier</span><span class="nav-badge" id="nav-badge-cal">0</span></div>
+    <div class="nav-item" data-tab="events" onclick="showTab('events')"><span class="nav-icon">🗂️</span><span>Événements</span></div>
+    <div class="nav-item" data-tab="stock" onclick="showTab('stock')"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
+    <div class="nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
     <div class="nav-section">Paramètres</div>
-    <div class="nav-item" onclick="showTab('config',this);closeSidebar()"><span class="nav-icon">⚙️</span><span>Configuration</span></div>
+    <div class="nav-item" data-tab="config" onclick="showTab('config')"><span class="nav-icon">⚙️</span><span>Configuration</span></div>
     <div class="sidebar-bottom">
-      <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Connexion...</span></div>
+      <div class="sync-status"><div class="sync-dot js-sync-dot" id="sync-dot"></div><span class="js-sync-label" id="sync-label">Connexion...</span></div>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;" id="last-sync">—</div>
     </div>
   </div>
@@ -369,8 +382,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()">☰</button>
         <div class="topbar-title" id="page-title">📅 Calendrier</div>
+        <div class="sync-status sync-top"><div class="sync-dot js-sync-dot"></div><span class="js-sync-label">Connexion...</span></div>
       </div>
       <div class="topbar-actions">
         <div class="notif-btn-wrap">
@@ -490,6 +503,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
   </div>
 </div>
+
+<!-- BARRE DE NAVIGATION DU BAS (mobile uniquement) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-item active" data-tab="calendar" onclick="showTab('calendar')"><span class="bn-ico">📅</span>Agenda</button>
+  <button class="bottom-nav-item" data-tab="events" onclick="showTab('events')"><span class="bn-ico">🗂️</span>Events</button>
+  <button class="bottom-nav-item" data-tab="stock" onclick="showTab('stock')"><span class="bn-ico">📦</span>Stock</button>
+  <button class="bottom-nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="bn-ico">📋</span>Activité<span class="bn-badge" id="bn-badge-activity">0</span></button>
+  <button class="bottom-nav-item" data-tab="config" onclick="showTab('config')"><span class="bn-ico">⚙️</span>Réglages</button>
+</nav>
 
 <!-- NOTIF PANEL -->
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifPanel()"></div>
@@ -704,12 +726,15 @@ async function persistDelete(id){
 }
 
 function setSyncStatus(s){
-  const dot=document.getElementById('sync-dot'), lbl=document.getElementById('sync-label');
-  dot.className='sync-dot';
-  if(s==='ok'){dot.style.cssText='background:var(--green);box-shadow:0 0 6px var(--green)';lbl.textContent='Synchronisé';}
-  else if(s==='syncing'){dot.classList.add('syncing');dot.style.cssText='background:var(--gold);box-shadow:0 0 6px var(--gold)';lbl.textContent='Sync...';}
-  else if(s==='error'){dot.style.cssText='background:var(--red);box-shadow:0 0 6px var(--red)';lbl.textContent='Hors ligne';}
-  else{dot.style.cssText='background:var(--text3);box-shadow:none';lbl.textContent='Mode local';}
+  const dots=document.querySelectorAll('.js-sync-dot');
+  const lbls=document.querySelectorAll('.js-sync-label');
+  let css='',txt='',syncing=false;
+  if(s==='ok'){css='background:var(--green);box-shadow:0 0 6px var(--green)';txt='Synchronisé';}
+  else if(s==='syncing'){css='background:var(--gold);box-shadow:0 0 6px var(--gold)';txt='Sync...';syncing=true;}
+  else if(s==='error'){css='background:var(--red);box-shadow:0 0 6px var(--red)';txt='Hors ligne';}
+  else{css='background:var(--text3);box-shadow:none';txt='Mode local';}
+  dots.forEach(d=>{d.className='sync-dot js-sync-dot'+(syncing?' syncing':'');d.style.cssText=css;});
+  lbls.forEach(l=>{l.textContent=txt;});
 }
 function setLastSync(){document.getElementById('last-sync').textContent='Màj '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
 function renderFbStatus(){
@@ -779,14 +804,12 @@ function checkStockAlerts(){
 function renderBadges(){
   const dot = document.getElementById('notif-red-dot');
   const badge = document.getElementById('nav-badge-activity');
-  if(unreadCount > 0){
-    dot.style.display='block';
-    badge.style.display='inline';
-    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-  } else {
-    dot.style.display='none';
-    badge.style.display='none';
-  }
+  const bn = document.getElementById('bn-badge-activity');
+  const has = unreadCount > 0;
+  const txt = unreadCount > 9 ? '9+' : String(unreadCount);
+  if(dot) dot.style.display = has ? 'block' : 'none';
+  if(badge){ badge.style.display = has ? 'inline' : 'none'; badge.textContent = txt; }
+  if(bn){ bn.style.display = has ? 'inline-flex' : 'none'; bn.textContent = txt; }
 }
 function markAllRead(){
   activityLog = activityLog.map(e=>({...e,read:true}));
@@ -1128,15 +1151,17 @@ async function saveEvent(){
 // ══════════════════════════════════════════════════════
 function showTab(n,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-  document.getElementById('tab-'+n).classList.add('active');
-  if(el)el.classList.add('active');
+  document.querySelectorAll('.nav-item,.bottom-nav-item').forEach(x=>x.classList.remove('active'));
+  const sec=document.getElementById('tab-'+n); if(sec) sec.classList.add('active');
+  document.querySelectorAll('[data-tab="'+n+'"]').forEach(x=>x.classList.add('active'));
   const T={calendar:'📅 Calendrier',events:'🗂️ Événements',stock:'📦 Stock',activity:'📋 Activité',config:'⚙️ Configuration'};
-  document.getElementById('page-title').textContent=T[n]||n;
+  const pt=document.getElementById('page-title'); if(pt) pt.textContent=T[n]||n;
+  closeSidebar();
   if(n==='stock')renderStock();
   if(n==='events')applyFilters();
   if(n==='config')renderConfig();
-  if(n==='activity'){renderActivityList();}
+  if(n==='activity')renderActivityList();
+  try{window.scrollTo(0,0);}catch(e){}
 }
 function prevMonth(){currentMonth--;if(currentMonth<0){currentMonth=11;currentYear--;}renderCalendar();}
 function nextMonth(){currentMonth++;if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();}
@@ -1159,6 +1184,10 @@ function showToast(msg,type='info'){const t=document.getElementById('toast');t.t
 // Enregistre le service worker (rend l'app installable + utilisable hors-ligne)
 function registerServiceWorker(){
   if('serviceWorker' in navigator){
+    let refreshing=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(refreshing)return; refreshing=true; window.location.reload();
+    });
     window.addEventListener('load', ()=>{
       navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW non enregistré:',err));
     });
