@@ -2,8 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Events Café — Dashboard</title>
+<meta name="theme-color" content="#111318">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Events Café">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -26,7 +34,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ── LAYOUT ── */
 .wrapper{position:relative;z-index:1;display:flex;min-height:100vh;}
-.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 .main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;}
 
 /* ── SIDEBAR ── */
@@ -268,34 +276,62 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .mob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:49;display:none;}
 .mob-overlay.open{display:block;}
 
+/* ── SAFE AREA (encoche iPhone) ── */
+.topbar{padding-top:calc(14px + env(safe-area-inset-top));padding-left:calc(24px + env(safe-area-inset-left));padding-right:calc(24px + env(safe-area-inset-right));}
+.sidebar{padding-top:env(safe-area-inset-top);}
+.content{padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+
 @media(max-width:820px){
   :root{--sidebar-w:0px;}
-  .sidebar{transform:translateX(-240px);width:240px;min-width:240px;}
-  .sidebar.mob-open{transform:translateX(0);}
+  .sidebar{transform:translateX(-260px);width:min(260px,86vw);min-width:min(260px,86vw);}
+  .sidebar.mob-open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,.6);}
   .main{margin-left:0 !important;}
   .hamburger{display:flex !important;}
   .stats-row{grid-template-columns:1fr 1fr;gap:8px;}
   .stat-value{font-size:22px;}
   .stat-icon{font-size:18px;}
-  .content{padding:14px;}
-  .topbar{padding:11px 14px;}
+  .content{padding:14px;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+  .topbar{padding:11px 14px;padding-top:calc(11px + env(safe-area-inset-top));}
   .topbar-title{font-size:16px;}
   .form-row{grid-template-columns:1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
   .cal-cell{min-height:60px;}
   .ev-footer{gap:4px;}
   .config-grid{grid-template-columns:1fr;}
-  .notif-panel{width:min(340px,100vw);}
+  .notif-panel{width:min(360px,100vw);}
   .btn .btn-label{display:none;}
+  .btn{padding:9px 12px;}
+  /* iOS : police >=16px sur les champs pour éviter le zoom auto au focus */
+  .form-input,.form-select,.form-textarea,.cfg-input,.filter-input,.status-sel{font-size:16px;}
+  /* zones tactiles plus confortables */
+  .btn-xs{padding:7px 12px;font-size:12px;}
+  .status-sel{padding:7px 10px;font-size:12px;}
+  .mat-btn{width:32px;height:32px;}
+  .cal-btn{padding:8px 14px;}
+  #stock-config-grid{grid-template-columns:1fr 1fr !important;}
 }
 @media(max-width:480px){
   .stats-row{grid-template-columns:1fr 1fr;}
   .stock-grid{grid-template-columns:1fr 1fr;}
   .mat-grid{grid-template-columns:1fr 1fr;}
-  .cal-dh{font-size:8px;padding:4px 0;}
-  .cal-cell{min-height:52px;padding:3px;}
+  .cal-dh{font-size:9px;padding:4px 0;}
+  .cal-cell{min-height:58px;padding:3px;}
   .ev-chip{font-size:8px;}
-  .topbar-actions .btn-ghost:not(.notif-btn-wrap .btn-ghost){display:none;}
+  /* Toutes les actions du haut restent visibles (icônes) */
+  .topbar-actions{gap:6px;}
+  .topbar-actions .btn{padding:9px 11px;font-size:15px;}
+  .ev-top{flex-wrap:wrap;}
+  .ev-footer{gap:6px;}
+  .ev-footer .btn-xs,.ev-footer .status-sel{flex:1 1 auto;justify-content:center;text-align:center;}
+  .filters-row{flex-direction:column;align-items:stretch;}
+  .filter-sel{width:100%;}
+  .toast{left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));max-width:none;}
+  .modal-footer{flex-direction:column-reverse;}
+  .modal-footer .btn{width:100%;justify-content:center;}
+  #stock-config-grid{grid-template-columns:1fr 1fr !important;}
+}
+@media(max-width:360px){
+  .stats-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -307,9 +343,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div style="font-size:12px;color:var(--text3);margin-top:4px;">Connexion Firebase...</div>
 </div>
 
-<div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
-
 <div class="wrapper" id="app" style="display:none">
+  <!-- Overlay mobile (DOIT être dans .wrapper pour que la sidebar passe au-dessus) -->
+  <div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="logo">
@@ -552,7 +588,32 @@ const findEv = id => events.find(e => String(e.id)===String(id));
 function startRealtime(){
   if(!fbReady){setSyncStatus('local');loadLocal();renderFbStatus();return;}
   setSyncStatus('syncing');
+
+  // Suivi fiable de l'état de connexion (corrige le "Connexion..." figé sur téléphone)
+  db.ref('.info/connected').on('value', s=>{
+    const connected = s.val()===true;
+    if(connected){
+      if(!isFirstLoad){ setSyncStatus('ok'); setLastSync(); }
+    } else {
+      // On n'affiche "Hors ligne" que si on avait déjà reçu des données
+      // (évite un faux clignotement rouge pendant la 1re connexion)
+      if(!isFirstLoad){ setSyncStatus('error'); }
+      else { setSyncStatus('syncing'); }
+    }
+  });
+
+  // Watchdog : si Firebase ne répond pas dans les 8s, on bascule en local pour ne pas rester bloqué
+  let firstSnapReceived = false;
+  const watchdog = setTimeout(()=>{
+    if(!firstSnapReceived){
+      console.warn('Firebase: pas de réponse, bascule en mode local');
+      setSyncStatus('error');
+      if(!events.length) loadLocal();
+    }
+  }, 8000);
+
   db.ref('events').on('value', snap => {
+    firstSnapReceived = true; clearTimeout(watchdog);
     const val = snap.val()||{};
     const newEvs = Object.keys(val).map(k=>{const e={...val[k]};e.id=k;e.material=e.material||{};return e;});
 
@@ -561,7 +622,7 @@ function startRealtime(){
       newEvs.forEach(ev => {
         const old = prevEventsSnapshot[ev.id];
         if(!old){
-          const isForm = ev.source==='formulaire';
+          const isForm = ev.origin==='formulaire' || ev.source==='formulaire';
           if(isForm && notifPrefs.form){
             pushNotif('📋','Nouveau formulaire client',`${ev.client} — ${ev.salon} (${formatDate(ev.start)} → ${formatDate(ev.end)})`,'form');
             sendEmailBoth('🆕 Nouveau formulaire client',`Client : ${ev.client}\nSalon : ${ev.salon}\nStand : ${ev.stand||'—'}\nDates : ${ev.start} → ${ev.end}\nContact : ${ev.contact||'—'}`);
@@ -596,8 +657,10 @@ function startRealtime(){
 
     prevEventsSnapshot = {};
     newEvs.forEach(ev=>{prevEventsSnapshot[ev.id]=JSON.parse(JSON.stringify(ev));});
+    const wasFirstLoad = isFirstLoad;
     events = newEvs;
     isFirstLoad = false;
+    if(!wasFirstLoad) checkStockAlerts();
     setSyncStatus('ok'); setLastSync(); renderAll();
   }, err=>{console.error(err); setSyncStatus('error'); loadLocal();});
 
@@ -674,21 +737,41 @@ function pushNotif(icon, title, msg, type){
   renderBadges();
   renderNotifHistory();
   if(document.getElementById('tab-activity').classList.contains('active')) renderActivityList();
-  // Notif navigateur push
-  if(Notification.permission==='granted'){
-    try{new Notification('Events Café — '+title,{body:msg,icon:'https://events-cafe.com/wp-content/uploads/2022/08/cropped-Events-Cafe-11.png'});}
-    catch(e){}
-  }
+  // Notif navigateur push (protégée — l'API Notification n'existe pas partout, ex: Safari iOS hors app installée)
+  showNativeNotification(title, msg);
 }
 
+// Affiche une notification système de façon sûre (ne crashe jamais si l'API est absente)
+function notifSupported(){ return (typeof window !== 'undefined') && ('Notification' in window); }
+function notifPermission(){ return notifSupported() ? Notification.permission : 'unsupported'; }
+function showNativeNotification(title, msg){
+  if(!notifSupported() || Notification.permission !== 'granted') return;
+  const opts = {body:msg, icon:'icon.svg', badge:'icon.svg', tag:'events-cafe'};
+  try{
+    // Préfère le service worker (obligatoire pour les notifs sur iOS installé)
+    if('serviceWorker' in navigator && navigator.serviceWorker.ready){
+      navigator.serviceWorker.ready.then(reg=>{ try{reg.showNotification('Events Café — '+title, opts);}catch(e){} }).catch(()=>{});
+    } else {
+      new Notification('Events Café — '+title, opts);
+    }
+  }catch(e){ /* certains navigateurs interdisent new Notification() : on ignore */ }
+}
+
+let _stockAlerted = {}; // mémorise les articles déjà signalés en critique (anti-spam)
 function checkStockAlerts(){
   if(!notifPrefs.stock) return;
   const locked = getLockedStock();
   STOCK_META.forEach(si=>{
-    const avail = STOCK_DEFAULTS[si.id]-(locked[si.id]||0);
-    const pct = STOCK_DEFAULTS[si.id]>0 ? avail/STOCK_DEFAULTS[si.id] : 1;
-    if(pct <= 0.15 && avail >= 0){
-      pushNotif('⚠️','Stock critique',`${si.label} : seulement ${avail} unité(s) disponible(s)`,'stock');
+    const total = STOCK_DEFAULTS[si.id]||0;
+    const avail = total-(locked[si.id]||0);
+    const pct = total>0 ? avail/total : 1;
+    const critical = (pct <= 0.15 && avail >= 0 && total > 0);
+    if(critical && !_stockAlerted[si.id]){
+      _stockAlerted[si.id] = true;
+      pushNotif('⚠️','Stock critique',`${si.label} : seulement ${avail} unité(s) disponible(s) sur ${total}`,'stock');
+    } else if(!critical && _stockAlerted[si.id]){
+      // l'article est repassé au-dessus du seuil : on réarme l'alerte
+      _stockAlerted[si.id] = false;
     }
   });
 }
@@ -773,15 +856,18 @@ function saveNotifPrefs(){
   showToast('Préférences sauvegardées','info');
 }
 function requestPush(){
-  if(!('Notification' in window)){showToast('Navigateur non supporté','error');return;}
+  if(!notifSupported()){
+    showToast("Notifications non supportées ici. Sur iPhone : ajoute d'abord l'app à l'écran d'accueil, puis rouvre-la.",'error');
+    return;
+  }
   Notification.requestPermission().then(p=>{
     if(p==='granted'){
       const btn=document.getElementById('push-btn');
-      btn.textContent='✅ Notifications push activées';btn.classList.add('active');
-      new Notification('Events Café',{body:'Notifications push activées !'});
+      if(btn){btn.textContent='✅ Notifications push activées';btn.classList.add('active');}
+      showNativeNotification('Notifications activées','Vous recevrez désormais les alertes.');
       showToast('Notifications push activées ✓','success');
-    } else showToast('Permission refusée — activez dans les réglages','error');
-  });
+    } else showToast('Permission refusée — activez-la dans les réglages du navigateur','error');
+  }).catch(()=>showToast('Impossible d\'activer les notifications ici','error'));
 }
 
 // ══════════════════════════════════════════════════════
@@ -798,12 +884,13 @@ function saveEmailConfig(){
     name2: document.getElementById('cfg-email2-name').value.trim(),
   };
   localStorage.setItem('ep_ejs', JSON.stringify(ejsCfg));
-  if(ejsCfg.pubkey) emailjs.init(ejsCfg.pubkey);
+  if(ejsCfg.pubkey && typeof emailjs!=='undefined'){ try{emailjs.init(ejsCfg.pubkey);}catch(e){} }
   showToast('Configuration email sauvegardée ✓','success');
 }
 
 async function sendEmailTo(toEmail, toName, subject, message){
   if(!ejsCfg.pubkey || !ejsCfg.service || !ejsCfg.template || !toEmail) return;
+  if(typeof emailjs==='undefined'){ console.warn('EmailJS non chargé'); return; }
   try{
     emailjs.init(ejsCfg.pubkey);
     await emailjs.send(ejsCfg.service, ejsCfg.template, {
@@ -836,8 +923,8 @@ function loadEmailConfig(){
   if(ejsCfg.name1) document.getElementById('cfg-email1-name').value=ejsCfg.name1;
   if(ejsCfg.email2) document.getElementById('cfg-email2').value=ejsCfg.email2;
   if(ejsCfg.name2) document.getElementById('cfg-email2-name').value=ejsCfg.name2;
-  if(ejsCfg.pubkey) emailjs.init(ejsCfg.pubkey);
-  if(Notification.permission==='granted'){
+  if(ejsCfg.pubkey){ try{ emailjs.init(ejsCfg.pubkey); }catch(e){} }
+  if(notifPermission()==='granted'){
     const btn=document.getElementById('push-btn');
     if(btn){btn.textContent='✅ Notifications push activées';btn.classList.add('active');}
   }
@@ -1069,14 +1156,28 @@ function closeSidebar(){
 // ══════════════════════════════════════════════════════
 function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
 
-setTimeout(()=>{
-  document.getElementById('loading-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  if(ejsCfg.pubkey) try{emailjs.init(ejsCfg.pubkey);}catch(e){}
-  loadEmailConfig();
-  renderBadges();
-  startRealtime();
-},1000);
+// Enregistre le service worker (rend l'app installable + utilisable hors-ligne)
+function registerServiceWorker(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW non enregistré:',err));
+    });
+  }
+}
+
+// Démarrage robuste : chaque étape est isolée pour qu'une erreur n'empêche jamais
+// la synchronisation Firebase de démarrer (cause du "Connexion..." figé sur mobile).
+function bootApp(){
+  try{ document.getElementById('loading-screen').style.display='none'; }catch(e){}
+  try{ document.getElementById('app').style.display='flex'; }catch(e){}
+  try{ if(ejsCfg.pubkey && typeof emailjs!=='undefined') emailjs.init(ejsCfg.pubkey); }catch(e){console.warn(e);}
+  try{ loadEmailConfig(); }catch(e){console.warn('loadEmailConfig:',e);}
+  try{ renderBadges(); }catch(e){console.warn('renderBadges:',e);}
+  try{ startRealtime(); }catch(e){console.error('startRealtime:',e); setSyncStatus('error'); try{loadLocal();}catch(_){}}
+}
+
+registerServiceWorker();
+setTimeout(bootApp, 800);
 </script>
 </body>
 </html>
