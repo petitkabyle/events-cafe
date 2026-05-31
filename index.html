@@ -129,6 +129,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .ev-card.en-cours::before{background:var(--gold);}
 .ev-card.termine::before{background:var(--green);}
 .ev-card.rendu::before{background:var(--text3);}
+.ev-card.attente::before{background:var(--orange);}
+.ev-card.livre::before{background:var(--gold);}
 .ev-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;}
 .ev-name{font-family:var(--font-head);font-size:14px;font-weight:600;}
 .ev-client{font-size:12px;color:var(--text2);margin-top:1px;}
@@ -137,6 +139,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .badge-gold{background:rgba(245,158,11,.15);color:var(--gold2);border:1px solid rgba(245,158,11,.25);}
 .badge-green{background:rgba(16,185,129,.15);color:var(--green2);border:1px solid rgba(16,185,129,.25);}
 .badge-gray{background:rgba(255,255,255,.07);color:var(--text3);border:1px solid var(--border);}
+.badge-orange{background:rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.3);}
 .ev-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:8px;}
 .mat-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
 .mat-chip{font-size:11px;padding:3px 9px;border-radius:5px;font-weight:500;}
@@ -297,6 +300,28 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .plan-entry .pe-hours{font-family:var(--font-head);font-weight:700;font-size:17px;color:var(--accent2);white-space:nowrap;}
 .plan-entry .pe-amount{font-size:12px;color:var(--green2);white-space:nowrap;margin-top:1px;}
 
+/* ── GRAPHIQUES STATS (sans librairie) ── */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px;}
+.bar-label{width:135px;flex-shrink:0;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;height:11px;background:var(--bg3);border-radius:6px;overflow:hidden;min-width:40px;}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s;min-width:2px;}
+.bar-val{width:100px;flex-shrink:0;text-align:right;color:var(--text1);font-weight:600;font-size:11px;white-space:nowrap;}
+.mbar-chart{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:6px;}
+.mbar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;}
+.mbar-bar{width:100%;min-height:2px;border-radius:3px 3px 0 0;transition:height .5s;}
+.mbar-x{font-size:9px;color:var(--text3);}
+.chart-total{font-size:12px;color:var(--text2);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);text-align:right;}
+
+/* ── MENU "PLUS" (mobile) ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;}
+.sheet-overlay.open{display:block;}
+.more-sheet{position:fixed;left:0;right:0;bottom:0;z-index:101;background:var(--bg1);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom));transform:translateY(115%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);}
+.more-sheet.open{transform:translateY(0);}
+.more-sheet-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;text-align:center;}
+.more-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text1);font-family:var(--font-body);font-size:14px;margin-bottom:8px;cursor:pointer;text-align:left;}
+.more-item:active{background:var(--bg3);}
+.more-item .mi-ico{font-size:20px;}
+
 /* ── SAFE AREA (encoche iPhone) ── */
 .topbar{padding-top:calc(14px + env(safe-area-inset-top));padding-left:calc(24px + env(safe-area-inset-left));padding-right:calc(24px + env(safe-area-inset-right));}
 .sidebar{padding-top:env(safe-area-inset-top);}
@@ -382,6 +407,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="nav-item" data-tab="events" onclick="showTab('events')"><span class="nav-icon">🗂️</span><span>Événements</span></div>
     <div class="nav-item" data-tab="stock" onclick="showTab('stock')"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
     <div class="nav-item" data-tab="planning" onclick="showTab('planning')"><span class="nav-icon">⏱️</span><span>Planning / Heures</span></div>
+    <div class="nav-item" data-tab="stats" onclick="showTab('stats')"><span class="nav-icon">📊</span><span>Statistiques</span></div>
     <div class="nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
     <div class="nav-section">Paramètres</div>
     <div class="nav-item" data-tab="config" onclick="showTab('config')"><span class="nav-icon">⚙️</span><span>Configuration</span></div>
@@ -431,7 +457,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div id="tab-events" class="section">
         <div class="filters-row">
           <input class="filter-input" type="text" placeholder="🔍  Client, salon, stand..." id="search-input" oninput="applyFilters()">
-          <select class="filter-sel" id="filter-status" onchange="applyFilters()"><option value="">Tous les statuts</option><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">Matériel rendu</option></select>
+          <select class="filter-sel" id="filter-status" onchange="applyFilters()"><option value="actifs">Statuts actifs (défaut)</option><option value="attente_facturation">🧾 À facturer</option><option value="confirmé">✅ Confirmé</option><option value="livré">🚚 Livré</option><option value="terminé">🏁 Terminés</option><option value="all">Tout afficher</option></select>
           <select class="filter-sel" id="filter-type" onchange="applyFilters()"><option value="">Tous les types</option><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select>
         </div>
         <div id="events-list"></div>
@@ -488,6 +514,21 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="copyPlanningSummary()">📋 Copier le récap du mois</button>
         </div>
         <div id="plan-list"></div>
+      </div>
+
+      <!-- STATISTIQUES -->
+      <div id="tab-stats" class="section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div style="font-family:var(--font-head);font-size:15px;font-weight:600">📊 Statistiques &amp; bilan</div>
+          <select class="filter-sel" id="stats-year" onchange="renderAnalytics()"></select>
+        </div>
+        <div class="stats-row" id="stats-kpis" style="margin-bottom:16px;"></div>
+        <div class="config-panel"><div class="config-title">💶 Chiffre d'affaires par mois</div><div id="stats-ca-month"></div></div>
+        <div class="config-panel"><div class="config-title">⏱️ Heures travaillées par mois</div><div id="stats-hours-month"></div></div>
+        <div class="config-panel"><div class="config-title">📦 Matériel le plus loué</div><div id="stats-material"></div></div>
+        <div class="config-panel"><div class="config-title">🏷️ Répartition par type d'événement</div><div id="stats-type"></div></div>
+        <div class="config-panel"><div class="config-title">👥 Meilleurs clients (par CA)</div><div id="stats-clients"></div></div>
+        <div class="config-panel"><div class="config-title">🚦 Répartition par statut</div><div id="stats-status"></div></div>
       </div>
 
       <!-- CONFIG -->
@@ -556,9 +597,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <button class="bottom-nav-item" data-tab="events" onclick="showTab('events')"><span class="bn-ico">🗂️</span>Events</button>
   <button class="bottom-nav-item" data-tab="stock" onclick="showTab('stock')"><span class="bn-ico">📦</span>Stock</button>
   <button class="bottom-nav-item" data-tab="planning" onclick="showTab('planning')"><span class="bn-ico">⏱️</span>Heures</button>
-  <button class="bottom-nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="bn-ico">📋</span>Activité<span class="bn-badge" id="bn-badge-activity">0</span></button>
-  <button class="bottom-nav-item" data-tab="config" onclick="showTab('config')"><span class="bn-ico">⚙️</span>Réglages</button>
+  <button class="bottom-nav-item" data-tab="stats" onclick="showTab('stats')"><span class="bn-ico">📊</span>Stats</button>
+  <button class="bottom-nav-item" onclick="openMore()"><span class="bn-ico">⋯</span>Plus<span class="bn-badge" id="bn-badge-activity">0</span></button>
 </nav>
+
+<!-- Menu "Plus" (mobile) -->
+<div class="sheet-overlay" id="more-overlay" onclick="closeMore()"></div>
+<div class="more-sheet" id="more-sheet">
+  <div class="more-sheet-title">Plus d'options</div>
+  <button class="more-item" onclick="markAllRead();showTab('activity');closeMore()"><span class="mi-ico">📋</span> Activité / Historique</button>
+  <button class="more-item" onclick="showTab('config');closeMore()"><span class="mi-ico">⚙️</span> Configuration</button>
+</div>
 
 <!-- NOTIF PANEL -->
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifPanel()"></div>
@@ -594,7 +643,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="form-row"><div class="form-group"><label class="form-label">Nom du salon / événement *</label><input class="form-input" id="m-salon" type="text" placeholder="Festival de Cannes"></div><div class="form-group"><label class="form-label">Type d'événement</label><select class="form-select" id="m-type"><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">Stand(s) *</label><input class="form-input" id="m-stand" type="text" placeholder="Stand B12 - Palais"></div><div class="form-group"><label class="form-label">Ville / Lieu</label><input class="form-input" id="m-lieu" type="text" placeholder="Cannes"></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">📦 Date de montage *</label><input class="form-input" id="m-start" type="date"></div><div class="form-group"><label class="form-label">📤 Retour matériel *</label><input class="form-input" id="m-end" type="date"></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="m-status"><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">Matériel rendu ✓</option></select></div><div class="form-group"><label class="form-label">Notes internes</label><input class="form-input" id="m-notes" type="text" placeholder="Accès, horaires..."></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="m-status"><option value="attente_facturation">🧾 Attente facturation</option><option value="confirmé">✅ Confirmé</option><option value="livré">🚚 Livré</option><option value="terminé">🏁 Terminé</option></select></div><div class="form-group"><label class="form-label">Notes internes</label><input class="form-input" id="m-notes" type="text" placeholder="Accès, horaires..."></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">💶 Montant facturé (€)</label><input class="form-input" id="m-amount" type="number" min="0" step="0.01" placeholder="ex: 850"></div><div class="form-group"><label class="form-label">Paiement</label><select class="form-select" id="m-paid"><option value="">⏳ Non payé</option><option value="1">✅ Payé</option></select></div></div>
       <div class="form-section-title">📦 Matériel loué</div>
       <div class="mat-grid" id="modal-mat-grid"></div>
     </div>
@@ -625,8 +675,24 @@ const STOCK_META = [
   {id:'frigo_grand',label:'Frigo 200L',icon:'🧊',color:'#0d9488'},
 ];
 const EV_COLORS = ['c1','c2','c3','c4','c5','c6','c7','c8'];
-const STATUS_CLASSES = {'confirmé':'badge-blue','en cours':'badge-gold','terminé':'badge-green','matériel rendu':'badge-gray'};
-const STATUS_CARD_CLASSES = {'confirmé':'confirme','en cours':'en-cours','terminé':'termine','matériel rendu':'rendu'};
+// Workflow de statuts orienté facturation
+const STATUSES = [
+  {id:'attente_facturation', label:'Attente facturation', badge:'badge-orange', card:'attente',  icon:'🧾'},
+  {id:'confirmé',            label:'Confirmé',             badge:'badge-blue',   card:'confirme', icon:'✅'},
+  {id:'livré',               label:'Livré',                badge:'badge-gold',   card:'livre',    icon:'🚚'},
+  {id:'terminé',             label:'Terminé',              badge:'badge-green',  card:'termine',  icon:'🏁'},
+];
+const STATUS_MAP = {}; STATUSES.forEach(s=>STATUS_MAP[s.id]=s);
+// Convertit les anciens statuts vers les nouveaux (non destructif, à la lecture)
+function normStatus(s){
+  const m={'en cours':'livré','matériel rendu':'terminé','attente facturation':'attente_facturation'};
+  if(m[s]) return m[s];
+  return STATUS_MAP[s] ? s : (s==='terminé'?'terminé':'attente_facturation');
+}
+function statusBadge(s){const o=STATUS_MAP[normStatus(s)];return o?o.badge:'badge-gray';}
+function statusCard(s){const o=STATUS_MAP[normStatus(s)];return o?o.card:'attente';}
+function statusLabel(s){const o=STATUS_MAP[normStatus(s)];return o?o.label:(s||'—');}
+function statusIcon(s){const o=STATUS_MAP[normStatus(s)];return o?o.icon:'';}
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -695,7 +761,7 @@ function startRealtime(){
   db.ref('events').on('value', snap => {
     firstSnapReceived = true; clearTimeout(watchdog);
     const val = snap.val()||{};
-    const newEvs = Object.keys(val).map(k=>{const e={...val[k]};e.id=k;e.material=e.material||{};return e;});
+    const newEvs = Object.keys(val).map(k=>{const e={...val[k]};e.id=k;e.material=e.material||{};e.status=normStatus(e.status);return e;});
 
     if(!isFirstLoad){
       // Détection nouveaux / modifiés
@@ -789,6 +855,7 @@ function loadLocal(){
     {id:'demo3',client:'TechVision SAS',salon:'VivaTech Paris',stand:'Hall 2 - V42',type:'Salon professionnel',lieu:'Paris',start:'2026-06-11',end:'2026-06-14',status:'confirmé',notes:'Livraison J-1',material:{fontaine_eau:4,bonbonne:9,gobelet:3,nespresso:3,covim:1,cafe_pods:8,frigo_grand:1},contact:''},
     {id:'demo4',client:'BNP Paribas',salon:'Forum Banque',stand:'Allée B08',type:'Conférence / Congrès',lieu:'Paris La Défense',start:'2026-06-03',end:'2026-06-05',status:'confirmé',notes:'',material:{fontaine_eau:2,nespresso:2,lavazza:1,cafe_pods:5},contact:''},
   ];}
+  events=events.map(e=>{e.material=e.material||{};e.status=normStatus(e.status);return e;});
   isFirstLoad = false;
   renderAll();
 }
@@ -1031,7 +1098,7 @@ function emEventDetails(ev){
     `🏷️ Type : ${ev.type||'—'}`,
     `📦 Montage : ${emFmtDate(ev.start)}`,
     `📤 Retour : ${emFmtDate(ev.end)}`,
-    `🚦 Statut : ${ev.status||'—'}`,
+    `🚦 Statut : ${statusLabel(ev.status)}`,
     `☕ Matériel :\n${emMaterial(ev)}`,
     ev.notes ? `📝 Notes : ${ev.notes}` : null
   ].filter(Boolean).join('\n');
@@ -1070,25 +1137,25 @@ function loadEmailConfig(){
 function getEvColor(ev){return EV_COLORS[events.indexOf(ev)%EV_COLORS.length];}
 function getLockedStock(){
   const l={};STOCK_META.forEach(s=>l[s.id]=0);
-  events.forEach(ev=>{if(ev.status==='matériel rendu')return;Object.entries(ev.material||{}).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
+  events.forEach(ev=>{if(normStatus(ev.status)==='terminé')return;Object.entries(ev.material||{}).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
   return l;
 }
 function formatDate(d){if(!d)return'—';return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
 
 function renderStats(){
-  const now=new Date().toISOString().slice(0,10);
-  const active=events.filter(ev=>ev.status==='en cours').length;
-  const upcoming=events.filter(ev=>ev.status==='confirmé'&&ev.start>=now).length;
+  const aFacturer=events.filter(ev=>normStatus(ev.status)==='attente_facturation').length;
+  const enCours=events.filter(ev=>normStatus(ev.status)==='livré').length;
   const locked=getLockedStock();
   const fa=STOCK_DEFAULTS.fontaine_eau-(locked.fontaine_eau||0);
   const na=STOCK_DEFAULTS.nespresso-(locked.nespresso||0);
   document.getElementById('stats-row').innerHTML=`
-    <div class="stat-card blue"><div class="stat-label">En cours</div><div class="stat-value" style="color:var(--accent2)">${active}</div><div class="stat-sub">événements actifs</div><div class="stat-icon">📅</div></div>
-    <div class="stat-card gold"><div class="stat-label">À venir</div><div class="stat-value" style="color:var(--gold2)">${upcoming}</div><div class="stat-sub">confirmés</div><div class="stat-icon">✅</div></div>
+    <div class="stat-card orange"><div class="stat-label">À facturer</div><div class="stat-value" style="color:${aFacturer>0?'var(--orange)':'var(--text2)'}">${aFacturer}</div><div class="stat-sub">demande(s) à traiter</div><div class="stat-icon">🧾</div></div>
+    <div class="stat-card blue"><div class="stat-label">Livrés / en cours</div><div class="stat-value" style="color:var(--accent2)">${enCours}</div><div class="stat-sub">événements actifs</div><div class="stat-icon">🚚</div></div>
     <div class="stat-card green"><div class="stat-label">Fontaines dispos</div><div class="stat-value" style="color:${fa<8?'var(--orange)':'var(--green2)'}">${fa}<span style="font-size:13px;color:var(--text3)"> / ${STOCK_DEFAULTS.fontaine_eau}</span></div><div class="stat-sub">sur ${STOCK_DEFAULTS.fontaine_eau} total</div><div class="stat-icon">💧</div></div>
     <div class="stat-card orange"><div class="stat-label">Nespresso dispos</div><div class="stat-value" style="color:${na<3?'var(--red)':'var(--green2)'}">${na}<span style="font-size:13px;color:var(--text3)"> / ${STOCK_DEFAULTS.nespresso}</span></div><div class="stat-sub">sur ${STOCK_DEFAULTS.nespresso} total</div><div class="stat-icon">☕</div></div>`;
-  document.getElementById('nav-badge-cal').textContent=active+upcoming;
-  const lowStock=STOCK_META.some(si=>{const avail=STOCK_DEFAULTS[si.id]-(getLockedStock()[si.id]||0);return STOCK_DEFAULTS[si.id]>0&&avail/STOCK_DEFAULTS[si.id]<0.2;});
+  const activeCount=events.filter(ev=>normStatus(ev.status)!=='terminé').length;
+  document.getElementById('nav-badge-cal').textContent=activeCount;
+  const lowStock=STOCK_META.some(si=>{const avail=STOCK_DEFAULTS[si.id]-(locked[si.id]||0);return STOCK_DEFAULTS[si.id]>0&&avail/STOCK_DEFAULTS[si.id]<0.2;});
   document.getElementById('nav-badge-stock').style.display=lowStock?'inline':'none';
 }
 
@@ -1132,24 +1199,26 @@ function showDayEvents(ds){
 }
 function renderCalEventList(){
   const now=new Date().toISOString().slice(0,10);
-  const ac=events.filter(ev=>ev.status!=='matériel rendu'&&ev.end>=now).sort((a,b)=>a.start.localeCompare(b.start));
+  const ac=events.filter(ev=>normStatus(ev.status)!=='terminé'&&ev.end>=now).sort((a,b)=>a.start.localeCompare(b.start));
   document.getElementById('cal-list-title').textContent='Événements actifs & à venir';
   document.getElementById('cal-ev-list').innerHTML=ac.length?ac.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">✨</div><div class="empty-text">Aucun événement actif</div></div>';
 }
 
 function renderEvCard(ev){
-  const sc=STATUS_CLASSES[ev.status]||'badge-gray';
-  const cc=STATUS_CARD_CLASSES[ev.status]||'rendu';
+  const sc=statusBadge(ev.status);
+  const cc=statusCard(ev.status);
   const mats=Object.entries(ev.material||{}).map(([k,v])=>{const si=STOCK_META.find(s=>s.id===k);if(!si||!parseInt(v))return'';return`<span class="mat-chip" style="background:${si.color}22;color:${si.color}">${si.icon} ${v}× ${si.label}</span>`;}).join('');
+  const amt=parseFloat(ev.amount)||0;
+  const money=amt>0?`<span>💶 ${fmtMoney(amt)} ${ev.paid?'· <span style="color:var(--green2)">payé ✅</span>':'· <span style="color:var(--orange)">non payé</span>'}</span>`:'';
   return`<div class="ev-card ${cc}">
-    <div class="ev-top"><div><div class="ev-name">${ev.salon||''}${ev.stand?` — ${ev.stand}`:''}</div><div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div></div><span class="badge ${sc}">${ev.status||''}</span></div>
-    <div class="ev-meta"><span>📦 Montage : ${formatDate(ev.start)}</span><span>📤 Démontage : ${formatDate(ev.end)}</span><span>🏷 ${ev.type||'—'}</span>${ev.contact?`<span>📞 ${ev.contact}</span>`:''}</div>
+    <div class="ev-top"><div><div class="ev-name">${ev.salon||''}${ev.stand?` — ${ev.stand}`:''}</div><div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div></div><span class="badge ${sc}">${statusIcon(ev.status)} ${statusLabel(ev.status)}</span></div>
+    <div class="ev-meta"><span>📦 Montage : ${formatDate(ev.start)}</span><span>📤 Démontage : ${formatDate(ev.end)}</span><span>🏷 ${ev.type||'—'}</span>${ev.contact?`<span>📞 ${ev.contact}</span>`:''}${money}</div>
     ${mats?`<div class="mat-chips">${mats}</div>`:''}
     ${ev.notes?`<div class="ev-notes">💬 ${ev.notes}</div>`:''}
     <div class="ev-footer">
       <button class="btn-xs" onclick="openEditModal('${ev.id}')">✏️ Modifier</button>
-      <select class="status-sel" onchange="quickStatus('${ev.id}',this.value)"><option value="">— Statut —</option><option value="confirmé">Confirmé</option><option value="en cours">En cours</option><option value="terminé">Terminé</option><option value="matériel rendu">✅ Matériel rendu</option></select>
-      <button class="btn-xs success" onclick="quickStatus('${ev.id}','matériel rendu')">✅ Rendu</button>
+      <select class="status-sel" onchange="quickStatus('${ev.id}',this.value)"><option value="">— Changer statut —</option><option value="attente_facturation">🧾 Attente facturation</option><option value="confirmé">✅ Confirmé</option><option value="livré">🚚 Livré</option><option value="terminé">🏁 Terminé</option></select>
+      <button class="btn-xs ${ev.paid?'success':''}" onclick="togglePaid('${ev.id}')">${ev.paid?'✅ Payé':'💶 Marquer payé'}</button>
       <button class="btn-xs danger" onclick="deleteEvent('${ev.id}')">🗑</button>
     </div></div>`;
 }
@@ -1159,8 +1228,11 @@ function applyFilters(){
   const st=document.getElementById('filter-status').value;
   const tp=document.getElementById('filter-type').value;
   const f=events.filter(ev=>{
+    const s=normStatus(ev.status);
     if(q&&!(ev.client||'').toLowerCase().includes(q)&&!(ev.salon||'').toLowerCase().includes(q)&&!(ev.stand||'').toLowerCase().includes(q))return false;
-    if(st&&ev.status!==st)return false;
+    if(st==='actifs'){ if(s==='terminé') return false; }
+    else if(st==='all'){ /* tout afficher */ }
+    else if(st && s!==st) return false;
     if(tp&&ev.type!==tp)return false;
     return true;
   }).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
@@ -1175,7 +1247,7 @@ function renderStock(){
     const st=pct>50?'Disponible':pct>20?'Stock limité':'⚠️ Stock critique';
     return`<div class="stock-card"><div class="stock-card-label">${si.icon} ${si.label}</div><div class="stock-nums"><div class="stock-avail" style="color:${col}">${avail}</div><div class="stock-total">/ ${total} total</div></div><div class="stock-bar"><div class="stock-bar-fill" style="width:${Math.max(0,pct)}%;background:${col}"></div></div><div class="stock-status" style="color:${col}">${st}</div><div class="stock-locked">${locked[si.id]||0} en location</div></div>`;
   }).join('');
-  const ac=events.filter(ev=>ev.status!=='matériel rendu');
+  const ac=events.filter(ev=>normStatus(ev.status)!=='terminé');
   document.getElementById('stock-active-list').innerHTML=ac.length?ac.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucun matériel en location</div></div>';
 }
 
@@ -1313,24 +1385,107 @@ function copyPlanningSummary(){
   else showToast('Copie non supportée sur ce navigateur','error');
 }
 
-function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();renderPlanning();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();}
+// ══════════════════════════════════════════════════════
+// STATISTIQUES / BILAN
+// ══════════════════════════════════════════════════════
+function emptyMini(t){ return `<div style="font-size:12px;color:var(--text3);padding:8px 0">${t}</div>`; }
+function barRows(items){
+  if(!items.length) return emptyMini('Aucune donnée');
+  const max=Math.max(1,...items.map(i=>i.value));
+  return items.map(i=>`<div class="bar-row"><div class="bar-label">${i.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,Math.round(i.value/max*100))}%;background:${i.color||'var(--accent)'}"></div></div><div class="bar-val">${i.display!=null?i.display:i.value}</div></div>`).join('');
+}
+function monthBars(values,fmt,color){
+  const max=Math.max(1,...values);
+  const M=['J','F','M','A','M','J','J','A','S','O','N','D'];
+  return `<div class="mbar-chart">`+values.map((v,i)=>`<div class="mbar-col" title="${M[i]} : ${fmt(v)}"><div class="mbar-bar" style="height:${v>0?Math.max(3,Math.round(v/max*100)):0}%;background:${color}"></div><div class="mbar-x">${M[i]}</div></div>`).join('')+`</div>`;
+}
+function renderAnalytics(){
+  const yearSel=document.getElementById('stats-year'); if(!yearSel) return;
+  const years=new Set();
+  events.forEach(e=>{ if(e.start) years.add(e.start.slice(0,4)); });
+  hoursList.forEach(h=>{ if(h.date) years.add(h.date.slice(0,4)); });
+  years.add(String(new Date().getFullYear()));
+  const yearArr=[...years].filter(Boolean).sort().reverse();
+  const cur=yearSel.value||String(new Date().getFullYear());
+  yearSel.innerHTML=yearArr.map(y=>`<option ${y===cur?'selected':''}>${y}</option>`).join('')+`<option value="all" ${cur==='all'?'selected':''}>Toutes les années</option>`;
+  const year=yearSel.value;
+  const inYear=d=> year==='all' ? !!d : (d||'').slice(0,4)===year;
+  const evs=events.filter(e=>inYear(e.start));
+  const hrs=hoursList.filter(h=>inYear(h.date));
+  const amount=e=>parseFloat(e.amount)||0;
+  const caTotal=evs.reduce((s,e)=>s+amount(e),0);
+  const encaisse=evs.filter(e=>e.paid).reduce((s,e)=>s+amount(e),0);
+  const reste=evs.filter(e=>!e.paid).reduce((s,e)=>s+amount(e),0);
+  const aFacturer=evs.filter(e=>normStatus(e.status)==='attente_facturation').length;
+  const totalHours=hrs.reduce((s,h)=>s+(parseFloat(h.hours)||0),0);
+  const montantHours=hrs.reduce((s,h)=>s+hourAmount(h),0);
+  const totalUnits=evs.reduce((s,e)=>s+Object.values(e.material||{}).reduce((a,v)=>a+(parseInt(v)||0),0),0);
+  // KPIs
+  document.getElementById('stats-kpis').innerHTML=`
+    <div class="stat-card blue"><div class="stat-label">Événements</div><div class="stat-value" style="color:var(--accent2)">${evs.length}</div><div class="stat-sub">sur la période</div><div class="stat-icon">🎪</div></div>
+    <div class="stat-card green"><div class="stat-label">CA total (devis)</div><div class="stat-value" style="color:var(--green2);font-size:21px">${fmtMoney(caTotal)}</div><div class="stat-sub">montant facturé</div><div class="stat-icon">💶</div></div>
+    <div class="stat-card green"><div class="stat-label">Encaissé</div><div class="stat-value" style="color:var(--green2);font-size:21px">${fmtMoney(encaisse)}</div><div class="stat-sub">déjà payé</div><div class="stat-icon">✅</div></div>
+    <div class="stat-card orange"><div class="stat-label">Reste à encaisser</div><div class="stat-value" style="color:${reste>0?'var(--orange)':'var(--text2)'};font-size:21px">${fmtMoney(reste)}</div><div class="stat-sub">non payé</div><div class="stat-icon">⏳</div></div>
+    <div class="stat-card orange"><div class="stat-label">À facturer</div><div class="stat-value" style="color:${aFacturer>0?'var(--orange)':'var(--text2)'}">${aFacturer}</div><div class="stat-sub">demande(s)</div><div class="stat-icon">🧾</div></div>
+    <div class="stat-card blue"><div class="stat-label">Heures travaillées</div><div class="stat-value" style="color:var(--accent2)">${totalHours.toLocaleString('fr-FR')}<span style="font-size:13px;color:var(--text3)"> h</span></div><div class="stat-sub">${montantHours>0?fmtMoney(montantHours):'—'}</div><div class="stat-icon">⏱️</div></div>
+    <div class="stat-card gold"><div class="stat-label">Unités louées</div><div class="stat-value" style="color:var(--gold2)">${totalUnits}</div><div class="stat-sub">total matériel</div><div class="stat-icon">📦</div></div>
+    <div class="stat-card gold"><div class="stat-label">Panier moyen</div><div class="stat-value" style="color:var(--gold2);font-size:21px">${evs.length?fmtMoney(caTotal/evs.length):'—'}</div><div class="stat-sub">CA / événement</div><div class="stat-icon">📈</div></div>`;
+  // CA par mois
+  const caMonth=Array(12).fill(0);
+  evs.forEach(e=>{ if(e.start){const m=parseInt(e.start.slice(5,7))-1; if(m>=0&&m<12) caMonth[m]+=amount(e);} });
+  document.getElementById('stats-ca-month').innerHTML=monthBars(caMonth,v=>fmtMoney(v),'var(--green)')+`<div class="chart-total">Total : ${fmtMoney(caTotal)}</div>`;
+  // Heures par mois
+  const hMonth=Array(12).fill(0);
+  hrs.forEach(h=>{ if(h.date){const m=parseInt(h.date.slice(5,7))-1; if(m>=0&&m<12) hMonth[m]+=(parseFloat(h.hours)||0);} });
+  document.getElementById('stats-hours-month').innerHTML=monthBars(hMonth,v=>v+' h','var(--accent)')+`<div class="chart-total">Total : ${totalHours.toLocaleString('fr-FR')} h${montantHours>0?' · '+fmtMoney(montantHours):''}</div>`;
+  // Matériel le plus loué
+  const matTotals={};
+  evs.forEach(e=>Object.entries(e.material||{}).forEach(([k,v])=>{matTotals[k]=(matTotals[k]||0)+(parseInt(v)||0);}));
+  const matItems=STOCK_META.map(si=>({label:si.icon+' '+si.label,value:matTotals[si.id]||0,display:(matTotals[si.id]||0)+'×',color:si.color})).filter(i=>i.value>0).sort((a,b)=>b.value-a.value);
+  document.getElementById('stats-material').innerHTML=barRows(matItems);
+  // Répartition par type
+  const typeT={};
+  evs.forEach(e=>{const t=e.type||'Autre'; typeT[t]=typeT[t]||{n:0,ca:0}; typeT[t].n++; typeT[t].ca+=amount(e);});
+  const typeItems=Object.entries(typeT).map(([t,o])=>({label:t,value:o.n,display:o.n+' évé.'+(o.ca?' · '+fmtMoney(o.ca):''),color:'var(--purple)'})).sort((a,b)=>b.value-a.value);
+  document.getElementById('stats-type').innerHTML=barRows(typeItems);
+  // Meilleurs clients
+  const cliT={};
+  evs.forEach(e=>{const c=e.client||'—'; cliT[c]=cliT[c]||{n:0,ca:0}; cliT[c].n++; cliT[c].ca+=amount(e);});
+  const cliItems=Object.entries(cliT).map(([c,o])=>({label:c,value:(o.ca||o.n),display:(o.ca?fmtMoney(o.ca):o.n+' évé.'),color:'var(--gold)'})).sort((a,b)=>b.value-a.value).slice(0,10);
+  document.getElementById('stats-clients').innerHTML=barRows(cliItems);
+  // Répartition par statut
+  const stT={}; STATUSES.forEach(s=>stT[s.id]=0);
+  evs.forEach(e=>{const s=normStatus(e.status); stT[s]=(stT[s]||0)+1;});
+  const stColors={attente_facturation:'var(--orange)',confirmé:'var(--accent)',livré:'var(--gold)',terminé:'var(--green)'};
+  const stItems=STATUSES.map(s=>({label:s.icon+' '+s.label,value:stT[s.id]||0,display:String(stT[s.id]||0),color:stColors[s.id]}));
+  document.getElementById('stats-status').innerHTML=barRows(stItems);
+}
+
+function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();renderPlanning();renderAnalytics();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();}
 
 // ══════════════════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════════════════
 function quickStatus(id,val){
   if(!val)return;
-  const ev=findEv(id); const oldStatus=ev?ev.status:'';
+  const ev=findEv(id); const oldStatus=ev?statusLabel(ev.status):'';
   persistUpdate(id,{status:val});
-  showToast('Statut mis à jour : '+val,'success');
+  showToast('Statut : '+statusLabel(val),'success');
   if(ev){
     const merged=Object.assign({},ev,{status:val});
-    if(val==='matériel rendu'){
-      if(notifPrefs.rendu) sendEmailBoth('✅ Matériel rendu — '+ev.client, `Le matériel de cet événement a été marqué comme RENDU.\n(Ancien statut : ${oldStatus})\n\n`+emEventDetails(merged));
+    if(val==='terminé'){
+      if(notifPrefs.rendu) sendEmailBoth('🏁 Événement terminé — '+ev.client, `Le matériel a été repris, l'événement est marqué TERMINÉ.\n(Ancien statut : ${oldStatus})\n\n`+emEventDetails(merged));
     } else if(notifPrefs.edit){
-      sendEmailBoth('🔄 Statut mis à jour — '+ev.client, `Le statut a changé : « ${oldStatus} » → « ${val} »\n\n`+emEventDetails(merged));
+      sendEmailBoth('🔄 Statut mis à jour — '+ev.client, `Le statut a changé : « ${oldStatus} » → « ${statusLabel(val)} »\n\n`+emEventDetails(merged));
     }
   }
+}
+function togglePaid(id){
+  const ev=findEv(id); if(!ev)return;
+  const np=!ev.paid;
+  persistUpdate(id,{paid:np});
+  showToast(np?'Marqué comme payé ✓':'Marqué non payé','info');
+  if(np && notifPrefs.edit && ev.client) sendEmailBoth('💶 Paiement reçu — '+ev.client, `Le paiement de cet événement a été marqué comme REÇU.\n\n`+emEventDetails(Object.assign({},ev,{paid:true})));
 }
 function deleteEvent(id){
   if(!confirm('Supprimer cet événement ?'))return;
@@ -1358,9 +1513,10 @@ function openAddModal(){
   editingId=null;
   document.getElementById('modal-title-text').textContent='＋ Nouvel événement';
   document.getElementById('modal-save-btn').textContent='Créer l\'événement';
-  ['m-client','m-contact','m-salon','m-stand','m-lieu','m-notes'].forEach(id=>document.getElementById(id).value='');
+  ['m-client','m-contact','m-salon','m-stand','m-lieu','m-notes','m-amount'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('m-start').value='';document.getElementById('m-end').value='';
   document.getElementById('m-status').value='confirmé';
+  document.getElementById('m-paid').value='';
   buildMatGrid('modal-mat-grid',{});
   document.getElementById('modal-overlay').style.display='flex';
 }
@@ -1377,8 +1533,10 @@ function openEditModal(id){
   document.getElementById('m-start').value=ev.start||'';
   document.getElementById('m-end').value=ev.end||'';
   document.getElementById('m-type').value=ev.type||'';
-  document.getElementById('m-status').value=ev.status||'confirmé';
+  document.getElementById('m-status').value=normStatus(ev.status);
   document.getElementById('m-notes').value=ev.notes||'';
+  document.getElementById('m-amount').value=ev.amount||'';
+  document.getElementById('m-paid').value=ev.paid?'1':'';
   buildMatGrid('modal-mat-grid',ev.material||{});
   document.getElementById('modal-overlay').style.display='flex';
 }
@@ -1388,7 +1546,7 @@ async function saveEvent(){
   const start=document.getElementById('m-start').value,end=document.getElementById('m-end').value;
   if(!client||!salon||!start||!end){showToast('Champs obligatoires manquants','error');return;}
   if(end<start){showToast('La date de retour doit être après le montage','error');return;}
-  const data={client,salon,contact:document.getElementById('m-contact').value,stand:document.getElementById('m-stand').value,lieu:document.getElementById('m-lieu').value,start,end,type:document.getElementById('m-type').value,status:document.getElementById('m-status').value,notes:document.getElementById('m-notes').value,material:getMatValues('modal-mat-grid')};
+  const data={client,salon,contact:document.getElementById('m-contact').value,stand:document.getElementById('m-stand').value,lieu:document.getElementById('m-lieu').value,start,end,type:document.getElementById('m-type').value,status:document.getElementById('m-status').value,notes:document.getElementById('m-notes').value,amount:parseFloat(document.getElementById('m-amount').value)||0,paid:document.getElementById('m-paid').value==='1',material:getMatValues('modal-mat-grid')};
   const btn=document.getElementById('modal-save-btn');const old=btn.textContent;
   btn.innerHTML='<div class="loader"></div>';btn.disabled=true;
   try{
@@ -1412,7 +1570,7 @@ function showTab(n,el){
   document.querySelectorAll('.nav-item,.bottom-nav-item').forEach(x=>x.classList.remove('active'));
   const sec=document.getElementById('tab-'+n); if(sec) sec.classList.add('active');
   document.querySelectorAll('[data-tab="'+n+'"]').forEach(x=>x.classList.add('active'));
-  const T={calendar:'📅 Calendrier',events:'🗂️ Événements',stock:'📦 Stock',planning:'⏱️ Planning / Heures',activity:'📋 Activité',config:'⚙️ Configuration'};
+  const T={calendar:'📅 Calendrier',events:'🗂️ Événements',stock:'📦 Stock',planning:'⏱️ Planning / Heures',stats:'📊 Statistiques',activity:'📋 Activité',config:'⚙️ Configuration'};
   const pt=document.getElementById('page-title'); if(pt) pt.textContent=T[n]||n;
   const sr=document.getElementById('stats-row'); if(sr) sr.style.display=(n==='calendar'||n==='events'||n==='stock')?'':'none';
   closeSidebar();
@@ -1421,6 +1579,7 @@ function showTab(n,el){
   if(n==='config')renderConfig();
   if(n==='activity')renderActivityList();
   if(n==='planning')renderPlanning();
+  if(n==='stats')renderAnalytics();
   try{window.scrollTo(0,0);}catch(e){}
 }
 function prevMonth(){currentMonth--;if(currentMonth<0){currentMonth=11;currentYear--;}renderCalendar();}
@@ -1434,6 +1593,14 @@ function toggleSidebar(){
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('mob-open');
   document.getElementById('mob-overlay').classList.remove('open');
+}
+function openMore(){
+  const s=document.getElementById('more-sheet'), o=document.getElementById('more-overlay');
+  if(s)s.classList.add('open'); if(o)o.classList.add('open');
+}
+function closeMore(){
+  const s=document.getElementById('more-sheet'), o=document.getElementById('more-overlay');
+  if(s)s.classList.remove('open'); if(o)o.classList.remove('open');
 }
 
 // ══════════════════════════════════════════════════════

@@ -540,7 +540,7 @@ async function submitForm(){
     type: document.getElementById('f-type').value,
     lieu: document.getElementById('f-lieu').value,
     start, end,
-    status: 'confirmé',
+    status: 'attente_facturation',
     notes: `${document.getElementById('f-notes').value}${document.getElementById('f-budget').value?' | Budget: '+document.getElementById('f-budget').value:''}`,
     material: mat,
     contact: `${email}${tel?' / '+tel:''}`,
