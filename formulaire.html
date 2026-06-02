@@ -275,6 +275,22 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
           <input class="form-input" id="f-lieu" type="text" placeholder="Cannes, Palais des Festivals">
         </div>
       </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">📍 Adresse complète de livraison <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-delivery-address" placeholder="Numéro, rue, bâtiment, hall, accès, code... (où doit-on livrer le matériel ?)" style="min-height:64px;" oninput="updateProgress()"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">👤 Contact sur place (à appeler à la livraison)</label>
+          <input class="form-input" id="f-onsite-name" type="text" placeholder="ex: Marie, responsable stand">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📞 Téléphone du contact sur place</label>
+          <input class="form-input" id="f-onsite-phone" type="tel" placeholder="+33 6 00 00 00 00">
+        </div>
+      </div>
       <div class="date-range">
         <div class="form-group">
           <label class="form-label">📦 Date de montage <span class="req">*</span></label>
@@ -493,6 +509,8 @@ async function sendFormEmail(row, mat){
 🎪 Salon / événement : ${row.salon||'—'}
 🪧 Stand : ${row.stand||'—'}
 📍 Lieu : ${row.lieu||'—'}
+🚚 Adresse de livraison : ${row.deliveryAddress||'—'}
+👤 Contact sur place : ${row.onSiteName||'—'}${row.onSitePhone?' / '+row.onSitePhone:''}
 🏷️ Type : ${row.type||'—'}
 📦 Montage : ${formatDate(row.start)}
 📤 Retour : ${formatDate(row.end)}
@@ -501,7 +519,7 @@ ${emMaterialText(mat)}
 📝 Précisions : ${row.notes||'—'}
 🔎 Connu via : ${row.source||'—'}
 
-➡️ Connecte-toi au dashboard pour confirmer la demande.`;
+➡️ Connecte-toi au dashboard : la demande arrive en "📩 Devis à envoyer".`;
   const recipients = [
     { email: emailCfg.email1, name: emailCfg.name1 },
     { email: emailCfg.email2, name: emailCfg.name2 }
@@ -583,7 +601,7 @@ function updateSummary(){
 }
 function updateProgress(){
   const s1 = document.getElementById('f-client').value && document.getElementById('f-nom').value && document.getElementById('f-email').value;
-  const s2 = document.getElementById('f-salon').value && document.getElementById('f-stand').value && document.getElementById('f-start').value && document.getElementById('f-end').value;
+  const s2 = document.getElementById('f-salon').value && document.getElementById('f-stand').value && document.getElementById('f-delivery-address').value && document.getElementById('f-start').value && document.getElementById('f-end').value;
   const s3 = Object.keys(getMatValues()).length > 0;
   setStep(1, s1 ? 'done' : 'active');
   setStep(2, s2 ? 'done' : (s1 ? 'active' : ''));
@@ -604,18 +622,27 @@ async function submitForm(){
   const stand = document.getElementById('f-stand').value.trim();
   const start = document.getElementById('f-start').value;
   const end = document.getElementById('f-end').value;
+  const deliveryAddress = document.getElementById('f-delivery-address').value.trim();
   if(!client||!nom||!email){ showToast('Merci de renseigner vos coordonnées','error'); return; }
   if(!salon||!stand||!start||!end){ showToast('Merci de renseigner l\'événement et les dates','error'); return; }
+  if(!deliveryAddress){ showToast('Merci d\'indiquer l\'adresse de livraison','error'); return; }
   if(end < start){ showToast('La date de retour doit être après le montage','error'); return; }
   const mat = getMatValues();
   const tel = document.getElementById('f-tel').value;
+  const onSiteName = document.getElementById('f-onsite-name').value.trim();
+  const onSitePhone = document.getElementById('f-onsite-phone').value.trim();
   const row = {
     client: `${client} (${nom})`,
+    clientCompany: client,
+    clientName: nom,
+    email: email,
     salon, stand,
     type: document.getElementById('f-type').value,
     lieu: document.getElementById('f-lieu').value,
+    deliveryAddress,
+    onSiteName, onSitePhone,
     start, end,
-    status: 'attente_facturation',
+    status: 'devis_a_envoyer',
     notes: `${document.getElementById('f-notes').value}${document.getElementById('f-budget').value?' | Budget: '+document.getElementById('f-budget').value:''}`,
     material: mat,
     contact: `${email}${tel?' / '+tel:''}`,
@@ -644,6 +671,7 @@ function showSuccess(ev, mat){
     <div class="success-row"><span class="success-row-label">Client</span><span class="success-row-val">${ev.client}</span></div>
     <div class="success-row"><span class="success-row-label">Événement</span><span class="success-row-val">${ev.salon}</span></div>
     <div class="success-row"><span class="success-row-label">Stand</span><span class="success-row-val">${ev.stand}</span></div>
+    <div class="success-row"><span class="success-row-label">Livraison</span><span class="success-row-val" style="max-width:280px;text-align:right">${ev.deliveryAddress||'—'}</span></div>
     <div class="success-row"><span class="success-row-label">Montage</span><span class="success-row-val">${formatDate(ev.start)}</span></div>
     <div class="success-row"><span class="success-row-label">Démontage</span><span class="success-row-val">${formatDate(ev.end)}</span></div>
     <div class="success-row"><span class="success-row-label">Matériel</span><span class="success-row-val" style="max-width:280px;text-align:right">${matText}</span></div>`;
@@ -651,7 +679,7 @@ function showSuccess(ev, mat){
 function resetForm(){
   document.getElementById('form-wrap').style.display = 'block';
   document.getElementById('success-screen').classList.remove('show');
-  ['f-client','f-nom','f-email','f-tel','f-salon','f-stand','f-lieu','f-start','f-end','f-notes','f-budget','f-type','f-source'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['f-client','f-nom','f-email','f-tel','f-salon','f-stand','f-lieu','f-delivery-address','f-onsite-name','f-onsite-phone','f-start','f-end','f-notes','f-budget','f-type','f-source'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   STOCK_META.forEach(si => { const el = document.getElementById('qty-'+si.id); if(el){ el.textContent='0'; el.className='qty-val'; } const mc = document.getElementById('mc-'+si.id); if(mc) mc.className='mat-card'; });
   updateSummary(); updateProgress();
   window.scrollTo({top:0,behavior:'smooth'});
