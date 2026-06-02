@@ -32,14 +32,33 @@ Les deux partagent `firebase-config.js`. **Tu ne configures Firebase qu'une fois
 ```json
 {
   "rules": {
-    "events": { ".read": true, ".write": true },
-    "stock":  { ".read": true, ".write": true }
+    ".read": true,
+    ".write": true
   }
 }
 ```
 
+> ✅ **IMPORTANT — pourquoi une règle à la racine ?**
+> L'application partage *plusieurs* types de données entre toi, ton frère et le
+> formulaire client : `events`, `stock`, `hours`, `catalogue`, `clients`,
+> `basePricing`, `drivers`, `deliveries`, `config`...
+> Une règle à la **racine** (`.read`/`.write` au plus haut niveau) autorise **tous**
+> ces nœuds d'un coup. Si tu listes les nœuds un par un, tout nœud oublié sera
+> **bloqué silencieusement** : le voyant reste vert mais les données (ex: un nouveau
+> client/tarif) ne se synchronisent pas sur l'autre appareil.
+>
 > ⚠️ Le mode test laisse la base ouverte (simple pour démarrer). Voir la section
 > « Sécurité » en bas pour la fermer plus tard.
+
+### 🔧 Tu as déjà installé l'app avant cette mise à jour ?
+
+Si tes anciennes règles ne listaient que `events` et `stock`, les nouveautés
+(clients, tarifs, livraisons…) **ne se synchronisent pas**. Corrige en 1 minute :
+
+1. Console Firebase → **Realtime Database** → onglet **« Règles »**
+2. Remplace tout par le bloc ci-dessus (`.read`/`.write` à la racine)
+3. **Publier**
+4. Recharge l'app sur le téléphone **et** l'ordinateur → tout se synchronise.
 
 ---
 
