@@ -234,14 +234,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .form-select option{background:var(--bg2);}
 .form-textarea{resize:vertical;min-height:58px;}
 .form-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:500;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.mat-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;transition:border-color .2s;}
+.mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.mat-item{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 5px;text-align:center;transition:border-color .2s;}
 .mat-item:hover{border-color:var(--border2);}
-.mat-item-label{font-size:10px;color:var(--text2);margin-bottom:6px;line-height:1.3;}
-.mat-qty{display:flex;align-items:center;justify-content:center;gap:8px;}
-.mat-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.mat-item-label{font-size:9px;color:var(--text2);margin-bottom:5px;line-height:1.25;}
+.mat-qty{display:flex;align-items:center;justify-content:center;gap:5px;}
+.mat-btn{width:22px;height:22px;border-radius:5px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .mat-btn:hover{background:var(--accent);border-color:var(--accent);}
-.mat-val{min-width:22px;text-align:center;font-weight:600;font-size:14px;}
+.mat-val{min-width:18px;text-align:center;font-weight:600;font-size:13px;}
+.mat-cat-sep{grid-column:1/-1;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:5px 2px 1px;border-bottom:1px solid var(--border);margin-top:2px;}
 .modal-footer{padding:12px 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
 .loader{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -252,6 +253,27 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green2);}
 .toast.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
 .toast.info{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--accent2);}
+
+/* ── CATALOGUE ── */
+.cat-table{width:100%;border-collapse:collapse;}
+.cat-table th{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.cat-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
+.cat-table tr:hover td{background:var(--bg3);}
+.cat-table tr.cat-hidden td{opacity:.45;}
+.cat-icon-cell{font-size:18px;width:36px;text-align:center;}
+.cat-label-cell{font-weight:500;color:var(--text1);}
+.cat-desc-cell{font-size:11px;color:var(--text3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-cat-cell .cat-pill{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg4);color:var(--text2);border:1px solid var(--border2);}
+.cat-stock-cell{font-family:var(--font-head);font-weight:600;color:var(--text1);}
+.cat-color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0;}
+.cat-actions{display:flex;gap:5px;align-items:center;}
+.cat-toggle{font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;color:var(--text2);font-family:var(--font-body);transition:all .2s;white-space:nowrap;}
+.cat-toggle:hover{background:var(--bg4);color:var(--text1);}
+.cat-toggle.active{border-color:rgba(16,185,129,.3);color:var(--green2);}
+.cat-toggle.inactive{border-color:rgba(239,68,68,.2);color:#fca5a5;}
+.cat-section-hdr{background:var(--bg2);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;padding:6px 12px;font-weight:500;}
+.cat-order-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 4px;transition:color .15s;}
+.cat-order-btn:hover{color:var(--text1);}
 
 /* ── EMPTY ── */
 .empty{text-align:center;padding:36px 16px;color:var(--text3);}
@@ -343,7 +365,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .content{padding:14px;padding-bottom:calc(88px + env(safe-area-inset-bottom));}
   .topbar{padding:11px 14px;padding-top:calc(11px + env(safe-area-inset-top));}
   .form-row{grid-template-columns:1fr;}
-  .mat-grid{grid-template-columns:1fr 1fr;}
+  .mat-grid{grid-template-columns:1fr 1fr 1fr;}
   .cal-cell{min-height:60px;}
   .ev-footer{gap:4px;}
   .config-grid{grid-template-columns:1fr;}
@@ -356,7 +378,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   /* zones tactiles plus confortables */
   .btn-xs{padding:7px 12px;font-size:12px;}
   .status-sel{padding:7px 10px;font-size:12px;}
-  .mat-btn{width:32px;height:32px;}
+  .mat-btn{width:28px;height:28px;}
   .cal-btn{padding:8px 14px;}
   #stock-config-grid{grid-template-columns:1fr 1fr !important;}
 }
@@ -406,6 +428,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="nav-item active" data-tab="calendar" onclick="showTab('calendar')"><span class="nav-icon">📅</span><span>Calendrier</span><span class="nav-badge" id="nav-badge-cal">0</span></div>
     <div class="nav-item" data-tab="events" onclick="showTab('events')"><span class="nav-icon">🗂️</span><span>Événements</span></div>
     <div class="nav-item" data-tab="stock" onclick="showTab('stock')"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
+    <div class="nav-item" data-tab="catalogue" onclick="showTab('catalogue')"><span class="nav-icon">🛠️</span><span>Catalogue produits</span></div>
     <div class="nav-item" data-tab="planning" onclick="showTab('planning')"><span class="nav-icon">⏱️</span><span>Planning / Heures</span></div>
     <div class="nav-item" data-tab="stats" onclick="showTab('stats')"><span class="nav-icon">📊</span><span>Statistiques</span></div>
     <div class="nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
@@ -531,6 +554,40 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="config-panel"><div class="config-title">🚦 Répartition par statut</div><div id="stats-status"></div></div>
       </div>
 
+      <!-- CATALOGUE PRODUITS -->
+      <div id="tab-catalogue" class="section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-family:var(--font-head);font-size:16px;font-weight:600">🛠️ Catalogue produits</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Ajoutez, modifiez ou désactivez vos produits. Les changements s'appliquent partout : stock, événements, formulaire client.</div>
+          </div>
+          <button class="btn btn-gold" onclick="openCatModal()">＋ Nouveau produit</button>
+        </div>
+
+        <!-- Filtres catalogue -->
+        <div class="filters-row" style="margin-bottom:12px;">
+          <input class="filter-input" type="text" id="cat-search" placeholder="🔍 Rechercher un produit..." oninput="renderCatalogue()">
+          <select class="filter-sel" id="cat-filter-cat" onchange="renderCatalogue()">
+            <option value="">Toutes les catégories</option>
+          </select>
+          <select class="filter-sel" id="cat-filter-status" onchange="renderCatalogue()">
+            <option value="">Actifs & inactifs</option>
+            <option value="active">Actifs uniquement</option>
+            <option value="hidden">Inactifs uniquement</option>
+          </select>
+        </div>
+
+        <!-- Tableau produits -->
+        <div id="catalogue-list"></div>
+
+        <div style="margin-top:16px;padding:12px 14px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:10px;font-size:12px;color:var(--text2);">
+          💡 <strong style="color:var(--accent2)">Astuce :</strong> Les produits <em>inactifs</em> n'apparaissent plus dans la fiche de location ni dans le formulaire client, mais l'historique reste intact. Tu peux les réactiver à tout moment.
+        </div>
+        <div style="margin-top:8px;padding:12px 14px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:10px;font-size:12px;color:var(--text2);">
+          🔄 <strong style="color:var(--green2)">Synchronisation automatique :</strong> Chaque modification du catalogue (ajout, désactivation, renommage) est <em>instantanément reflétée</em> dans le formulaire client — zéro action manuelle requise.
+        </div>
+      </div>
+
       <!-- CONFIG -->
       <div id="tab-config" class="section">
         <div class="config-panel">
@@ -583,7 +640,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div class="config-panel">
           <div class="config-title">📦 Stock total (modifiable)</div>
           <div class="config-sub">Définis tes quantités totales. Partagées entre toi et ton frère via Firebase.</div>
-          <div id="stock-config-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;"></div>
+          <div id="stock-config-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;"></div>
           <button class="btn btn-primary" onclick="saveStockConfig()">💾 Mettre à jour le stock</button>
         </div>
       </div>
@@ -606,6 +663,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div class="more-sheet" id="more-sheet">
   <div class="more-sheet-title">Plus d'options</div>
   <button class="more-item" onclick="markAllRead();showTab('activity');closeMore()"><span class="mi-ico">📋</span> Activité / Historique</button>
+  <button class="more-item" onclick="showTab('catalogue');closeMore()"><span class="mi-ico">🛠️</span> Catalogue produits</button>
   <button class="more-item" onclick="showTab('config');closeMore()"><span class="mi-ico">⚙️</span> Configuration</button>
 </div>
 
@@ -631,6 +689,62 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
   <div class="notif-panel-foot">
     <button class="notif-foot-btn" onclick="markAllRead();renderBadges()">✓ Tout marquer comme lu</button>
+  </div>
+</div>
+
+<!-- MODAL CATALOGUE PRODUIT -->
+<div class="overlay" id="cat-modal-overlay" style="display:none" onclick="if(event.target===this)closeCatModal()">
+  <div class="modal" style="width:480px;">
+    <div class="modal-head"><span class="modal-title" id="cat-modal-title">Nouveau produit</span><button class="modal-close" onclick="closeCatModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nom du produit *</label><input class="form-input" id="cp-label" type="text" placeholder="ex: Nespresso Gemini 220"></div>
+        <div class="form-group"><label class="form-label">Icône (emoji) *</label><input class="form-input" id="cp-icon" type="text" placeholder="☕" style="font-size:20px;text-align:center;" maxlength="4"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Catégorie *</label>
+          <select class="form-select" id="cp-cat" onchange="toggleCustomCat()">
+            <option value="eau">💧 Eau & Boissons</option>
+            <option value="cafe">☕ Machines Café (capsules)</option>
+            <option value="grains">🌰 Café Grains</option>
+            <option value="frigo">🧊 Réfrigération</option>
+            <option value="mobilier">🪑 Mobilier</option>
+            <option value="ventil">🌀 Ventilation</option>
+            <option value="autre">📦 Autre</option>
+            <option value="__new__">✏️ Créer une nouvelle catégorie...</option>
+          </select>
+          <input class="form-input" id="cp-cat-custom" type="text" placeholder="Nom de la nouvelle catégorie" style="display:none;margin-top:6px;" oninput="applyCustomCat()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Couleur d'accent</label>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="color" id="cp-color" value="#3b82f6" style="width:36px;height:34px;border:1px solid var(--border2);border-radius:6px;background:var(--bg2);cursor:pointer;padding:2px;">
+            <input class="form-input" id="cp-color-hex" type="text" placeholder="#3b82f6" style="flex:1;" oninput="syncColorHex()" maxlength="7">
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Stock total initial</label><input class="form-input" id="cp-stock" type="number" min="0" value="0" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Unité (optionnel)</label><input class="form-input" id="cp-unit" type="text" placeholder="ex: lot 50, kg, unité..."></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label class="form-label">Description (visible dans le formulaire client)</label><input class="form-input" id="cp-desc" type="text" placeholder="ex: Machine cappuccino double tête..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Statut</label>
+          <select class="form-select" id="cp-active">
+            <option value="1">✅ Actif — visible partout</option>
+            <option value="0">🚫 Inactif — masqué (conservé)</option>
+          </select>
+        </div>
+        <div class="form-group" id="cp-id-group"><label class="form-label">ID technique (auto)</label><input class="form-input" id="cp-id" type="text" placeholder="généré automatiquement" style="color:var(--text3);" readonly></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeCatModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveCatProduct()" id="cat-save-btn">Ajouter le produit</button>
+    </div>
   </div>
 </div>
 
@@ -664,15 +778,29 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 // CONSTANTES
 // ══════════════════════════════════════════════════════
 const STOCK_META = [
-  {id:'fontaine_eau',label:'Fontaine à eau',icon:'💧',color:'#0ea5e9'},
-  {id:'bonbonne',label:'Bonbonnes',icon:'🫙',color:'#0369a1'},
-  {id:'gobelet',label:'Gobelets (lot 50)',icon:'🥤',color:'#38bdf8'},
-  {id:'nespresso',label:'Machine Nespresso (Zenus)',icon:'☕',color:'#8b5cf6'},
-  {id:'covim',label:'Machine Covim',icon:'☕',color:'#7c3aed'},
-  {id:'lavazza',label:'Machine Lavazza',icon:'☕',color:'#6d28d9'},
-  {id:'cafe_pods',label:'Café (boîte 50)',icon:'📦',color:'#f59e0b'},
-  {id:'frigo_petit',label:'Frigo 50L',icon:'🧊',color:'#14b8a6'},
-  {id:'frigo_grand',label:'Frigo 200L',icon:'🧊',color:'#0d9488'},
+  // ── Fontaines & eau ──
+  {id:'fontaine_eau',  label:'Fontaine à eau',         icon:'💧', color:'#0ea5e9', cat:'eau'},
+  {id:'bonbonne',      label:'Bonbonnes',               icon:'🫙', color:'#0369a1', cat:'eau'},
+  {id:'gobelet',       label:'Gobelets (lot 50)',        icon:'🥤', color:'#38bdf8', cat:'eau'},
+  // ── Machines café capsules ──
+  {id:'nespresso',     label:'Nespresso Zenus',          icon:'☕', color:'#8b5cf6', cat:'cafe'},
+  {id:'nespresso_g220',label:'Nespresso Gemini 220 ★',  icon:'☕', color:'#a855f7', cat:'cafe'},
+  {id:'nespresso_g200',label:'Nespresso Gemini 200',    icon:'☕', color:'#c084fc', cat:'cafe'},
+  {id:'covim',         label:'Machine Covim',            icon:'☕', color:'#7c3aed', cat:'cafe'},
+  {id:'lavazza',       label:'Machine Lavazza',          icon:'☕', color:'#6d28d9', cat:'cafe'},
+  // ── Machines café grains ──
+  {id:'machine_grains',label:'Machine Café Grains',     icon:'⚙️', color:'#92400e', cat:'grains'},
+  {id:'cafe_grains',   label:'Café Grains (kg)',         icon:'🌰', color:'#a16207', cat:'grains'},
+  // ── Consommables café ──
+  {id:'cafe_pods',     label:'Café Pods (boîte 50)',     icon:'📦', color:'#f59e0b', cat:'cafe'},
+  // ── Réfrigérateurs ──
+  {id:'frigo_petit',   label:'Frigo 50L',                icon:'🧊', color:'#14b8a6', cat:'frigo'},
+  {id:'frigo_grand',   label:'Frigo 200L',               icon:'🧊', color:'#0d9488', cat:'frigo'},
+  // ── Mobilier ──
+  {id:'table_pliante', label:'Tables pliantes',          icon:'🪑', color:'#64748b', cat:'mobilier'},
+  {id:'chaise_pliante',label:'Chaises pliantes',         icon:'🪑', color:'#475569', cat:'mobilier'},
+  // ── Ventilation ──
+  {id:'ventilateur',   label:'Ventilateurs',             icon:'🌀', color:'#0891b2', cat:'ventil'},
 ];
 const EV_COLORS = ['c1','c2','c3','c4','c5','c6','c7','c8'];
 // Workflow de statuts orienté facturation
@@ -697,7 +825,7 @@ function statusIcon(s){const o=STATUS_MAP[normStatus(s)];return o?o.icon:'';}
 // ══════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════
-let STOCK_DEFAULTS = JSON.parse(localStorage.getItem('ep_stock')||'null') || {fontaine_eau:40,bonbonne:80,gobelet:60,nespresso:10,covim:8,lavazza:8,cafe_pods:100,frigo_petit:15,frigo_grand:8};
+let STOCK_DEFAULTS = JSON.parse(localStorage.getItem('ep_stock')||'null') || {fontaine_eau:40,bonbonne:80,gobelet:60,nespresso:10,nespresso_g220:4,nespresso_g200:4,covim:8,lavazza:8,machine_grains:4,cafe_grains:20,cafe_pods:100,frigo_petit:15,frigo_grand:8,table_pliante:30,chaise_pliante:100,ventilateur:10};
 let events = [], editingId = null;
 let hoursList = JSON.parse(localStorage.getItem('ep_hours')||'[]'), editingHourId = null;
 let planningDefaults = JSON.parse(localStorage.getItem('ep_plan_def')||'{}');
@@ -844,16 +972,17 @@ function startRealtime(){
   }).catch(()=>{});
 
   renderFbStatus();
+  loadCatalogueFromFirebase();
 }
 
 function loadLocal(){
   const raw = localStorage.getItem('ep_events');
   if(raw){try{events=JSON.parse(raw);}catch{events=[];}}
   else{events=[
-    {id:'demo1',client:'Groupe Publicis',salon:'Festival de Cannes',stand:'Stand B12 - Palais',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-14',end:'2026-05-25',status:'en cours',notes:'Accès dès 7h',material:{fontaine_eau:3,bonbonne:6,gobelet:2,nespresso:2,cafe_pods:4},contact:''},
-    {id:'demo2',client:'Orange Business',salon:'Festival de Cannes',stand:'Stand A3 - Debussy',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-16',end:'2026-05-23',status:'en cours',notes:'',material:{fontaine_eau:2,nespresso:1,cafe_pods:2,frigo_petit:2},contact:''},
-    {id:'demo3',client:'TechVision SAS',salon:'VivaTech Paris',stand:'Hall 2 - V42',type:'Salon professionnel',lieu:'Paris',start:'2026-06-11',end:'2026-06-14',status:'confirmé',notes:'Livraison J-1',material:{fontaine_eau:4,bonbonne:9,gobelet:3,nespresso:3,covim:1,cafe_pods:8,frigo_grand:1},contact:''},
-    {id:'demo4',client:'BNP Paribas',salon:'Forum Banque',stand:'Allée B08',type:'Conférence / Congrès',lieu:'Paris La Défense',start:'2026-06-03',end:'2026-06-05',status:'confirmé',notes:'',material:{fontaine_eau:2,nespresso:2,lavazza:1,cafe_pods:5},contact:''},
+    {id:'demo1',client:'Groupe Publicis',salon:'Festival de Cannes',stand:'Stand B12 - Palais',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-14',end:'2026-05-25',status:'en cours',notes:'Accès dès 7h',material:{fontaine_eau:3,bonbonne:6,gobelet:2,nespresso:1,nespresso_g220:1,cafe_pods:4,table_pliante:4,chaise_pliante:12},contact:''},
+    {id:'demo2',client:'Orange Business',salon:'Festival de Cannes',stand:'Stand A3 - Debussy',type:'Festival / Cinéma',lieu:'Cannes',start:'2026-05-16',end:'2026-05-23',status:'en cours',notes:'',material:{fontaine_eau:2,nespresso_g200:1,cafe_pods:2,frigo_petit:2,ventilateur:2},contact:''},
+    {id:'demo3',client:'TechVision SAS',salon:'VivaTech Paris',stand:'Hall 2 - V42',type:'Salon professionnel',lieu:'Paris',start:'2026-06-11',end:'2026-06-14',status:'confirmé',notes:'Livraison J-1',material:{fontaine_eau:4,bonbonne:9,gobelet:3,nespresso:2,nespresso_g220:1,machine_grains:1,cafe_grains:5,cafe_pods:8,frigo_grand:1,table_pliante:8,chaise_pliante:30},contact:''},
+    {id:'demo4',client:'BNP Paribas',salon:'Forum Banque',stand:'Allée B08',type:'Conférence / Congrès',lieu:'Paris La Défense',start:'2026-06-03',end:'2026-06-05',status:'confirmé',notes:'',material:{fontaine_eau:2,nespresso:2,lavazza:1,cafe_pods:5,table_pliante:6,chaise_pliante:20},contact:''},
   ];}
   events=events.map(e=>{e.material=e.material||{};e.status=normStatus(e.status);return e;});
   isFirstLoad = false;
@@ -935,7 +1064,7 @@ let _stockAlerted = {}; // mémorise les articles déjà signalés en critique (
 function checkStockAlerts(){
   if(!notifPrefs.stock) return;
   const locked = getLockedStock();
-  STOCK_META.forEach(si=>{
+  STOCK_META.filter(si=>si.active!==false).forEach(si=>{
     const total = STOCK_DEFAULTS[si.id]||0;
     const avail = total-(locked[si.id]||0);
     const pct = total>0 ? avail/total : 1;
@@ -1461,7 +1590,307 @@ function renderAnalytics(){
   document.getElementById('stats-status').innerHTML=barRows(stItems);
 }
 
-function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();renderPlanning();renderAnalytics();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();}
+// ══════════════════════════════════════════════════════
+// CATALOGUE PRODUITS — gestion dynamique du STOCK_META
+// Stocké dans Firebase /catalogue + localStorage 'ep_catalogue'
+// ══════════════════════════════════════════════════════
+
+// Produits par défaut (si aucun catalogue en base)
+const DEFAULT_CATALOGUE = [
+  {id:'fontaine_eau',  label:'Fontaine à eau',         icon:'💧', color:'#0ea5e9', cat:'eau',     stock:40, active:true},
+  {id:'bonbonne',      label:'Bonbonnes',               icon:'🫙', color:'#0369a1', cat:'eau',     stock:80, active:true},
+  {id:'gobelet',       label:'Gobelets (lot 50)',        icon:'🥤', color:'#38bdf8', cat:'eau',     stock:60, active:true},
+  {id:'nespresso',     label:'Nespresso Zenus',          icon:'☕', color:'#8b5cf6', cat:'cafe',    stock:10, active:true},
+  {id:'nespresso_g220',label:'Nespresso Gemini 220 ★',  icon:'☕', color:'#a855f7', cat:'cafe',    stock:4,  active:true},
+  {id:'nespresso_g200',label:'Nespresso Gemini 200',    icon:'☕', color:'#c084fc', cat:'cafe',    stock:4,  active:true},
+  {id:'covim',         label:'Machine Covim',            icon:'☕', color:'#7c3aed', cat:'cafe',    stock:8,  active:true},
+  {id:'lavazza',       label:'Machine Lavazza',          icon:'☕', color:'#6d28d9', cat:'cafe',    stock:8,  active:true},
+  {id:'machine_grains',label:'Machine Café Grains',     icon:'⚙️', color:'#92400e', cat:'grains',  stock:4,  active:true},
+  {id:'cafe_grains',   label:'Café Grains (kg)',         icon:'🌰', color:'#a16207', cat:'grains',  stock:20, active:true},
+  {id:'cafe_pods',     label:'Café Pods (boîte 50)',     icon:'📦', color:'#f59e0b', cat:'cafe',    stock:100,active:true},
+  {id:'frigo_petit',   label:'Frigo 50L',                icon:'🧊', color:'#14b8a6', cat:'frigo',   stock:15, active:true},
+  {id:'frigo_grand',   label:'Frigo 200L',               icon:'🧊', color:'#0d9488', cat:'frigo',   stock:8,  active:true},
+  {id:'table_pliante', label:'Tables pliantes',          icon:'🪑', color:'#64748b', cat:'mobilier',stock:30, active:true},
+  {id:'chaise_pliante',label:'Chaises pliantes',         icon:'🪑', color:'#475569', cat:'mobilier',stock:100,active:true},
+  {id:'ventilateur',   label:'Ventilateurs',             icon:'🌀', color:'#0891b2', cat:'ventil',  stock:10, active:true},
+];
+
+const CAT_LABELS_BASE = {
+  eau:'💧 Eau & Boissons', cafe:'☕ Machines Café', grains:'🌰 Café Grains',
+  frigo:'🧊 Réfrigération', mobilier:'🪑 Mobilier', ventil:'🌀 Ventilation', autre:'📦 Autre'
+};
+// Fonction dynamique : retourne le label formaté même pour les catégories personnalisées
+const CAT_LABELS = new Proxy(CAT_LABELS_BASE, {
+  get(target, key){ return target[key] || ('🏷️ '+String(key).charAt(0).toUpperCase()+String(key).slice(1)); }
+});
+
+let catalogue = JSON.parse(localStorage.getItem('ep_catalogue')||'null') || DEFAULT_CATALOGUE.map(p=>({...p}));
+let catEditingId = null;
+
+// Synchronise STOCK_META et STOCK_DEFAULTS depuis le catalogue dynamique
+function syncStockMetaFromCatalogue(){
+  // Reconstruire STOCK_META depuis le catalogue (tous produits, actifs ou non — pour conserver l'historique)
+  STOCK_META.length = 0;
+  catalogue.forEach(p=>{
+    STOCK_META.push({id:p.id, label:p.label, icon:p.icon, color:p.color||'#6b7280', cat:p.cat||'autre', active:p.active!==false});
+  });
+  // Mettre à jour les stocks par défaut uniquement pour les nouveaux produits
+  catalogue.forEach(p=>{
+    if(STOCK_DEFAULTS[p.id] === undefined) STOCK_DEFAULTS[p.id] = p.stock || 0;
+  });
+}
+
+// Sauvegarde catalogue en local + Firebase
+async function saveCatalogue(){
+  localStorage.setItem('ep_catalogue', JSON.stringify(catalogue));
+  if(fbReady){ try{ await db.ref('catalogue').set(catalogue); }catch(e){ console.warn('catalogue firebase:', e); } }
+  syncStockMetaFromCatalogue();
+  renderAll();
+  renderCatalogue();
+}
+
+// Chargement catalogue depuis Firebase au démarrage
+function loadCatalogueFromFirebase(){
+  if(!fbReady) return;
+  db.ref('catalogue').on('value', snap=>{
+    const val = snap.val();
+    if(val && Array.isArray(val) && val.length > 0){
+      catalogue = val;
+      localStorage.setItem('ep_catalogue', JSON.stringify(catalogue));
+      syncStockMetaFromCatalogue();
+      renderAll();
+      if(document.getElementById('tab-catalogue').classList.contains('active')) renderCatalogue();
+    }
+  }, ()=>{});
+}
+
+// ── Rendu du tableau catalogue ──
+function renderCatalogue(){
+  const q = (document.getElementById('cat-search')?.value||'').toLowerCase();
+  const catF = document.getElementById('cat-filter-cat')?.value || '';
+  const statF = document.getElementById('cat-filter-status')?.value || '';
+
+  // Mettre à jour le select catégorie
+  const catSel = document.getElementById('cat-filter-cat');
+  const usedCats = [...new Set(catalogue.map(p=>p.cat||'autre'))];
+  catSel.innerHTML = '<option value="">Toutes les catégories</option>' +
+    usedCats.map(c=>`<option value="${c}" ${catF===c?'selected':''}>${CAT_LABELS[c]||c}</option>`).join('');
+
+  let filtered = catalogue.filter(p=>{
+    if(q && !p.label.toLowerCase().includes(q)) return false;
+    if(catF && p.cat !== catF) return false;
+    if(statF === 'active' && p.active === false) return false;
+    if(statF === 'hidden' && p.active !== false) return false;
+    return true;
+  });
+
+  const el = document.getElementById('catalogue-list');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucun produit trouvé</div></div>';
+    return;
+  }
+
+  // Grouper par catégorie
+  const grouped = {};
+  filtered.forEach(p=>{ const c=p.cat||'autre'; if(!grouped[c]) grouped[c]=[]; grouped[c].push(p); });
+
+  let html = `<div style="overflow-x:auto;"><table class="cat-table">
+    <thead><tr>
+      <th style="width:40px"></th>
+      <th>Produit</th>
+      <th>Description</th>
+      <th>Catégorie</th>
+      <th>Stock</th>
+      <th>Statut</th>
+      <th style="width:150px">Actions</th>
+    </tr></thead><tbody>`;
+
+  Object.entries(grouped).forEach(([cat, prods])=>{
+    html += `<tr class="cat-section-hdr"><td colspan="7">${CAT_LABELS[cat]||cat} — ${prods.length} produit(s)</td></tr>`;
+    prods.forEach((p,i)=>{
+      const isHidden = p.active === false;
+      const idx = catalogue.indexOf(p);
+      html += `<tr class="${isHidden?'cat-hidden':''}">
+        <td class="cat-icon-cell" style="font-size:20px">${p.icon||'📦'}</td>
+        <td class="cat-label-cell">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="cat-color-dot" style="background:${p.color||'#6b7280'}"></span>
+            ${p.label}
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:1px;">ID: ${p.id}</div>
+        </td>
+        <td class="cat-desc-cell">${p.desc||'—'}</td>
+        <td><span class="cat-pill">${CAT_LABELS[p.cat||'autre']||p.cat||'—'}</span></td>
+        <td class="cat-stock-cell">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span>${STOCK_DEFAULTS[p.id]||0}</span>
+            <input type="number" min="0" value="${STOCK_DEFAULTS[p.id]||0}" 
+              style="width:60px;padding:3px 6px;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text1);font-size:12px;font-family:var(--font-body);"
+              onchange="quickUpdateStock('${p.id}',this.value)" onclick="this.select()">
+          </div>
+        </td>
+        <td>
+          <span style="font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;${isHidden
+            ?'background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2);'
+            :'background:rgba(16,185,129,.12);color:var(--green2);border:1px solid rgba(16,185,129,.2);'}">${isHidden?'🚫 Inactif':'✅ Actif'}</span>
+        </td>
+        <td>
+          <div class="cat-actions">
+            <button class="cat-order-btn" title="Monter" onclick="moveCatProduct(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+            <button class="cat-order-btn" title="Descendre" onclick="moveCatProduct(${idx},1)" ${idx===catalogue.length-1?'disabled':''}>↓</button>
+            <button class="btn-xs" onclick="openCatModal('${p.id}')" title="Modifier">✏️</button>
+            <button class="btn-xs" onclick="duplicateCatProduct('${p.id}')" title="Dupliquer">⧉</button>
+            <button class="btn-xs ${isHidden?'success':''}" onclick="toggleCatActive('${p.id}')" title="${isHidden?'Réactiver':'Désactiver'}">
+              ${isHidden?'👁 Activer':'🚫 Désact.'}
+            </button>
+            <button class="btn-xs danger" onclick="deleteCatProduct('${p.id}')">🗑</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function quickUpdateStock(id, val){
+  STOCK_DEFAULTS[id] = Math.max(0, parseInt(val)||0);
+  localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS));
+  if(fbReady) db.ref('stock').set(STOCK_DEFAULTS);
+  renderStats();
+  renderStock();
+  showToast(`Stock ${catalogue.find(p=>p.id===id)?.label||id} : ${STOCK_DEFAULTS[id]} ✓`, 'success');
+}
+
+function toggleCatActive(id){
+  const p = catalogue.find(x=>x.id===id);
+  if(!p) return;
+  p.active = !(p.active !== false);
+  saveCatalogue();
+  showToast(`${p.label} ${p.active?'activé ✅':'désactivé 🚫'}`, 'info');
+}
+
+function moveCatProduct(idx, dir){
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= catalogue.length) return;
+  [catalogue[idx], catalogue[newIdx]] = [catalogue[newIdx], catalogue[idx]];
+  saveCatalogue();
+}
+
+function deleteCatProduct(id){
+  const p = catalogue.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`Supprimer "${p.label}" du catalogue ?\n\nAttention : si ce produit est utilisé dans des événements existants, les quantités resteront dans l'historique mais le nom n'apparaîtra plus.`)) return;
+  catalogue = catalogue.filter(x=>x.id!==id);
+  saveCatalogue();
+  showToast(`${p.label} supprimé du catalogue`, 'info');
+}
+
+// ── Modal catalogue ──
+function openCatModal(id=null){
+  catEditingId = id;
+  const p = id ? catalogue.find(x=>x.id===id) : null;
+  document.getElementById('cat-modal-title').textContent = p ? `✏️ Modifier — ${p.label}` : 'Nouveau produit';
+  document.getElementById('cat-save-btn').textContent = p ? 'Enregistrer' : 'Ajouter le produit';
+
+  document.getElementById('cp-label').value = p?.label || '';
+  document.getElementById('cp-icon').value = p?.icon || '📦';
+  document.getElementById('cp-cat').value = p?.cat || 'autre';
+  document.getElementById('cp-color').value = p?.color || '#3b82f6';
+  document.getElementById('cp-color-hex').value = p?.color || '#3b82f6';
+  document.getElementById('cp-stock').value = p ? (STOCK_DEFAULTS[p.id]||0) : 0;
+  document.getElementById('cp-unit').value = p?.unit || '';
+  document.getElementById('cp-desc').value = p?.desc || '';
+  document.getElementById('cp-active').value = (p?.active === false) ? '0' : '1';
+  document.getElementById('cp-id').value = p?.id || '';
+
+  // Générer ID auto à la saisie du nom si nouveau produit
+  if(!p){
+    document.getElementById('cp-label').oninput = function(){
+      const auto = this.value.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30);
+      document.getElementById('cp-id').value = auto;
+    };
+  } else {
+    document.getElementById('cp-label').oninput = null;
+  }
+
+  // Sync color picker <-> hex
+  document.getElementById('cp-color').oninput = function(){
+    document.getElementById('cp-color-hex').value = this.value;
+  };
+
+  // Injecter les catégories personnalisées dans le select
+  const catSel2 = document.getElementById('cp-cat');
+  const builtinCats = ['eau','cafe','grains','frigo','mobilier','ventil','autre'];
+  const customCats = [...new Set(catalogue.map(x=>x.cat||'autre'))].filter(c=>!builtinCats.includes(c));
+  // Supprimer les customs existants puis réinjecter proprement
+  [...catSel2.options].forEach(o=>{ if(!builtinCats.includes(o.value) && o.value!=='__new__') o.remove(); });
+  const newOpt = catSel2.options[catSel2.options.length-1]; // __new__ option
+  customCats.forEach(c=>{
+    if(![...catSel2.options].find(o=>o.value===c)){
+      const opt = document.createElement('option');
+      opt.value=c; opt.text='🏷️ '+c;
+      catSel2.insertBefore(opt, newOpt);
+    }
+  });
+  if(p?.cat) catSel2.value = p.cat;
+  document.getElementById('cp-cat-custom').style.display='none';
+
+  document.getElementById('cat-modal-overlay').style.display = 'flex';
+}
+function closeCatModal(){ document.getElementById('cat-modal-overlay').style.display='none'; }
+function syncColorHex(){
+  const v = document.getElementById('cp-color-hex').value;
+  if(/^#[0-9a-fA-F]{6}$/.test(v)) document.getElementById('cp-color').value = v;
+}
+
+async function saveCatProduct(){
+  const label = document.getElementById('cp-label').value.trim();
+  const icon = document.getElementById('cp-icon').value.trim() || '📦';
+  // Si catégorie personnalisée, récupérer la valeur de l'input
+  let cat = document.getElementById('cp-cat').value;
+  if(cat === '__new__'){
+    const customVal = document.getElementById('cp-cat-custom')?.value.trim();
+    if(!customVal){ showToast('Renseignez le nom de la nouvelle catégorie','error'); return; }
+    cat = customVal;
+  }
+  const color = document.getElementById('cp-color-hex').value || document.getElementById('cp-color').value;
+  const stockVal = Math.max(0, parseInt(document.getElementById('cp-stock').value)||0);
+  const unit = document.getElementById('cp-unit').value.trim();
+  const desc = document.getElementById('cp-desc').value.trim();
+  const active = document.getElementById('cp-active').value === '1';
+
+  if(!label){ showToast('Nom du produit requis','error'); return; }
+
+  if(catEditingId){
+    // Modifier existant
+    const p = catalogue.find(x=>x.id===catEditingId);
+    if(p){
+      p.label = label; p.icon = icon; p.cat = cat; p.color = color;
+      p.unit = unit; p.desc = desc; p.active = active;
+      STOCK_DEFAULTS[p.id] = stockVal;
+    }
+    showToast(`${label} mis à jour ✓`, 'success');
+  } else {
+    // Nouveau produit
+    let id = document.getElementById('cp-id').value.trim();
+    if(!id) id = label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30);
+    if(catalogue.find(x=>x.id===id)){
+      showToast(`L'ID "${id}" existe déjà — modifiez le nom du produit`, 'error'); return;
+    }
+    catalogue.push({id, label, icon, cat, color, unit, desc, active, stock:stockVal});
+    STOCK_DEFAULTS[id] = stockVal;
+    localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS));
+    if(fbReady) db.ref('stock').set(STOCK_DEFAULTS);
+    showToast(`${label} ajouté au catalogue ✓`, 'success');
+  }
+  closeCatModal();
+  await saveCatalogue();
+}
+
+function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();renderPlanning();renderAnalytics();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();if(document.getElementById('tab-catalogue').classList.contains('active'))renderCatalogue();}
 
 // ══════════════════════════════════════════════════════
 // ACTIONS
@@ -1504,10 +1933,21 @@ function saveStockConfig(){
 // MODAL
 // ══════════════════════════════════════════════════════
 function buildMatGrid(cid,values={}){
-  document.getElementById(cid).innerHTML=STOCK_META.map(si=>`<div class="mat-item"><div class="mat-item-label">${si.icon} ${si.label}</div><div class="mat-qty"><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',-1)">−</button><span class="mat-val" id="${cid}-${si.id}">${values[si.id]||0}</span><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',1)">+</button></div></div>`).join('');
+  const cats={eau:'💧 Eau & Boissons',cafe:'☕ Machines Café',grains:'🌰 Café Grains',frigo:'🧊 Réfrigération',mobilier:'🪑 Mobilier',ventil:'🌀 Ventilation'};
+  let html='', lastCat='';
+  // N'afficher que les produits actifs dans la modal de création d'événement
+  const activeItems = STOCK_META.filter(si => si.active !== false);
+  activeItems.forEach(si=>{
+    if(si.cat!==lastCat){
+      html+=`<div class="mat-cat-sep">${cats[si.cat]||CAT_LABELS[si.cat]||si.cat}</div>`;
+      lastCat=si.cat;
+    }
+    html+=`<div class="mat-item"><div class="mat-item-label">${si.icon} ${si.label}</div><div class="mat-qty"><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',-1)">−</button><span class="mat-val" id="${cid}-${si.id}">${values[si.id]||0}</span><button class="mat-btn" onclick="adjMat('${cid}','${si.id}',1)">+</button></div></div>`;
+  });
+  document.getElementById(cid).innerHTML=html;
 }
 function adjMat(gid,sid,delta){const el=document.getElementById(`${gid}-${sid}`);if(el)el.textContent=Math.max(0,(parseInt(el.textContent||'0')||0)+delta);}
-function getMatValues(cid){const mat={};STOCK_META.forEach(si=>{const el=document.getElementById(`${cid}-${si.id}`);if(el){const v=parseInt(el.textContent||'0');if(v>0)mat[si.id]=v;}});return mat;}
+function getMatValues(cid){const mat={};STOCK_META.filter(si=>si.active!==false).forEach(si=>{const el=document.getElementById(`${cid}-${si.id}`);if(el){const v=parseInt(el.textContent||'0');if(v>0)mat[si.id]=v;}});return mat;}
 
 function openAddModal(){
   editingId=null;
