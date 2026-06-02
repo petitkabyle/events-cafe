@@ -720,6 +720,18 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         </div>
 
         <div class="config-panel">
+          <div class="config-title">🔄 Diagnostic de synchronisation</div>
+          <div class="config-sub">Vérifie que <strong>chaque type de donnée</strong> se synchronise bien entre les appareils. Un voyant vert « connecté » ne suffit pas : chaque module a son propre canal, et les règles Firebase doivent autoriser tous les nœuds.</div>
+          <div id="sync-diag-box" style="margin-bottom:12px;"></div>
+          <button class="btn btn-primary" onclick="runSyncDiagnostic()">🧪 Tester la synchronisation</button>
+          <div class="cfg-note" style="margin-top:12px;">
+            ⚠️ <strong>Si un nœud est « bloqué »</strong> : va dans la console Firebase → Realtime Database → <strong>Règles</strong>, et mets :
+            <br><code style="color:var(--gold2)">{ "rules": { ".read": true, ".write": true } }</code><br>
+            puis <strong>Publier</strong>. Cela autorise tous les modules (clients, tarifs, livraisons…) d'un coup. Détails dans <strong>GUIDE_INSTALLATION.md</strong>.
+          </div>
+        </div>
+
+        <div class="config-panel">
           <div class="config-title">🔔 Notifications par email</div>
           <div class="config-sub">Recevez un email sur <strong>deux adresses</strong> quand un client remplit le formulaire, ou quand un événement est créé / modifié. Via EmailJS (gratuit, 200 emails/mois).</div>
           <div class="cfg-note" style="margin-bottom:14px;">
@@ -1679,6 +1691,9 @@ function renderStock(){
 
 function renderConfig(){
   renderFbStatus(); loadEmailConfig();
+  // Lance le diagnostic de synchronisation automatiquement (léger, en arrière-plan)
+  if(fbReady){ setTimeout(()=>{ try{ runSyncDiagnostic(); }catch(e){} }, 300); }
+  else { const b=document.getElementById('sync-diag-box'); if(b) b.innerHTML='<div style="font-size:13px;color:var(--text3)">Firebase non connecté — synchronisation indisponible.</div>'; }
   document.getElementById('stock-config-grid').innerHTML=STOCK_META.map(si=>`<div class="cfg-group"><label class="cfg-label">${si.icon} ${si.label}</label><input class="cfg-input" id="sc-${si.id}" type="number" min="0" value="${STOCK_DEFAULTS[si.id]||0}"></div>`).join('');
 }
 
@@ -2190,6 +2205,69 @@ async function saveCatProduct(){
 function renderAll(){renderStats();renderCalendar();applyFilters();renderStock();renderPlanning();renderAnalytics();updateDeliveryBadge();if(document.getElementById('tab-config').classList.contains('active'))renderConfig();if(document.getElementById('tab-catalogue').classList.contains('active'))renderCatalogue();if(document.getElementById('tab-clients').classList.contains('active'))renderClients();if(document.getElementById('tab-delivery').classList.contains('active'))renderDelivery();}
 
 // ══════════════════════════════════════════════════════
+// ÉCRITURE FIREBASE ROBUSTE (détecte les règles bloquantes)
+// ══════════════════════════════════════════════════════
+// Si un nœud n'est pas autorisé par les règles Firebase, l'écriture échoue
+// silencieusement → l'autre appareil ne voit jamais la donnée. Ce helper
+// remonte clairement l'erreur à l'écran pour qu'on sache qu'il faut corriger
+// les règles (voir GUIDE_INSTALLATION.md).
+let _fbRuleWarned = false;
+async function fbWrite(path, value){
+  if(!fbReady) return false;
+  try{
+    await db.ref(path).set(value);
+    return true;
+  }catch(e){
+    console.error('Firebase write bloqué sur "'+path+'":', e);
+    const denied = e && (e.code==='PERMISSION_DENIED' || /permission_denied|permission denied/i.test(String(e.message||e)));
+    if(denied && !_fbRuleWarned){
+      _fbRuleWarned = true;
+      showToast('⚠️ Synchro bloquée par les règles Firebase ('+path+'). Voir Configuration → Synchronisation.','error');
+      try{ pushNotif('⚠️','Synchronisation bloquée',`Le nœud « ${path} » est refusé par les règles Firebase. Mets les règles « .read/.write à la racine » (voir guide).`,'edit'); }catch(_){}
+    }
+    return false;
+  }
+}
+
+// Alerte une seule fois si la LECTURE d'un nœud est refusée par les règles Firebase
+function flagSyncBlocked(path){
+  if(_fbRuleWarned) return;
+  _fbRuleWarned = true;
+  showToast('⚠️ Lecture bloquée par les règles Firebase ('+path+'). Voir Configuration → Diagnostic de synchronisation.','error');
+  try{ pushNotif('⚠️','Synchronisation bloquée',`Le nœud « ${path} » est refusé en lecture. Mets les règles « .read/.write à la racine » (voir guide).`,'edit'); }catch(_){}
+}
+async function runSyncDiagnostic(){
+  const box=document.getElementById('sync-diag-box'); if(!box) return;
+  if(!fbReady){ box.innerHTML='<div style="font-size:13px;color:#fca5a5">❌ Firebase non connecté — vérifie firebase-config.js</div>'; return; }
+  const nodes=[
+    ['events','Événements'],['stock','Stock'],['hours','Heures'],['catalogue','Catalogue'],
+    ['clients','Clients'],['basePricing','Tarifs de base'],['drivers','Livreurs'],
+    ['deliveries','Livraisons'],['config','Configuration']
+  ];
+  box.innerHTML='<div style="font-size:13px;color:var(--text2)">🧪 Test en cours…</div>';
+  let html='', okCount=0;
+  for(const [path,label] of nodes){
+    let read=false, write=false;
+    try{ await db.ref(path).limitToFirst(1).once('value'); read=true; }catch(e){ read=false; }
+    try{ await db.ref('__diag/'+path).set(Date.now()); await db.ref('__diag/'+path).remove(); write=true; }catch(e){ write=false; }
+    const ok = read && write;
+    if(ok) okCount++;
+    const color = ok?'var(--green2)':'#fca5a5';
+    const icon = ok?'✅':'⛔';
+    const detail = ok?'lecture + écriture OK':(!read&&!write?'bloqué (lecture + écriture)':(!write?'écriture bloquée':'lecture bloquée'));
+    html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <span>${icon} <strong>${label}</strong> <span style="color:var(--text3)">/${path}</span></span>
+      <span style="color:${color}">${detail}</span></div>`;
+  }
+  // nettoie le nœud de diagnostic au cas où
+  try{ await db.ref('__diag').remove(); }catch(e){}
+  const banner = okCount===nodes.length
+    ? '<div style="color:var(--green2);font-weight:600;margin-bottom:8px;">✅ Tout est synchronisé ('+okCount+'/'+nodes.length+') — toi et ton frère voyez les mêmes données.</div>'
+    : '<div style="color:#fca5a5;font-weight:600;margin-bottom:8px;">⚠️ '+(nodes.length-okCount)+' module(s) bloqué(s). Corrige les règles Firebase (voir ci-dessous).</div>';
+  box.innerHTML=banner+html;
+}
+
+// ══════════════════════════════════════════════════════
 // CLIENTS & TARIFS PERSONNALISÉS
 // ══════════════════════════════════════════════════════
 // clients = [{id, company, type, contact, ref, discount, deliveryFee, note, prices:{prodId:€}}]
@@ -2261,23 +2339,30 @@ function findClientByCompany(company){ return findClientByName(company); }
 
 async function saveClients(){
   localStorage.setItem('ep_clients', JSON.stringify(clients));
-  if(fbReady){ try{ await db.ref('clients').set(clients); }catch(e){ console.warn('clients firebase:', e); } }
+  await fbWrite('clients', clients);
   renderClients();
 }
 async function saveBasePricingData(){
   localStorage.setItem('ep_base_pricing', JSON.stringify(basePricing));
-  if(fbReady){ try{ await db.ref('basePricing').set(basePricing); }catch(e){ console.warn('basePricing firebase:', e); } }
+  await fbWrite('basePricing', basePricing);
+}
+// Firebase peut renvoyer un tableau, un objet (tableau "creux"), ou null. On normalise toujours en tableau.
+function fbToArray(val){
+  if(Array.isArray(val)) return val.filter(x=>x!=null);
+  if(val && typeof val==='object') return Object.values(val);
+  return [];
 }
 function loadClientsFromFirebase(){
   if(!fbReady) return;
   db.ref('clients').on('value', snap=>{
-    const val = snap.val();
-    if(val && Array.isArray(val)){ clients = val; localStorage.setItem('ep_clients', JSON.stringify(clients)); if(document.getElementById('tab-clients').classList.contains('active')) renderClients(); }
-  }, ()=>{});
+    clients = fbToArray(snap.val());
+    localStorage.setItem('ep_clients', JSON.stringify(clients));
+    if(document.getElementById('tab-clients').classList.contains('active')) renderClients();
+  }, err=>{ console.error('clients read bloqué:', err); flagSyncBlocked('clients'); });
   db.ref('basePricing').on('value', snap=>{
     const val = snap.val();
     if(val && typeof val==='object'){ basePricing = {prices:val.prices||{}, deliveryFee:val.deliveryFee||0}; localStorage.setItem('ep_base_pricing', JSON.stringify(basePricing)); if(document.getElementById('tab-clients').classList.contains('active')) renderBasePricingPreview(); }
-  }, ()=>{});
+  }, err=>{ console.error('basePricing read bloqué:', err); flagSyncBlocked('basePricing'); });
 }
 
 // ── MOTEUR DE DEVIS ──
@@ -2627,16 +2712,24 @@ function driverColor(id){ const d=driverById(id); return d?d.color:'#5c6478'; }
 
 async function saveDrivers(){
   localStorage.setItem('ep_drivers', JSON.stringify(drivers));
-  if(fbReady){ try{ await db.ref('drivers').set(drivers); }catch(e){ console.warn('drivers fb:',e); } }
+  await fbWrite('drivers', drivers);
 }
 async function saveDeliveries(){
   localStorage.setItem('ep_deliveries', JSON.stringify(deliveries));
-  if(fbReady){ try{ await db.ref('deliveries').set(deliveries); }catch(e){ console.warn('deliveries fb:',e); } }
+  await fbWrite('deliveries', deliveries);
 }
 function loadDeliveriesFromFirebase(){
   if(!fbReady) return;
-  db.ref('drivers').on('value', snap=>{ const v=snap.val(); if(v&&Array.isArray(v)){ drivers=v; localStorage.setItem('ep_drivers',JSON.stringify(drivers)); if(document.getElementById('tab-delivery').classList.contains('active'))renderDelivery(); } },()=>{});
-  db.ref('deliveries').on('value', snap=>{ const v=snap.val(); if(v&&Array.isArray(v)){ deliveries=v; } else if(v===null){ deliveries=[]; } localStorage.setItem('ep_deliveries',JSON.stringify(deliveries)); if(document.getElementById('tab-delivery').classList.contains('active'))renderDelivery(); updateDeliveryBadge(); },()=>{});
+  db.ref('drivers').on('value', snap=>{
+    const arr=fbToArray(snap.val());
+    if(arr.length){ drivers=arr; localStorage.setItem('ep_drivers',JSON.stringify(drivers)); if(document.getElementById('tab-delivery').classList.contains('active'))renderDelivery(); }
+  }, err=>{ console.error('drivers read bloqué:', err); flagSyncBlocked('drivers'); });
+  db.ref('deliveries').on('value', snap=>{
+    deliveries=fbToArray(snap.val());
+    localStorage.setItem('ep_deliveries',JSON.stringify(deliveries));
+    if(document.getElementById('tab-delivery').classList.contains('active'))renderDelivery();
+    updateDeliveryBadge();
+  }, err=>{ console.error('deliveries read bloqué:', err); flagSyncBlocked('deliveries'); });
 }
 function updateDeliveryBadge(){
   const today=todayISO();

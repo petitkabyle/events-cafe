@@ -3,7 +3,7 @@
    But : rendre l'app installable et utilisable hors-ligne (coquille),
    SANS jamais interférer avec Firebase (temps réel) ni EmailJS.
    ============================================================ */
-const CACHE = 'events-cafe-v8';
+const CACHE = 'events-cafe-v9';
 const APP_SHELL = [
   './',
   './index.html',
