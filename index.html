@@ -828,8 +828,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Contact (email / tél.)</label><input class="form-input" id="cl-contact" type="text" placeholder="contact@societe.com"></div>
+        <div class="form-group"><label class="form-label">Contact principal (email / tél.)</label><input class="form-input" id="cl-contact" type="text" placeholder="contact@societe.com"></div>
         <div class="form-group"><label class="form-label">Personne référente</label><input class="form-input" id="cl-ref" type="text" placeholder="ex: Marie Dupont"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label class="form-label">📧 Emails de reconnaissance (séparés par virgule) — le + fiable</label><input class="form-input" id="cl-emails" type="text" placeholder="marie@mairie.fr, compta@mairie.fr"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label class="form-label">🔤 Autres noms / variantes d'écriture (1 par ligne ou séparés par virgule)</label><textarea class="form-textarea" id="cl-aliases" style="min-height:46px;" placeholder="Mairie de Cannes&#10;Ville de Cannes&#10;Commune de Cannes"></textarea></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">🎁 Remise globale (%)</label><input class="form-input" id="cl-discount" type="number" min="0" max="100" step="1" value="0" placeholder="0" oninput="updateClientPricingTotals()"></div>
@@ -2206,14 +2212,52 @@ function clientTypeLabel(t){return (CLIENT_TYPES[t]||CLIENT_TYPES.autre).label;}
 function normCompany(s){
   return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 }
-// Reconnaît un client à partir du nom de société (et accepte le format "Société (Nom)")
-function findClientByCompany(company){
+function normEmail(s){ return String(s||'').toLowerCase().trim(); }
+// Extrait une adresse email d'un texte libre (ex: "jean@x.com / 0600")
+function pickEmail(s){ if(!s)return''; const m=String(s).match(/[\w.+-]+@[\w-]+\.[\w.-]+/); return m?m[0].toLowerCase():''; }
+
+// Récupère toutes les adresses email connues d'une fiche client (champ emails OU contact)
+function clientEmails(c){
+  const out=[];
+  if(c.emails) String(c.emails).split(/[,;\s]+/).forEach(e=>{ const x=normEmail(e); if(x.includes('@')) out.push(x); });
+  const ce=pickEmail(c.contact); if(ce) out.push(ce);
+  return [...new Set(out)];
+}
+// Récupère tous les noms/alias d'une fiche client
+function clientAliases(c){
+  const out=[normCompany(c.company)];
+  if(c.aliases) String(c.aliases).split(/[\n,;]+/).forEach(a=>{ const x=normCompany(a); if(x) out.push(x); });
+  return [...new Set(out.filter(Boolean))];
+}
+
+// Reconnaît un client à partir d'un événement, par PLUSIEURS critères.
+// Priorité : 1) email (le plus fiable) → 2) nom/alias exact → 3) nom partiel
+function findClientForEvent(ev){
+  if(!ev) return null;
+  // 1) EMAIL — cherche dans ev.email puis dans ev.contact
+  const evEmail = normEmail(ev.email) || pickEmail(ev.contact);
+  if(evEmail){
+    const byEmail = clients.find(c=>clientEmails(c).includes(evEmail));
+    if(byEmail) return byEmail;
+  }
+  // 2) & 3) NOM de société (gère le format "Société (Nom)")
+  const company = ev.clientCompany || ev.client || '';
+  return findClientByName(company);
+}
+// Reconnaissance par nom seul (utilisée en secours et pour la saisie manuelle)
+function findClientByName(company){
   if(!company) return null;
   const raw = normCompany(company);
-  // enlève un éventuel "(prénom nom)" en fin de chaîne
-  const stripped = normCompany(company.replace(/\([^)]*\)\s*$/,''));
-  return clients.find(c=>{const n=normCompany(c.company);return n && (n===raw || n===stripped || raw.startsWith(n) || stripped.startsWith(n));}) || null;
+  const stripped = normCompany(String(company).replace(/\([^)]*\)\s*$/,'')); // enlève "(prénom nom)"
+  if(!raw && !stripped) return null;
+  // exact d'abord
+  let hit = clients.find(c=>clientAliases(c).some(n=>n===raw||n===stripped));
+  if(hit) return hit;
+  // partiel ensuite (le nom enregistré est contenu au début de la saisie, ou inversement)
+  return clients.find(c=>clientAliases(c).some(n=>n && (raw.startsWith(n)||stripped.startsWith(n)||n.startsWith(stripped)&&stripped.length>=4))) || null;
 }
+// Compat : ancien nom conservé
+function findClientByCompany(company){ return findClientByName(company); }
 
 async function saveClients(){
   localStorage.setItem('ep_clients', JSON.stringify(clients));
@@ -2240,7 +2284,7 @@ function loadClientsFromFirebase(){
 // Calcule le devis d'un événement : reconnaît le client, applique ses prix/remise/frais.
 // Retourne {lines:[{id,label,qty,unit,total,offered}], client, profileName, subtotal, discountPct, discountAmt, deliveryFee, total}
 function computeQuote(ev){
-  const client = findClientByCompany(ev.clientCompany || ev.client);
+  const client = findClientForEvent(ev);
   const prices = (client && client.prices) ? client.prices : {};
   const lines = [];
   let subtotal = 0;
@@ -2289,6 +2333,7 @@ function renderClients(){
         <div>
           <div class="client-name">${clientTypeIcon(c.type)} ${c.company}</div>
           <div class="client-meta">${clientTypeLabel(c.type)}${c.ref?' · '+c.ref:''}${c.contact?' · '+c.contact:''}</div>
+          ${(clientEmails(c).length||clientAliases(c).length>1)?`<div style="font-size:11px;color:var(--text3);margin-top:3px;">${clientEmails(c).length?'📧 '+clientEmails(c).join(', '):''}${clientAliases(c).length>1?`${clientEmails(c).length?' · ':''}🔤 ${clientAliases(c).length-1} alias`:''}</div>`:''}
           <div class="client-tags">
             ${disc>0?`<span class="client-tag gold">🎁 −${disc}%</span>`:''}
             <span class="client-tag">🚚 ${fee>0?fmtEur(fee):'Livraison offerte'}</span>
@@ -2339,6 +2384,8 @@ function openClientModal(id=null){
   document.getElementById('cl-type').value=c?.type||'entreprise';
   document.getElementById('cl-contact').value=c?.contact||'';
   document.getElementById('cl-ref').value=c?.ref||'';
+  document.getElementById('cl-emails').value=c?.emails||'';
+  document.getElementById('cl-aliases').value=c?.aliases||'';
   document.getElementById('cl-discount').value=c?.discount||0;
   document.getElementById('cl-delivery-fee').value=(c&&c.deliveryFee!==undefined)?c.deliveryFee:'';
   document.getElementById('cl-note').value=c?.note||'';
@@ -2371,6 +2418,8 @@ async function saveClient(){
     type:document.getElementById('cl-type').value,
     contact:document.getElementById('cl-contact').value.trim(),
     ref:document.getElementById('cl-ref').value.trim(),
+    emails:document.getElementById('cl-emails').value.trim(),
+    aliases:document.getElementById('cl-aliases').value.trim(),
     discount:parseFloat(document.getElementById('cl-discount').value)||0,
     deliveryFee:document.getElementById('cl-delivery-fee').value===''?'':(parseFloat(document.getElementById('cl-delivery-fee').value)||0),
     note:document.getElementById('cl-note').value.trim(),
@@ -2434,8 +2483,13 @@ function openQuoteModal(id){
   // Bandeau profil
   const banner=document.getElementById('quote-profile-banner');
   banner.className='quote-banner'+(q.client?'':' base');
+  let how='';
+  if(q.client){
+    const evEmail=normEmail(ev.email)||pickEmail(ev.contact);
+    how = (evEmail && clientEmails(q.client).includes(evEmail)) ? ' (reconnu par email 📧)' : ' (reconnu par nom)';
+  }
   banner.innerHTML=q.client
-    ? `✅ Client reconnu : <strong>${q.client.company}</strong> (${clientTypeLabel(q.client.type)}) — tarifs personnalisés appliqués`
+    ? `✅ Client reconnu : <strong>${q.client.company}</strong> (${clientTypeLabel(q.client.type)})${how} — tarifs personnalisés appliqués`
     : `🏷️ Client non enregistré — <strong>tarif de base</strong> appliqué. <span style="opacity:.85">Tu peux l'ajouter dans « Clients & Tarifs ».</span>`;
   // Validité + email + remise + frais (pré-remplis depuis le devis enregistré si présent)
   const saved=ev.quote||{};
