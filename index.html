@@ -2335,6 +2335,38 @@ function syncColorHex(){
   const v = document.getElementById('cp-color-hex').value;
   if(/^#[0-9a-fA-F]{6}$/.test(v)) document.getElementById('cp-color').value = v;
 }
+// Affiche/masque le champ "nouvelle catégorie" selon le choix du select
+function toggleCustomCat(){
+  const sel=document.getElementById('cp-cat');
+  const inp=document.getElementById('cp-cat-custom');
+  if(!sel||!inp) return;
+  if(sel.value==='__new__'){ inp.style.display='block'; inp.focus(); }
+  else { inp.style.display='none'; inp.value=''; }
+}
+// (Réservé) hook quand on tape une catégorie personnalisée — pas d'action requise,
+// la valeur est lue à l'enregistrement. Présent pour éviter toute erreur d'appel.
+function applyCustomCat(){ /* la valeur saisie est lue dans saveCatProduct() */ }
+// Duplique un produit du catalogue (pré-remplit le modal en mode création)
+function duplicateCatProduct(id){
+  const p=catalogue.find(x=>x.id===id); if(!p) return;
+  openCatModal(); // ouvre en mode "nouveau"
+  document.getElementById('cat-modal-title').textContent='Dupliquer un produit';
+  document.getElementById('cp-label').value=(p.label||'')+' (copie)';
+  document.getElementById('cp-icon').value=p.icon||'📦';
+  document.getElementById('cp-color').value=p.color||'#3b82f6';
+  document.getElementById('cp-color-hex').value=p.color||'#3b82f6';
+  document.getElementById('cp-unit').value=p.unit||'';
+  document.getElementById('cp-desc').value=p.desc||'';
+  document.getElementById('cp-active').value=p.active===false?'0':'1';
+  document.getElementById('cp-stock').value=STOCK_DEFAULTS[p.id]||0;
+  const sel=document.getElementById('cp-cat');
+  if(sel && [...sel.options].some(o=>o.value===p.cat)) sel.value=p.cat;
+  // Recalcule l'ID auto depuis le nouveau nom
+  const lbl=document.getElementById('cp-label');
+  const idEl=document.getElementById('cp-id');
+  if(idEl) idEl.value=lbl.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30);
+  showToast('Produit dupliqué — ajuste puis enregistre','info');
+}
 
 async function saveCatProduct(){
   const label = document.getElementById('cp-label').value.trim();
@@ -2561,6 +2593,8 @@ function computeQuote(ev){
   return {client, profileName: client?`${clientTypeIcon(client.type)} ${client.company}`:'🏷️ Tarif de base (client inconnu)', lines, subtotal, discountPct, discountAmt, deliveryFee, total};
 }
 function fmtEur(n){ return (Math.round((n||0)*100)/100).toLocaleString('fr-FR',{minimumFractionDigits: (n%1?2:0), maximumFractionDigits:2})+' €'; }
+// Échappe le HTML (utilisé pour remplir les listes d'autocomplétion en toute sécurité)
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // ── RENDU ONGLET CLIENTS ──
 function renderClients(){
@@ -3360,8 +3394,8 @@ function duplicateEvent(id){
   document.getElementById('m-notes').value=ev.notes||'';
   document.getElementById('m-amount').value='';
   document.getElementById('m-paid').value='';
-  rebuildModalDatalists();
-  buildMatGrid('modal-mat-grid',ev.material||{});
+  try{ rebuildModalDatalists(); }catch(e){ console.warn('datalists:',e); }
+  try{ buildMatGrid('modal-mat-grid',ev.material||{}); }catch(e){ console.warn('matgrid:',e); }
   document.getElementById('modal-overlay').style.display='flex';
   showToast('Copie créée — ajuste les dates puis enregistre','info');
 }
@@ -3370,12 +3404,12 @@ function openAddModal(){
   editingId=null; _clientAutofilled=false;
   document.getElementById('modal-title-text').textContent='＋ Nouvel événement';
   document.getElementById('modal-save-btn').textContent='Créer l\'événement';
-  ['m-client','m-contact','m-salon','m-stand','m-lieu','m-delivery-address','m-onsite-name','m-onsite-phone','m-notes','m-amount'].forEach(id=>document.getElementById(id).value='');
+  ['m-client','m-contact','m-salon','m-stand','m-lieu','m-delivery-address','m-onsite-name','m-onsite-phone','m-notes','m-amount'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-start').value='';document.getElementById('m-end').value='';
   document.getElementById('m-status').value='devis_a_envoyer';
   document.getElementById('m-paid').value='';
-  rebuildModalDatalists();
-  buildMatGrid('modal-mat-grid',{});
+  try{ rebuildModalDatalists(); }catch(e){ console.warn('datalists:',e); }
+  try{ buildMatGrid('modal-mat-grid',{}); }catch(e){ console.warn('matgrid:',e); }
   document.getElementById('modal-overlay').style.display='flex';
 }
 function openEditModal(id){
@@ -3398,8 +3432,8 @@ function openEditModal(id){
   document.getElementById('m-notes').value=ev.notes||'';
   document.getElementById('m-amount').value=ev.amount||'';
   document.getElementById('m-paid').value=ev.paid?'1':'';
-  rebuildModalDatalists();
-  buildMatGrid('modal-mat-grid',ev.material||{});
+  try{ rebuildModalDatalists(); }catch(e){ console.warn('datalists:',e); }
+  try{ buildMatGrid('modal-mat-grid',ev.material||{}); }catch(e){ console.warn('matgrid:',e); }
   document.getElementById('modal-overlay').style.display='flex';
 }
 function closeModal(){document.getElementById('modal-overlay').style.display='none';}
