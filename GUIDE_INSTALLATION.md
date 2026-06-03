@@ -116,6 +116,22 @@ window.FIREBASE_CONFIG = {
 - **Tes clients** : remplissent le formulaire → la demande apparaît chez vous.
 - **Sur mobile** : ouvre l'URL → menu du navigateur → « Ajouter à l'écran d'accueil ».
 
+### 📴 Mode hors-ligne (terrain, salons, livraisons)
+
+L'application **fonctionne sans connexion** :
+- Tu peux consulter le tableau de bord et **créer / modifier / supprimer** des
+  événements, livraisons, heures, tarifs… même hors-ligne.
+- Toutes tes modifications sont **enregistrées sur l'appareil** et placées dans
+  une file d'attente.
+- **Dès que la connexion revient**, tout est **envoyé automatiquement** et partagé
+  avec ton frère (et inversement). Rien n'est perdu, même si tu fermes l'app.
+- Un indicateur **« X en attente »** (en haut) et l'onglet **Configuration → Mode
+  hors-ligne** montrent le nombre de changements pas encore synchronisés.
+
+> ⚠️ Pour que l'app s'ouvre hors-ligne, il faut l'avoir **ouverte au moins une fois
+> avec connexion** (le navigateur met alors l'app en cache). Idéal : « Ajouter à
+> l'écran d'accueil » sur le téléphone.
+
 ---
 
 ## Sécurité (optionnel, à faire après le lancement)
