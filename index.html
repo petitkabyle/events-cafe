@@ -75,8 +75,22 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .notif-red-dot{position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;animation:badgepulse 1.5s infinite;border:1.5px solid var(--bg1);}
 
 /* ── CONTENT ── */
-.content{padding:24px;flex:1;}
+.content{padding:20px 24px;flex:1;}
 .section{display:none;}.section.active{display:block;}
+
+/* Masque les barres de défilement (l'app tient sur une page, scroll interne discret) */
+html,body{scrollbar-width:none;-ms-overflow-style:none;}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
+.content{scrollbar-width:none;-ms-overflow-style:none;}
+.content::-webkit-scrollbar{width:0;height:0;display:none;}
+
+/* Sur grand écran : topbar + sidebar fixes, seul le contenu défile (pas de barre globale) */
+@media(min-width:821px){
+  html,body{height:100%;overflow:hidden;}
+  .wrapper{height:100vh;overflow:hidden;}
+  .main{height:100vh;min-height:0;overflow:hidden;}
+  .content{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+}
 
 /* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
@@ -402,15 +416,29 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .mbar-x{font-size:9px;color:var(--text3);}
 .chart-total{font-size:12px;color:var(--text2);margin-top:10px;padding-top:8px;border-top:1px solid var(--border);text-align:right;}
 
-/* ── MENU "PLUS" (mobile) ── */
-.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;}
+/* ── MENU "PLUS" (bottom-sheet mobile + modal centré desktop) ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;}
 .sheet-overlay.open{display:block;}
-.more-sheet{position:fixed;left:0;right:0;bottom:0;z-index:101;background:var(--bg1);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom));transform:translateY(115%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);}
+.more-sheet{position:fixed;left:0;right:0;bottom:0;z-index:101;background:var(--bg1);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(115%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);}
 .more-sheet.open{transform:translateY(0);}
-.more-sheet-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;text-align:center;}
-.more-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;color:var(--text1);font-family:var(--font-body);font-size:14px;margin-bottom:8px;cursor:pointer;text-align:left;}
-.more-item:active{background:var(--bg3);}
-.more-item .mi-ico{font-size:20px;}
+.more-sheet-grip{width:38px;height:4px;border-radius:3px;background:var(--border2);margin:0 auto 12px;}
+.more-sheet-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;text-align:center;}
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.more-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;width:100%;padding:16px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;color:var(--text1);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;text-align:center;position:relative;transition:all .15s;}
+.more-item:hover{background:var(--bg3);border-color:var(--accent);}
+.more-item:active{background:var(--bg3);transform:scale(.97);}
+.more-item .mi-ico{font-size:24px;}
+.more-item .mi-badge{position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;font-weight:600;}
+.more-close-btn{width:100%;margin-top:12px;padding:11px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-body);font-size:13px;cursor:pointer;}
+.more-close-btn:hover{background:var(--bg4);color:var(--text1);}
+.nav-item.nav-more{margin-top:6px;background:var(--bg3);font-weight:600;}
+.nav-item.nav-more .nav-icon{font-size:18px;}
+/* Sur grand écran : le menu PLUS s'affiche comme une fenêtre centrée */
+@media(min-width:821px){
+  .more-sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%) scale(.96);width:460px;max-width:92vw;border:1px solid var(--border2);border-radius:16px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
+  .more-sheet.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto;}
+  .more-sheet-grip{display:none;}
+}
 
 /* ── SAFE AREA (encoche iPhone) ── */
 .topbar{padding-top:calc(14px + env(safe-area-inset-top));padding-left:calc(24px + env(safe-area-inset-left));padding-right:calc(24px + env(safe-area-inset-right));}
@@ -497,14 +525,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="nav-item" data-tab="events" onclick="showTab('events')"><span class="nav-icon">🗂️</span><span>Événements</span></div>
     <div class="nav-item" data-tab="delivery" onclick="showTab('delivery')"><span class="nav-icon">🚚</span><span>Livraisons</span><span class="nav-badge" id="nav-badge-delivery" style="display:none">0</span></div>
     <div class="nav-item" data-tab="stock" onclick="showTab('stock')"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
-    <div class="nav-section">Gestion</div>
-    <div class="nav-item" data-tab="clients" onclick="showTab('clients')"><span class="nav-icon">👥</span><span>Clients &amp; Tarifs</span></div>
-    <div class="nav-item" data-tab="catalogue" onclick="showTab('catalogue')"><span class="nav-icon">🛠️</span><span>Catalogue produits</span></div>
-    <div class="nav-item" data-tab="planning" onclick="showTab('planning')"><span class="nav-icon">⏱️</span><span>Planning / Heures</span></div>
-    <div class="nav-item" data-tab="stats" onclick="showTab('stats')"><span class="nav-icon">📊</span><span>Statistiques</span></div>
-    <div class="nav-item" data-tab="activity" onclick="markAllRead();showTab('activity')"><span class="nav-icon">📋</span><span>Activité</span><span class="nav-badge red" id="nav-badge-activity" style="display:none">0</span></div>
-    <div class="nav-section">Paramètres</div>
-    <div class="nav-item" data-tab="config" onclick="showTab('config')"><span class="nav-icon">⚙️</span><span>Configuration</span></div>
+    <div class="nav-item nav-more" id="more-nav-btn-desktop" onclick="openMore()"><span class="nav-icon">☰</span><span>PLUS</span><span class="nav-badge red" id="nav-badge-more" style="display:none">0</span></div>
     <div class="sidebar-bottom">
       <div class="sync-status"><div class="sync-dot js-sync-dot" id="sync-dot"></div><span class="js-sync-label" id="sync-label">Connexion...</span></div>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;" id="last-sync">—</div>
@@ -788,13 +809,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <!-- Menu "Plus" (mobile) -->
 <div class="sheet-overlay" id="more-overlay" onclick="closeMore()"></div>
 <div class="more-sheet" id="more-sheet">
-  <div class="more-sheet-title">Plus d'options</div>
-  <button class="more-item" onclick="showTab('clients');closeMore()"><span class="mi-ico">👥</span> Clients &amp; Tarifs</button>
-  <button class="more-item" onclick="showTab('catalogue');closeMore()"><span class="mi-ico">🛠️</span> Catalogue produits</button>
-  <button class="more-item" onclick="showTab('planning');closeMore()"><span class="mi-ico">⏱️</span> Planning / Heures</button>
-  <button class="more-item" onclick="showTab('stats');closeMore()"><span class="mi-ico">📊</span> Statistiques</button>
-  <button class="more-item" onclick="markAllRead();showTab('activity');closeMore()"><span class="mi-ico">📋</span> Activité / Historique <span class="bn-badge" id="more-badge-activity" style="position:static;margin-left:auto;display:none;">0</span></button>
-  <button class="more-item" onclick="showTab('config');closeMore()"><span class="mi-ico">⚙️</span> Configuration</button>
+  <div class="more-sheet-grip"></div>
+  <div class="more-sheet-title">Menu — toutes les sections</div>
+  <div class="more-grid">
+    <button class="more-item" onclick="showTab('clients');closeMore()"><span class="mi-ico">👥</span><span>Clients &amp; Tarifs</span></button>
+    <button class="more-item" onclick="showTab('catalogue');closeMore()"><span class="mi-ico">🛠️</span><span>Catalogue produits</span></button>
+    <button class="more-item" onclick="showTab('planning');closeMore()"><span class="mi-ico">⏱️</span><span>Planning / Heures</span></button>
+    <button class="more-item" onclick="showTab('stats');closeMore()"><span class="mi-ico">📊</span><span>Statistiques</span></button>
+    <button class="more-item" onclick="markAllRead();showTab('activity');closeMore()"><span class="mi-ico">📋</span><span>Activité</span><span class="mi-badge" id="more-badge-activity" style="display:none">0</span></button>
+    <button class="more-item" onclick="showTab('config');closeMore()"><span class="mi-ico">⚙️</span><span>Configuration</span></button>
+  </div>
+  <button class="more-close-btn" onclick="closeMore()">Fermer</button>
 </div>
 
 <!-- NOTIF PANEL -->
@@ -1025,16 +1050,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="modal">
     <div class="modal-head"><span class="modal-title" id="modal-title-text">Nouvel événement</span><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
-      <div class="form-row"><div class="form-group"><label class="form-label">Client / Société *</label><input class="form-input" id="m-client" type="text" placeholder="Groupe Publicis"></div><div class="form-group"><label class="form-label">Contact</label><input class="form-input" id="m-contact" type="text" placeholder="email ou tél."></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Nom du salon / événement *</label><input class="form-input" id="m-salon" type="text" placeholder="Festival de Cannes"></div><div class="form-group"><label class="form-label">Type d'événement</label><select class="form-select" id="m-type"><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Stand(s) *</label><input class="form-input" id="m-stand" type="text" placeholder="Stand B12 - Palais"></div><div class="form-group"><label class="form-label">Ville / Lieu</label><input class="form-input" id="m-lieu" type="text" placeholder="Cannes"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Client / Société *</label><input class="form-input" id="m-client" type="text" placeholder="Groupe Publicis" list="dl-clients" oninput="onClientInput()" autocomplete="off"></div><div class="form-group"><label class="form-label">Contact</label><input class="form-input" id="m-contact" type="text" placeholder="email ou tél." list="dl-contacts" autocomplete="off"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Nom du salon / événement *</label><input class="form-input" id="m-salon" type="text" placeholder="Festival de Cannes" list="dl-salons" autocomplete="off"></div><div class="form-group"><label class="form-label">Type d'événement</label><select class="form-select" id="m-type"><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Stand(s) *</label><input class="form-input" id="m-stand" type="text" placeholder="Stand B12 - Palais"></div><div class="form-group"><label class="form-label">Ville / Lieu</label><input class="form-input" id="m-lieu" type="text" placeholder="Cannes" list="dl-lieux" autocomplete="off"></div></div>
       <div class="form-row single"><div class="form-group"><label class="form-label">📍 Adresse de livraison</label><textarea class="form-textarea" id="m-delivery-address" placeholder="Adresse complète, bâtiment, hall, accès, code..." style="min-height:46px;"></textarea></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">👤 Contact sur place</label><input class="form-input" id="m-onsite-name" type="text" placeholder="Nom du contact à appeler"></div><div class="form-group"><label class="form-label">📞 Tél. sur place</label><input class="form-input" id="m-onsite-phone" type="tel" placeholder="+33 6 ..."></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">📦 Date de montage *</label><input class="form-input" id="m-start" type="date"></div><div class="form-group"><label class="form-label">📤 Retour matériel *</label><input class="form-input" id="m-end" type="date"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">📦 Date de montage *</label><input class="form-input" id="m-start" type="date" onchange="if(!document.getElementById('m-end').value)document.getElementById('m-end').value=this.value"></div><div class="form-group"><label class="form-label">📤 Retour matériel *</label><input class="form-input" id="m-end" type="date"></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="m-status"><option value="devis_a_envoyer">📩 Devis à envoyer</option><option value="devis_envoye">📨 Devis envoyé</option><option value="attente_facturation">🧾 À facturer</option><option value="confirmé">✅ Confirmé</option><option value="livré">🚚 Livré</option><option value="non_payé">⏳ Non payé</option><option value="payé">💶 Payé</option></select></div><div class="form-group"><label class="form-label">Notes internes</label><input class="form-input" id="m-notes" type="text" placeholder="Accès, horaires..."></div></div>
       <div class="form-row"><div class="form-group"><label class="form-label">💶 Montant facturé (€)</label><input class="form-input" id="m-amount" type="number" min="0" step="0.01" placeholder="ex: 850"></div><div class="form-group"><label class="form-label">Paiement</label><select class="form-select" id="m-paid"><option value="">⏳ Non payé</option><option value="1">✅ Payé</option></select></div></div>
       <div class="form-section-title">📦 Matériel loué</div>
       <div class="mat-grid" id="modal-mat-grid"></div>
+      <datalist id="dl-clients"></datalist>
+      <datalist id="dl-contacts"></datalist>
+      <datalist id="dl-salons"></datalist>
+      <datalist id="dl-lieux"></datalist>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button><button class="btn btn-primary" onclick="saveEvent()" id="modal-save-btn">Créer l'événement</button></div>
   </div>
@@ -1381,12 +1410,14 @@ function renderBadges(){
   const badge = document.getElementById('nav-badge-activity');
   const bn = document.getElementById('bn-badge-activity');
   const mb = document.getElementById('more-badge-activity');
+  const moreD = document.getElementById('nav-badge-more');
   const has = unreadCount > 0;
   const txt = unreadCount > 9 ? '9+' : String(unreadCount);
   if(dot) dot.style.display = has ? 'block' : 'none';
   if(badge){ badge.style.display = has ? 'inline' : 'none'; badge.textContent = txt; }
   if(bn){ bn.style.display = has ? 'inline-flex' : 'none'; bn.textContent = txt; }
   if(mb){ mb.style.display = has ? 'inline-flex' : 'none'; mb.textContent = txt; }
+  if(moreD){ moreD.style.display = has ? 'inline' : 'none'; moreD.textContent = txt; }
 }
 function markAllRead(){
   activityLog = activityLog.map(e=>({...e,read:true}));
@@ -1657,6 +1688,7 @@ function renderEvCard(ev){
       <button class="btn-xs" onclick="openEditModal('${ev.id}')">✏️ Modifier</button>
       <select class="status-sel" onchange="quickStatus('${ev.id}',this.value)"><option value="">— Changer statut —</option>${statusOptionsHtml()}</select>
       <button class="btn-xs ${ev.paid?'success':''}" onclick="togglePaid('${ev.id}')">${ev.paid?'✅ Payé':'💶 Marquer payé'}</button>
+      <button class="btn-xs" onclick="duplicateEvent('${ev.id}')" title="Créer une copie de cet événement">⧉ Dupliquer</button>
       <button class="btn-xs danger" onclick="deleteEvent('${ev.id}')">🗑</button>
     </div></div>`;
 }
@@ -3113,20 +3145,105 @@ function buildMatGrid(cid,values={}){
 function adjMat(gid,sid,delta){const el=document.getElementById(`${gid}-${sid}`);if(el)el.textContent=Math.max(0,(parseInt(el.textContent||'0')||0)+delta);}
 function getMatValues(cid){const mat={};STOCK_META.filter(si=>si.active!==false).forEach(si=>{const el=document.getElementById(`${cid}-${si.id}`);if(el){const v=parseInt(el.textContent||'0');if(v>0)mat[si.id]=v;}});return mat;}
 
-function openAddModal(){
+// ══════════════════════════════════════════════════════
+// RACCOURCIS — autocomplétion & reconnaissance client
+// ══════════════════════════════════════════════════════
+// Renvoie le dernier événement connu pour un nom de société (le plus récent)
+function lastEventForClient(name){
+  if(!name) return null;
+  const n=normCompany(name.replace(/\([^)]*\)\s*$/,''));
+  const matches=events.filter(e=>{
+    const en=normCompany((e.clientCompany||e.client||'').replace(/\([^)]*\)\s*$/,''));
+    return en && (en===n || en.startsWith(n) || n.startsWith(en));
+  });
+  if(!matches.length) return null;
+  return matches.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)||String(b.id).localeCompare(String(a.id)))[0];
+}
+// (Re)construit les listes d'autocomplétion du modal événement
+function rebuildModalDatalists(){
+  const clientsSet=new Set(), contactsSet=new Set(), salonsSet=new Set(), lieuxSet=new Set();
+  // Depuis la base clients enregistrés
+  clients.forEach(c=>{ if(c.company) clientsSet.add(c.company); clientEmails(c).forEach(e=>contactsSet.add(e)); });
+  // Depuis l'historique des événements
+  events.forEach(e=>{
+    if(e.clientCompany) clientsSet.add(e.clientCompany); else if(e.client) clientsSet.add(e.client);
+    if(e.contact) contactsSet.add(e.contact);
+    if(e.salon) salonsSet.add(e.salon);
+    if(e.lieu) lieuxSet.add(e.lieu);
+  });
+  const fill=(id,set)=>{ const el=document.getElementById(id); if(el) el.innerHTML=[...set].filter(Boolean).sort().map(v=>`<option value="${esc(v)}">`).join(''); };
+  fill('dl-clients',clientsSet); fill('dl-contacts',contactsSet); fill('dl-salons',salonsSet); fill('dl-lieux',lieuxSet);
+}
+// Quand on tape/choisit un client : pré-remplit ce qui ne change pas (contact, lieu, adresse...)
+let _clientAutofilled=false;
+function onClientInput(){
+  if(editingId) return; // en édition, on ne réécrase pas
+  const name=document.getElementById('m-client').value.trim();
+  if(!name) return;
+  // 1) Fiche client enregistrée (tarifs/contact)
+  const cli=findClientByName(name);
+  // 2) Dernier événement du même client (le plus complet pour pré-remplir)
+  const last=lastEventForClient(name);
+  // N'autofill que si les champs sont vides (ne jamais écraser une saisie en cours)
+  const setIfEmpty=(id,val)=>{ const el=document.getElementById(id); if(el && !el.value && val) el.value=val; };
+  if(cli){
+    setIfEmpty('m-contact', cli.contact || clientEmails(cli)[0] || '');
+  }
+  if(last){
+    setIfEmpty('m-contact', last.contact);
+    setIfEmpty('m-lieu', last.lieu);
+    setIfEmpty('m-delivery-address', last.deliveryAddress);
+    setIfEmpty('m-onsite-name', last.onSiteName);
+    setIfEmpty('m-onsite-phone', last.onSitePhone);
+    if(!document.getElementById('m-type').value && last.type) document.getElementById('m-type').value=last.type;
+  }
+  if((cli||last) && !_clientAutofilled){
+    _clientAutofilled=true;
+    showToast('Client reconnu — champs pré-remplis (modifiables)','info');
+  }
+}
+// Duplique un événement existant (pré-remplit le modal, sans dates)
+function duplicateEvent(id){
+  const ev=findEv(id); if(!ev) return;
   editingId=null;
+  document.getElementById('modal-title-text').textContent='＋ Nouvel événement (copie)';
+  document.getElementById('modal-save-btn').textContent='Créer l\'événement';
+  document.getElementById('m-client').value=ev.client||'';
+  document.getElementById('m-contact').value=ev.contact||'';
+  document.getElementById('m-salon').value=ev.salon||'';
+  document.getElementById('m-stand').value=ev.stand||'';
+  document.getElementById('m-lieu').value=ev.lieu||'';
+  document.getElementById('m-delivery-address').value=ev.deliveryAddress||'';
+  document.getElementById('m-onsite-name').value=ev.onSiteName||'';
+  document.getElementById('m-onsite-phone').value=ev.onSitePhone||'';
+  document.getElementById('m-start').value='';
+  document.getElementById('m-end').value='';
+  document.getElementById('m-type').value=ev.type||'';
+  document.getElementById('m-status').value='devis_a_envoyer';
+  document.getElementById('m-notes').value=ev.notes||'';
+  document.getElementById('m-amount').value='';
+  document.getElementById('m-paid').value='';
+  rebuildModalDatalists();
+  buildMatGrid('modal-mat-grid',ev.material||{});
+  document.getElementById('modal-overlay').style.display='flex';
+  showToast('Copie créée — ajuste les dates puis enregistre','info');
+}
+
+function openAddModal(){
+  editingId=null; _clientAutofilled=false;
   document.getElementById('modal-title-text').textContent='＋ Nouvel événement';
   document.getElementById('modal-save-btn').textContent='Créer l\'événement';
   ['m-client','m-contact','m-salon','m-stand','m-lieu','m-delivery-address','m-onsite-name','m-onsite-phone','m-notes','m-amount'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('m-start').value='';document.getElementById('m-end').value='';
   document.getElementById('m-status').value='devis_a_envoyer';
   document.getElementById('m-paid').value='';
+  rebuildModalDatalists();
   buildMatGrid('modal-mat-grid',{});
   document.getElementById('modal-overlay').style.display='flex';
 }
 function openEditModal(id){
   const ev=findEv(id);if(!ev)return;
-  editingId=id;
+  editingId=id; _clientAutofilled=false;
   document.getElementById('modal-title-text').textContent='✏️ Modifier l\'événement';
   document.getElementById('modal-save-btn').textContent='Enregistrer';
   document.getElementById('m-client').value=ev.client||'';
@@ -3144,6 +3261,7 @@ function openEditModal(id){
   document.getElementById('m-notes').value=ev.notes||'';
   document.getElementById('m-amount').value=ev.amount||'';
   document.getElementById('m-paid').value=ev.paid?'1':'';
+  rebuildModalDatalists();
   buildMatGrid('modal-mat-grid',ev.material||{});
   document.getElementById('modal-overlay').style.display='flex';
 }
@@ -3180,9 +3298,10 @@ function showTab(n,el){
   const T={calendar:'📅 Calendrier',events:'🗂️ Événements',delivery:'🚚 Livraisons & bons',stock:'📦 Stock',catalogue:'🛠️ Catalogue produits',clients:'👥 Clients & Tarifs',planning:'⏱️ Planning / Heures',stats:'📊 Statistiques',activity:'📋 Activité',config:'⚙️ Configuration'};
   const pt=document.getElementById('page-title'); if(pt) pt.textContent=T[n]||n;
   const sr=document.getElementById('stats-row'); if(sr) sr.style.display=(n==='calendar'||n==='events'||n==='stock')?'':'none';
-  // Sur mobile, surligne le bouton "Plus" quand on est sur un onglet du menu Plus
+  // Surligne le bouton "PLUS" (mobile + desktop) quand on est sur un onglet secondaire
   const inMore=['clients','catalogue','planning','stats','activity','config'].includes(n);
-  const moreBtn=document.getElementById('more-nav-btn'); if(moreBtn && inMore) moreBtn.classList.add('active');
+  const moreBtn=document.getElementById('more-nav-btn'); if(moreBtn){ moreBtn.classList.toggle('active', inMore); }
+  const moreBtnD=document.getElementById('more-nav-btn-desktop'); if(moreBtnD){ moreBtnD.classList.toggle('active', inMore); }
   closeSidebar();
   if(n==='stock')renderStock();
   if(n==='events')applyFilters();
