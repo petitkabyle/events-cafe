@@ -64,6 +64,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .hamburger{display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:36px;height:36px;cursor:pointer;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:var(--text2);}
 .topbar-title{font-family:var(--font-head);font-size:18px;font-weight:600;}
 .topbar-actions{display:flex;align-items:center;gap:8px;}
+.queue-pill{display:none;align-items:center;gap:5px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);color:var(--gold2);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
+.queue-pill:hover{background:rgba(245,158,11,.25);}
+.queue-pill .qp-ico{font-size:13px;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;transition:all .2s;white-space:nowrap;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover{background:#2563eb;}
@@ -540,6 +543,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
         <div class="sync-status sync-top"><div class="sync-dot js-sync-dot"></div><span class="js-sync-label">Connexion...</span></div>
       </div>
       <div class="topbar-actions">
+        <button class="queue-pill js-queue-badge" style="display:none" onclick="showTab('config')" title="Modifications en attente d'envoi"><span class="qp-ico">📴</span><span class="qp-n">0</span></button>
         <div class="notif-btn-wrap">
           <button class="btn btn-ghost" onclick="toggleNotifPanel()">🔔 <span class="btn-label">Alertes</span></button>
           <div class="notif-red-dot" id="notif-red-dot"></div>
@@ -738,6 +742,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
             3. Copie tes clés dans le fichier <strong>firebase-config.js</strong><br>
             4. Recharge la page — le voyant passe au vert ✅
           </div>
+        </div>
+
+        <div class="config-panel">
+          <div class="config-title">📴 Mode hors-ligne</div>
+          <div class="config-sub">L'application fonctionne <strong>même sans connexion</strong> (sur les salons, en livraison…). Toutes vos modifications sont enregistrées sur l'appareil et <strong>envoyées automatiquement à tout le monde</strong> dès le retour d'internet.</div>
+          <div id="queue-status-box"></div>
         </div>
 
         <div class="config-panel">
@@ -1178,23 +1188,40 @@ let ejsCfg = JSON.parse(localStorage.getItem('ep_ejs')||'{}');
     catch(e){console.error('Firebase init',e);}
   }
 })();
+
+// État réseau en direct (true dès qu'on est connecté à Firebase)
+let fbOnline = false;
 const findEv = id => events.find(e => String(e.id)===String(id));
 
 function startRealtime(){
   if(!fbReady){setSyncStatus('local');loadLocal();renderFbStatus();return;}
   setSyncStatus('syncing');
 
+  // Affichage instantané hors-ligne : on montre tout de suite les dernières données
+  // connues (stockées sur l'appareil). Firebase les remplacera dès qu'il répond.
+  try{
+    const cached = JSON.parse(localStorage.getItem('ep_events')||'[]');
+    if(cached.length){
+      events = cached.map(e=>{e.material=e.material||{};e.status=normStatus(e.status);return e;});
+      renderAll();
+    }
+  }catch(e){}
+
   // Suivi fiable de l'état de connexion (corrige le "Connexion..." figé sur téléphone)
   db.ref('.info/connected').on('value', s=>{
     const connected = s.val()===true;
+    fbOnline = connected;
     if(connected){
       if(!isFirstLoad){ setSyncStatus('ok'); setLastSync(); }
+      // Reconnexion : on rejoue toutes les modifications faites hors-ligne
+      flushOfflineQueue();
     } else {
       // On n'affiche "Hors ligne" que si on avait déjà reçu des données
       // (évite un faux clignotement rouge pendant la 1re connexion)
       if(!isFirstLoad){ setSyncStatus('error'); }
       else { setSyncStatus('syncing'); }
     }
+    updateQueueBadge();
   });
 
   // Watchdog : si Firebase ne répond pas dans les 8s, on bascule en local pour ne pas rester bloqué
@@ -1315,17 +1342,100 @@ function loadLocal(){
 }
 function saveLocal(){localStorage.setItem('ep_events',JSON.stringify(events));}
 
+// ══════════════════════════════════════════════════════
+// MODE HORS-LIGNE — file d'attente durable
+// Chaque modification est : 1) appliquée tout de suite en local (réactif)
+// 2) écrite dans une file persistante (localStorage) 3) rejouée vers Firebase
+// dès le retour de la connexion. Rien n'est perdu, même si on ferme l'app.
+// ══════════════════════════════════════════════════════
+let offlineQueue = [];
+try{ offlineQueue = JSON.parse(localStorage.getItem('ep_offline_queue')||'[]'); }catch(e){ offlineQueue = []; }
+let _flushing = false;
+
+function saveQueue(){ try{ localStorage.setItem('ep_offline_queue', JSON.stringify(offlineQueue)); }catch(e){} }
+function queueLen(){ return offlineQueue.length; }
+
+// Empile une opération Firebase à rejouer plus tard
+function enqueueOp(op){
+  op.ts = Date.now();
+  op.opId = 'op_'+op.ts+'_'+Math.floor(Math.random()*100000);
+  // Optimisation : pour les écritures "nœud entier" (set d'un tableau de module),
+  // une nouvelle valeur remplace la précédente encore en attente (même chemin).
+  const wholeNodePaths = ['clients','basePricing','drivers','deliveries','catalogue','stock'];
+  if(op.kind==='set' && wholeNodePaths.includes(op.path)){
+    const idx = offlineQueue.findIndex(o=>o.kind==='set' && o.path===op.path);
+    if(idx>=0){ offlineQueue[idx] = op; saveQueue(); updateQueueBadge(); return; }
+  }
+  offlineQueue.push(op);
+  saveQueue();
+  updateQueueBadge();
+}
+
+// Tente d'écrire immédiatement ; si échec/hors-ligne, garde dans la file
+function execOp(op){
+  let ref;
+  switch(op.kind){
+    case 'set':    ref = db.ref(op.path).set(op.value); break;
+    case 'update': ref = db.ref(op.path).update(op.value); break;
+    case 'remove': ref = db.ref(op.path).remove(); break;
+    default: return Promise.resolve();
+  }
+  // Garde-fou : si l'écriture ne se confirme pas en 10s (réseau instable),
+  // on considère l'opération non confirmée pour la retenter plus tard.
+  return Promise.race([
+    ref,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), 10000))
+  ]);
+}
+
+// Rejoue la file dans l'ordre dès qu'on est en ligne
+async function flushOfflineQueue(){
+  if(_flushing || !fbReady || !fbOnline) return;
+  if(!offlineQueue.length){ updateQueueBadge(); return; }
+  _flushing = true;
+  setSyncStatus('syncing');
+  try{
+    while(offlineQueue.length){
+      const op = offlineQueue[0];
+      try{
+        await execOp(op);
+        offlineQueue.shift();   // retiré seulement si succès
+        saveQueue();
+        updateQueueBadge();
+      }catch(e){
+        console.warn('Rejeu interrompu (sera retenté):', e);
+        break; // on s'arrête, on retentera à la prochaine reconnexion
+      }
+    }
+  } finally {
+    _flushing = false;
+    if(!offlineQueue.length){ setSyncStatus(fbOnline?'ok':'error'); setLastSync(); }
+    updateQueueBadge();
+  }
+}
+
+// Écriture "intelligente" : applique en local, met en file, et pousse si en ligne
+function queuedWrite(kind, path, value){
+  enqueueOp({kind, path, value});
+  if(fbReady && fbOnline) flushOfflineQueue();
+}
+
 async function persistNew(data){
-  if(fbReady){const r=db.ref('events').push(); await r.set({id:r.key,...data});}
-  else{events.push({id:'loc_'+Date.now(),...data}); saveLocal(); renderAll();}
+  // ID généré côté client => identique en local et sur Firebase (pas de doublon au rejeu)
+  const id = (fbReady && db.ref('events').push().key) || ('loc_'+Date.now()+'_'+Math.floor(Math.random()*100000));
+  const rec = {id, ...data};
+  events.push(rec); saveLocal(); renderAll();
+  if(fbReady) queuedWrite('set', 'events/'+id, rec);
 }
 async function persistUpdate(id,patch){
-  if(fbReady){await db.ref('events/'+id).update(patch);}
-  else{const ev=findEv(id);if(ev)Object.assign(ev,patch); saveLocal(); renderAll();}
+  const ev=findEv(id); if(ev) Object.assign(ev,patch);
+  saveLocal(); renderAll();
+  if(fbReady) queuedWrite('update', 'events/'+id, patch);
 }
 async function persistDelete(id){
-  if(fbReady){await db.ref('events/'+id).remove();}
-  else{events=events.filter(e=>String(e.id)!==String(id)); saveLocal(); renderAll();}
+  events=events.filter(e=>String(e.id)!==String(id));
+  saveLocal(); renderAll();
+  if(fbReady) queuedWrite('remove', 'events/'+id, null);
 }
 
 function setSyncStatus(s){
@@ -1340,6 +1450,37 @@ function setSyncStatus(s){
   lbls.forEach(l=>{l.textContent=txt;});
 }
 function setLastSync(){document.getElementById('last-sync').textContent='Màj '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+
+// Affiche le nombre de changements en attente d'envoi (file hors-ligne)
+function updateQueueBadge(){
+  const n = offlineQueue.length;
+  document.querySelectorAll('.js-queue-badge').forEach(el=>{
+    if(n>0){ el.style.display='inline-flex'; el.textContent = n>99?'99+':String(n); }
+    else { el.style.display='none'; }
+  });
+  // Met à jour le libellé de statut si des éléments sont en attente
+  if(n>0 && !fbOnline){
+    document.querySelectorAll('.js-sync-label').forEach(l=>{ l.textContent = `Hors ligne · ${n} en attente`; });
+  }
+  // Rafraîchit l'encart Configuration s'il est ouvert
+  const box=document.getElementById('queue-status-box');
+  if(box) renderQueueStatus();
+}
+
+// Encart détaillé dans Configuration
+function renderQueueStatus(){
+  const box=document.getElementById('queue-status-box'); if(!box) return;
+  const n=offlineQueue.length;
+  if(n===0){
+    box.innerHTML='<div style="padding:10px 14px;border-radius:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:var(--green2);font-size:13px;">✅ Tout est synchronisé — aucune modification en attente.</div>';
+    return;
+  }
+  const online = fbOnline;
+  box.innerHTML=`<div style="padding:10px 14px;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--gold2);font-size:13px;">
+    ${online?'🔄':'📴'} <strong>${n}</strong> modification(s) en attente d'envoi${online?' — envoi en cours…':' (seront envoyées dès le retour de la connexion)'}.
+    ${online?`<button class="btn btn-ghost" style="margin-top:8px;font-size:12px;padding:5px 12px;" onclick="flushOfflineQueue()">Réessayer maintenant</button>`:''}
+  </div>`;
+}
 function renderFbStatus(){
   const box=document.getElementById('fb-status-box');if(!box)return;
   box.innerHTML=fbReady
@@ -1723,6 +1864,7 @@ function renderStock(){
 
 function renderConfig(){
   renderFbStatus(); loadEmailConfig();
+  renderQueueStatus();
   // Lance le diagnostic de synchronisation automatiquement (léger, en arrière-plan)
   if(fbReady){ setTimeout(()=>{ try{ runSyncDiagnostic(); }catch(e){} }, 300); }
   else { const b=document.getElementById('sync-diag-box'); if(b) b.innerHTML='<div style="font-size:13px;color:var(--text3)">Firebase non connecté — synchronisation indisponible.</div>'; }
@@ -1734,16 +1876,20 @@ function renderConfig(){
 // ══════════════════════════════════════════════════════
 function saveHoursLocal(){ try{localStorage.setItem('ep_hours',JSON.stringify(hoursList));}catch(e){} }
 async function persistHourNew(data){
-  if(fbReady){ try{ const r=db.ref('hours').push(); await r.set({id:r.key,...data}); return; }catch(e){ console.warn('hours: fallback local',e); } }
-  hoursList.push({id:'h_'+Date.now(),...data}); saveHoursLocal(); renderPlanning();
+  const id = (fbReady && db.ref('hours').push().key) || ('h_'+Date.now()+'_'+Math.floor(Math.random()*100000));
+  const rec = {id, ...data};
+  hoursList.push(rec); saveHoursLocal(); renderPlanning();
+  if(fbReady) queuedWrite('set', 'hours/'+id, rec);
 }
 async function persistHourUpdate(id,patch){
-  if(fbReady){ try{ await db.ref('hours/'+id).update(patch); return; }catch(e){ console.warn('hours: fallback local',e); } }
-  const h=hoursList.find(x=>String(x.id)===String(id)); if(h)Object.assign(h,patch); saveHoursLocal(); renderPlanning();
+  const h=hoursList.find(x=>String(x.id)===String(id)); if(h)Object.assign(h,patch);
+  saveHoursLocal(); renderPlanning();
+  if(fbReady) queuedWrite('update', 'hours/'+id, patch);
 }
 async function persistHourDelete(id){
-  if(fbReady){ try{ await db.ref('hours/'+id).remove(); return; }catch(e){ console.warn('hours: fallback local',e); } }
-  hoursList=hoursList.filter(x=>String(x.id)!==String(id)); saveHoursLocal(); renderPlanning();
+  hoursList=hoursList.filter(x=>String(x.id)!==String(id));
+  saveHoursLocal(); renderPlanning();
+  if(fbReady) queuedWrite('remove', 'hours/'+id, null);
 }
 function hourAmount(h){ const r=parseFloat(h.rate)||0, hr=parseFloat(h.hours)||0; return r>0?r*hr:0; }
 function fmtMoney(n){ return (n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
@@ -1987,7 +2133,7 @@ function syncStockMetaFromCatalogue(){
 // Sauvegarde catalogue en local + Firebase
 async function saveCatalogue(){
   localStorage.setItem('ep_catalogue', JSON.stringify(catalogue));
-  if(fbReady){ try{ await db.ref('catalogue').set(catalogue); }catch(e){ console.warn('catalogue firebase:', e); } }
+  if(fbReady){ queuedWrite('set', 'catalogue', catalogue); }
   syncStockMetaFromCatalogue();
   renderAll();
   renderCatalogue();
@@ -2100,7 +2246,7 @@ function renderCatalogue(){
 function quickUpdateStock(id, val){
   STOCK_DEFAULTS[id] = Math.max(0, parseInt(val)||0);
   localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS));
-  if(fbReady) db.ref('stock').set(STOCK_DEFAULTS);
+  if(fbReady) queuedWrite('set','stock',STOCK_DEFAULTS);
   renderStats();
   renderStock();
   showToast(`Stock ${catalogue.find(p=>p.id===id)?.label||id} : ${STOCK_DEFAULTS[id]} ✓`, 'success');
@@ -2227,7 +2373,7 @@ async function saveCatProduct(){
     catalogue.push({id, label, icon, cat, color, unit, desc, active, stock:stockVal});
     STOCK_DEFAULTS[id] = stockVal;
     localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS));
-    if(fbReady) db.ref('stock').set(STOCK_DEFAULTS);
+    if(fbReady) queuedWrite('set','stock',STOCK_DEFAULTS);
     showToast(`${label} ajouté au catalogue ✓`, 'success');
   }
   closeCatModal();
@@ -2246,19 +2392,10 @@ function renderAll(){renderStats();renderCalendar();applyFilters();renderStock()
 let _fbRuleWarned = false;
 async function fbWrite(path, value){
   if(!fbReady) return false;
-  try{
-    await db.ref(path).set(value);
-    return true;
-  }catch(e){
-    console.error('Firebase write bloqué sur "'+path+'":', e);
-    const denied = e && (e.code==='PERMISSION_DENIED' || /permission_denied|permission denied/i.test(String(e.message||e)));
-    if(denied && !_fbRuleWarned){
-      _fbRuleWarned = true;
-      showToast('⚠️ Synchro bloquée par les règles Firebase ('+path+'). Voir Configuration → Synchronisation.','error');
-      try{ pushNotif('⚠️','Synchronisation bloquée',`Le nœud « ${path} » est refusé par les règles Firebase. Mets les règles « .read/.write à la racine » (voir guide).`,'edit'); }catch(_){}
-    }
-    return false;
-  }
+  // Passe par la file durable : appliqué localement déjà fait par l'appelant,
+  // ici on garantit que l'écriture sera rejouée même après une coupure/fermeture.
+  queuedWrite('set', path, value);
+  return true;
 }
 
 // Alerte une seule fois si la LECTURE d'un nœud est refusée par les règles Firebase
@@ -3121,7 +3258,7 @@ function deleteEvent(id){
 function saveStockConfig(){
   STOCK_META.forEach(si=>{const el=document.getElementById('sc-'+si.id);if(el)STOCK_DEFAULTS[si.id]=Math.max(0,parseInt(el.value)||0);});
   localStorage.setItem('ep_stock',JSON.stringify(STOCK_DEFAULTS));
-  if(fbReady)db.ref('stock').set(STOCK_DEFAULTS);
+  if(fbReady)queuedWrite('set','stock',STOCK_DEFAULTS);
   showToast('Stock mis à jour ✓','success'); renderAll();
 }
 
@@ -3361,8 +3498,11 @@ function bootApp(){
   try{ if(ejsCfg.pubkey && typeof emailjs!=='undefined') emailjs.init(ejsCfg.pubkey); }catch(e){console.warn(e);}
   try{ loadEmailConfig(); }catch(e){console.warn('loadEmailConfig:',e);}
   try{ renderBadges(); }catch(e){console.warn('renderBadges:',e);}
+  try{ updateQueueBadge(); }catch(e){console.warn('updateQueueBadge:',e);}
   try{ cancelHourEdit(); }catch(e){console.warn('cancelHourEdit:',e);}
   try{ startRealtime(); }catch(e){console.error('startRealtime:',e); setSyncStatus('error'); try{loadLocal();}catch(_){}}
+  // Filet de sécurité : retente l'envoi de la file toutes les 20s tant qu'il reste des éléments
+  setInterval(()=>{ if(offlineQueue.length && fbReady && fbOnline) flushOfflineQueue(); }, 20000);
 }
 
 registerServiceWorker();
