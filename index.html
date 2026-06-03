@@ -958,6 +958,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
     <div class="modal-footer" style="flex-wrap:wrap;">
       <button class="btn btn-ghost" onclick="closeQuoteModal()">Fermer</button>
+      <button class="btn btn-ghost" onclick="openQuoteDocument()">📄 Aperçu / PDF</button>
       <button class="btn btn-ghost" onclick="saveQuoteOnly()">💾 Enregistrer (sans envoyer)</button>
       <button class="btn btn-gold" id="quote-send-btn" onclick="sendQuote()">📨 Envoyer le devis au client</button>
     </div>
@@ -2635,34 +2636,184 @@ function recalcQuoteModal(){
   document.getElementById('q-total').textContent=fmtEur(q.total);
 }
 
-// Construit le récap texte du devis pour l'email client
+// Génère un numéro de devis stable (réutilisé si déjà attribué à l'événement)
+function genQuoteNumber(){
+  const yr=new Date().getFullYear();
+  const n=events.filter(e=>e.quote&&e.quote.number).length+1;
+  return 'DEV-'+yr+'-'+String(n).padStart(4,'0');
+}
+function quoteValidUntil(q){
+  return new Date(Date.now()+(q.validity||15)*86400000).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+}
+
+// Email client — texte clair et professionnel (sans emoji), compatible tous clients mail
 function quoteEmailBody(ev,q){
-  const validUntil=new Date(Date.now()+q.validity*86400000).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const num=q.number||'—';
+  const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const sep='------------------------------------------------------------';
   const lines=q.lines.map(l=>{
-    const right=l.offered?'OFFERT':fmtEur(l.total)+(l.qty>1?` (${fmtEur(l.unit)}/u)`:'');
-    return `   • ${l.qty}× ${l.label} — ${right}`;
+    const right=l.offered?'Offert':`${l.qty} x ${fmtEur(l.unit)}  =  ${fmtEur(l.total)}`;
+    return `  - ${l.label}\n      ${right}`;
   }).join('\n');
-  let body=`${q.intro}\n\n`;
-  body+=`━━━━━━━━━━━━━━━━━━━━━━━\n   DEVIS — Events Café\n━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-  body+=`🎪 Événement : ${ev.salon||'—'}\n🪧 Stand : ${ev.stand||'—'}\n`;
-  if(ev.deliveryAddress) body+=`📍 Livraison : ${ev.deliveryAddress}\n`;
-  body+=`📦 Montage : ${emFmtDate(ev.start)}\n📤 Retour : ${emFmtDate(ev.end)}\n\n`;
-  body+=`── Matériel ──\n${lines||'   • (aucun)'}\n\n`;
-  body+=`Sous-total : ${fmtEur(q.subtotal)}\n`;
-  if(q.discountPct>0) body+=`Remise (−${q.discountPct}%) : −${fmtEur(q.discountAmt)}\n`;
-  body+=`Frais de livraison : ${q.deliveryFee>0?fmtEur(q.deliveryFee):'Offerts'}\n`;
-  body+=`━━━━━━━━━━━━━━━━━━━━━━━\nTOTAL : ${fmtEur(q.total)}\n━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-  body+=`📅 Devis valable jusqu'au ${validUntil}.\nPour confirmer votre commande, répondez simplement à cet email.\n\nMerci de votre confiance,\nEvents Café — Call · Install · Smile ☕`;
-  return body;
+  let b='';
+  b+=`${q.intro}\n\n`;
+  b+=`${sep}\n`;
+  b+=`DEVIS  ${num}\n`;
+  b+=`${sep}\n`;
+  b+=`Date d'emission : ${today}\n`;
+  b+=`Valable jusqu'au : ${quoteValidUntil(q)}\n\n`;
+  b+=`PRESTATION\n`;
+  b+=`  Evenement : ${ev.salon||'-'}\n`;
+  if(ev.stand) b+=`  Stand : ${ev.stand}\n`;
+  if(ev.deliveryAddress) b+=`  Lieu de livraison : ${ev.deliveryAddress}\n`;
+  b+=`  Mise a disposition : ${emFmtDate(ev.start)}\n`;
+  b+=`  Reprise du materiel : ${emFmtDate(ev.end)}\n\n`;
+  b+=`DETAIL\n${lines||'  - (aucun materiel)'}\n\n`;
+  b+=`${sep}\n`;
+  b+=`Sous-total : ${fmtEur(q.subtotal)}\n`;
+  if(q.discountPct>0) b+=`Remise commerciale (-${q.discountPct} %) : -${fmtEur(q.discountAmt)}\n`;
+  b+=`Frais de livraison : ${q.deliveryFee>0?fmtEur(q.deliveryFee):'Offerts'}\n`;
+  b+=`TOTAL : ${fmtEur(q.total)}\n`;
+  b+=`${sep}\n\n`;
+  b+=`Pour accepter ce devis, il vous suffit de repondre a cet email.\n`;
+  b+=`Nous restons a votre entiere disposition pour toute precision.\n\n`;
+  b+=`Cordialement,\n`;
+  b+=`L'equipe Events Cafe`;
+  return b;
 }
 
 function buildQuotePatch(q){
-  return {quote:{lines:q.lines,subtotal:q.subtotal,discountPct:q.discountPct,discountAmt:q.discountAmt,deliveryFee:q.deliveryFee,validity:q.validity,total:q.total,intro:q.intro,updatedAt:Date.now(),sentAt:q.sentAt||null,sentTo:q.sentTo||null}, amount:q.total};
+  return {quote:{number:q.number||null,lines:q.lines,subtotal:q.subtotal,discountPct:q.discountPct,discountAmt:q.discountAmt,deliveryFee:q.deliveryFee,validity:q.validity,total:q.total,intro:q.intro,updatedAt:Date.now(),sentAt:q.sentAt||null,sentTo:q.sentTo||null}, amount:q.total};
+}
+
+// ── DOCUMENT DEVIS IMPRIMABLE / PDF (pro, responsive téléphone + ordi) ──
+function quoteDocHTML(ev, q){
+  const num=q.number||'—';
+  const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const clientName=ev.clientName||(ev.clientCompany||ev.client||'').replace(/\([^)]*\)\s*$/,'').trim()||'Client';
+  const company=ev.clientCompany||'';
+  const rows=q.lines.map(l=>`<tr>
+      <td class="d-desc">${esc(l.label)}</td>
+      <td class="d-c">${l.qty}</td>
+      <td class="d-c">${l.offered?'—':fmtEur(l.unit)}</td>
+      <td class="d-r">${l.offered?'<span class="d-free">Offert</span>':fmtEur(l.total)}</td>
+    </tr>`).join('');
+  return `<div class="doc">
+    <div class="doc-top">
+      <div class="brand"><div class="brand-name">Events <span>Café</span></div><div class="brand-tag">Location de matériel événementiel</div></div>
+      <div class="doc-id"><div class="doc-id-title">DEVIS</div><div class="doc-num">${num}</div></div>
+    </div>
+
+    <div class="doc-parties">
+      <div class="party">
+        <div class="party-h">Émis par</div>
+        <div class="party-b"><strong>Events Café</strong><br>Location &amp; service sur événements<br>contact@eventscafe.fr</div>
+      </div>
+      <div class="party">
+        <div class="party-h">Destinataire</div>
+        <div class="party-b"><strong>${esc(company||clientName)}</strong>${company&&clientName?`<br>${esc(clientName)}`:''}${ev.email?`<br>${esc(ev.email)}`:''}</div>
+      </div>
+    </div>
+
+    <div class="doc-meta">
+      <div><span>Date</span>${today}</div>
+      <div><span>Validité</span>${quoteValidUntil(q)}</div>
+      <div><span>Événement</span>${esc(ev.salon||'—')}</div>
+      ${ev.stand?`<div><span>Stand</span>${esc(ev.stand)}</div>`:''}
+      <div><span>Mise à disposition</span>${emFmtDate(ev.start)}</div>
+      <div><span>Reprise</span>${emFmtDate(ev.end)}</div>
+      ${ev.deliveryAddress?`<div class="full"><span>Livraison</span>${esc(ev.deliveryAddress)}</div>`:''}
+    </div>
+
+    <table class="doc-table">
+      <thead><tr><th>Désignation</th><th class="d-c">Qté</th><th class="d-c">P.U. HT</th><th class="d-r">Montant</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="4" style="color:#999">Aucun matériel</td></tr>'}</tbody>
+    </table>
+
+    <div class="doc-bottom">
+      <div class="doc-note">
+        <div class="dn-h">Conditions</div>
+        Devis valable jusqu'au ${quoteValidUntil(q)}.<br>
+        Pour l'accepter, répondez simplement à l'email ou contactez-nous.
+      </div>
+      <div class="doc-tot">
+        <div class="tot-row"><span>Sous-total</span><span>${fmtEur(q.subtotal)}</span></div>
+        ${q.discountPct>0?`<div class="tot-row disc"><span>Remise −${q.discountPct}%</span><span>−${fmtEur(q.discountAmt)}</span></div>`:''}
+        <div class="tot-row"><span>Frais de livraison</span><span>${q.deliveryFee>0?fmtEur(q.deliveryFee):'Offerts'}</span></div>
+        <div class="tot-row grand"><span>Total à régler</span><span>${fmtEur(q.total)}</span></div>
+      </div>
+    </div>
+
+    <div class="doc-foot">Merci de votre confiance — Events Café</div>
+  </div>`;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function quoteDocStyles(){
+  return `<style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;background:#f4f5f7;color:#222;padding:16px;-webkit-font-smoothing:antialiased;}
+    .doc{max-width:760px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,.08);}
+    .doc-top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:30px 34px;background:#14110d;color:#fff;flex-wrap:wrap;}
+    .brand-name{font-size:26px;font-weight:800;letter-spacing:-.5px;}
+    .brand-name span{color:#f5a623;}
+    .brand-tag{font-size:12px;color:#b9a892;margin-top:4px;letter-spacing:.5px;}
+    .doc-id{text-align:right;}
+    .doc-id-title{font-size:13px;letter-spacing:3px;color:#f5a623;font-weight:600;}
+    .doc-num{font-size:18px;font-weight:700;margin-top:2px;}
+    .doc-parties{display:flex;gap:16px;padding:24px 34px 8px;flex-wrap:wrap;}
+    .party{flex:1;min-width:200px;}
+    .party-h{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:6px;}
+    .party-b{font-size:14px;line-height:1.6;color:#333;}
+    .doc-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;padding:18px 34px;margin:8px 0;background:#faf8f5;border-top:1px solid #eee;border-bottom:1px solid #eee;}
+    .doc-meta div{font-size:14px;color:#333;display:flex;flex-direction:column;}
+    .doc-meta div.full{grid-column:1/-1;}
+    .doc-meta span{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#999;margin-bottom:2px;}
+    .doc-table{width:100%;border-collapse:collapse;margin:14px 0 0;}
+    .doc-table th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#888;text-align:left;padding:10px 34px;border-bottom:2px solid #14110d;}
+    .doc-table td{padding:13px 34px;border-bottom:1px solid #f0f0f0;font-size:14px;}
+    .doc-table .d-desc{font-weight:600;color:#222;}
+    .d-c{text-align:center;}.d-r{text-align:right;font-weight:600;}
+    th.d-c,th.d-r{text-align:center;}th.d-r{text-align:right;}
+    .d-free{color:#10b981;font-weight:600;}
+    .doc-bottom{display:flex;justify-content:space-between;gap:20px;padding:22px 34px;flex-wrap:wrap;align-items:flex-start;}
+    .doc-note{flex:1;min-width:220px;font-size:12px;color:#777;line-height:1.6;}
+    .dn-h{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#999;margin-bottom:5px;}
+    .doc-tot{width:280px;max-width:100%;}
+    .tot-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:#444;border-bottom:1px solid #f0f0f0;}
+    .tot-row.disc span:last-child{color:#10b981;}
+    .tot-row.grand{border-bottom:none;margin-top:6px;padding-top:14px;border-top:2px solid #14110d;font-size:19px;font-weight:800;color:#14110d;}
+    .doc-foot{text-align:center;padding:16px;background:#faf8f5;color:#999;font-size:12px;border-top:1px solid #eee;}
+    @media(max-width:560px){
+      body{padding:0;}
+      .doc{border-radius:0;box-shadow:none;}
+      .doc-top,.doc-parties,.doc-meta,.doc-bottom{padding-left:18px;padding-right:18px;}
+      .doc-table th,.doc-table td{padding-left:18px;padding-right:18px;}
+      .doc-meta{grid-template-columns:1fr;}
+      .doc-tot{width:100%;}
+    }
+    @media print{body{background:#fff;padding:0;}.doc{box-shadow:none;}.noprint{display:none!important;}}
+  </style>`;
+}
+function openQuoteDocument(){
+  if(!quoteEventId)return;
+  const ev=findEv(quoteEventId); if(!ev)return;
+  const q=collectQuoteModal();
+  q.number=(ev.quote&&ev.quote.number)||genQuoteNumber();
+  const w=window.open('','_blank');
+  if(!w){ showToast('Autorise les pop-ups pour afficher le devis','error'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Devis ${q.number} — Events Café</title>${quoteDocStyles()}</head><body>${quoteDocHTML(ev,q)}
+    <div class="noprint" style="max-width:760px;margin:14px auto;text-align:center;">
+      <button onclick="window.print()" style="background:#f5a623;border:none;color:#14110d;font-weight:700;padding:13px 28px;border-radius:9px;font-size:15px;cursor:pointer;">Télécharger / Imprimer (PDF)</button>
+      <p style="font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#999;margin-top:8px;">Dans la fenêtre d'impression, choisissez « Enregistrer en PDF ».</p>
+    </div></body></html>`);
+  w.document.close();
 }
 
 async function saveQuoteOnly(){
   if(!quoteEventId)return;
   const ev=findEv(quoteEventId); const q=collectQuoteModal();
+  q.number=(ev.quote&&ev.quote.number)||genQuoteNumber();
   if(ev&&ev.quote){ q.sentAt=ev.quote.sentAt; q.sentTo=ev.quote.sentTo; }
   await persistUpdate(quoteEventId, buildQuotePatch(q));
   showToast('Devis enregistré ✓ (montant mis à jour)','success');
@@ -2676,11 +2827,12 @@ async function sendQuote(){
   if(!email||!extractEmail(email)){ showToast('Email du client invalide','error'); return; }
   if(!ejsCfg.pubkey||!ejsCfg.service||!ejsCfg.template){ showToast('Configure d\'abord EmailJS (onglet Configuration)','error'); return; }
   const q=collectQuoteModal();
+  q.number=(ev.quote&&ev.quote.number)||genQuoteNumber();
   const btn=document.getElementById('quote-send-btn'); const old=btn.innerHTML;
   btn.innerHTML='<div class="loader"></div> Envoi...'; btn.disabled=true;
   try{
     const clientName=ev.clientName||ev.client||'Client';
-    await sendEmailTo(email, clientName, `Votre devis — ${ev.salon||'location de matériel'}`, quoteEmailBody(ev,q));
+    await sendEmailTo(email, clientName, `Votre devis ${q.number} — ${ev.salon||'location de matériel'}`, quoteEmailBody(ev,q));
     q.sentAt=Date.now(); q.sentTo=email;
     const patch=buildQuotePatch(q);
     patch.email=email;
