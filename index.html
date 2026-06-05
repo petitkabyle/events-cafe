@@ -630,7 +630,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
         <div class="filters-row">
           <input class="filter-input" type="month" id="plan-month" onchange="renderPlanning()" style="flex:0 0 auto;">
           <select class="filter-sel" id="plan-worker" onchange="renderPlanning()"><option value="">Tous les intervenants</option></select>
-          <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="copyPlanningSummary()">📋 Copier le récap du mois</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="copyPlanningSummary()">📋 Copier le récap</button>
+          <button class="btn btn-gold" style="font-size:12px;padding:7px 14px;" onclick="openInvoiceModal()">📄 Générer une facture</button>
         </div>
         <div id="plan-list"></div>
       </div>
@@ -1079,6 +1080,152 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
   </div>
 </div>
 
+<!-- MODAL FACTURE -->
+<div class="overlay" id="invoice-modal-overlay" style="display:none" onclick="if(event.target===this)closeInvoiceModal()">
+  <div class="modal" style="width:680px;max-height:92vh;">
+    <div class="modal-head">
+      <span class="modal-title">📄 Générer une facture</span>
+      <button class="modal-close" onclick="closeInvoiceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- SECTION NUMÉRO & DATE -->
+      <div class="form-section-title" style="margin-top:0">Références</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Numéro de facture *</label>
+          <input class="form-input" id="inv-number" type="text" placeholder="ex: SINDJI 2026-008">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date de la facture *</label>
+          <input class="form-input" id="inv-date" type="date">
+        </div>
+      </div>
+
+      <!-- SECTION PRESTATAIRE -->
+      <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Prestataire (vous)</span>
+        <span style="font-size:10px;color:var(--green2);font-weight:400;text-transform:none;letter-spacing:0">✓ Sauvegardé automatiquement</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nom / Prénom *</label>
+          <input class="form-input" id="inv-prest-name" type="text" placeholder="Soane Mansouri">
+        </div>
+        <div class="form-group">
+          <label class="form-label">SIRET / N° identification</label>
+          <input class="form-input" id="inv-prest-siret" type="text" placeholder="953 254 786 00015">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Adresse *</label>
+          <input class="form-input" id="inv-prest-address" type="text" placeholder="25 chemin des 4 chemins, 06000 Nice">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="inv-prest-email" type="email" placeholder="soane.mansouri@gmail.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input class="form-input" id="inv-prest-phone" type="tel" placeholder="06 63 24 08 43">
+        </div>
+      </div>
+
+      <!-- SECTION CLIENT -->
+      <div class="form-section-title">Client</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nom / Société *</label>
+          <input class="form-input" id="inv-cli-name" type="text" placeholder="Sindji Mansouri" list="inv-cli-list" autocomplete="off">
+          <datalist id="inv-cli-list"></datalist>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input class="form-input" id="inv-cli-phone" type="tel" placeholder="07 61 46 57 20">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Adresse</label>
+          <input class="form-input" id="inv-cli-address" type="text" placeholder="2 chemin des frère garbero, Antibes 06600">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="inv-cli-email" type="email" placeholder="client@email.com">
+        </div>
+      </div>
+
+      <!-- SECTION PRESTATIONS -->
+      <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Prestations</span>
+        <button class="btn-xs" type="button" onclick="invImportHours()">↺ Importer les heures du mois</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Description libre de toutes les missions effectuées. Sépare chaque prestation par une virgule ou une nouvelle ligne.</div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Description des prestations *</label>
+          <textarea class="form-textarea" id="inv-desc" style="min-height:90px;" placeholder="Livraison Nice (1h30) + nettoyage (4h30) + livraison pâtisseries (1h) + livraison Imperia, Cannes, Nice, Monaco (10h)"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre d'heures total *</label>
+          <input class="form-input" id="inv-hours" type="number" min="0" step="0.25" placeholder="43" oninput="invRecalc()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Taux horaire (€/h) *</label>
+          <input class="form-input" id="inv-rate" type="number" min="0" step="0.5" placeholder="25" oninput="invRecalc()">
+        </div>
+      </div>
+      <!-- Aperçu total -->
+      <div id="inv-total-preview" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:4px;"></div>
+
+      <!-- SECTION PAIEMENT -->
+      <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Modalités de paiement</span>
+        <span style="font-size:10px;color:var(--green2);font-weight:400;text-transform:none;letter-spacing:0">✓ Sauvegardé automatiquement</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">IBAN</label>
+          <input class="form-input" id="inv-iban" type="text" placeholder="FR76 4061 8804 0500 0404 9597 145" oninput="invFormatIban()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">BIC</label>
+          <input class="form-input" id="inv-bic" type="text" placeholder="BOUSFRPPXXX">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Mention TVA</label>
+          <select class="form-select" id="inv-tva">
+            <option value="non_applicable">TVA NON APPLICABLE (art.293B du CGI)</option>
+            <option value="20">TVA 20%</option>
+            <option value="10">TVA 10%</option>
+            <option value="5.5">TVA 5,5%</option>
+            <option value="0">Exonéré de TVA</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Mention légale complémentaire (optionnel)</label>
+          <input class="form-input" id="inv-legal" type="text" placeholder="Paiement sous 30 jours à réception de la facture">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-ghost" onclick="closeInvoiceModal()">Annuler</button>
+      <button class="btn btn-ghost" onclick="saveInvoiceConfig();showToast('Config sauvegardée ✓','success')">💾 Sauvegarder la config</button>
+      <button class="btn btn-gold" onclick="generateInvoice()">📄 Générer la facture (PDF)</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1325,6 +1472,7 @@ function startRealtime(){
   loadCatalogueFromFirebase();
   loadClientsFromFirebase();
   loadDeliveriesFromFirebase();
+  loadInvoiceConfigFromFirebase();
 }
 
 function loadLocal(){
@@ -2005,6 +2153,327 @@ function copyPlanningSummary(){
 }
 
 // ══════════════════════════════════════════════════════
+// MODULE FACTURE — génération PDF depuis le planning
+// ══════════════════════════════════════════════════════
+
+// ── Données de configuration facture ──
+// invoiceConfig = { prestName, prestAddress, prestSiret, prestEmail, prestPhone, iban, bic, tva, legal, lastNumber }
+let invoiceConfig = {};
+(function loadInvoiceConfig(){
+  try{ invoiceConfig = JSON.parse(localStorage.getItem('ep_invoice_cfg')||'{}'); }catch(e){ invoiceConfig = {}; }
+})();
+
+// ── Numérotation automatique ──
+// Génère le numéro suivant basé sur l'historique des factures de l'année en cours.
+// Format configurable — par défaut : NOM AAAA-XXX (ex: SINDJI 2026-008)
+function nextInvoiceNumber(clientName){
+  const yr = new Date().getFullYear();
+  const hist = invoiceConfig.history || {};
+  const key = yr;
+  const current = hist[key] || 0;
+  const next = current + 1;
+  const prefix = clientName ? clientName.split(' ')[0].toUpperCase() : 'FAC';
+  return `${prefix} ${yr}-${String(next).padStart(3,'0')}`;
+}
+function recordInvoiceNumber(year){
+  if(!invoiceConfig.history) invoiceConfig.history = {};
+  invoiceConfig.history[year] = (invoiceConfig.history[year]||0) + 1;
+}
+
+// ── Sauvegarde config (localStorage + Firebase) ──
+async function saveInvoiceConfig(){
+  const cfg = {
+    prestName:    document.getElementById('inv-prest-name').value.trim(),
+    prestAddress: document.getElementById('inv-prest-address').value.trim(),
+    prestSiret:   document.getElementById('inv-prest-siret').value.trim(),
+    prestEmail:   document.getElementById('inv-prest-email').value.trim(),
+    prestPhone:   document.getElementById('inv-prest-phone').value.trim(),
+    iban:         document.getElementById('inv-iban').value.trim(),
+    bic:          document.getElementById('inv-bic').value.trim(),
+    tva:          document.getElementById('inv-tva').value,
+    legal:        document.getElementById('inv-legal').value.trim(),
+    history:      invoiceConfig.history||{},
+  };
+  Object.assign(invoiceConfig, cfg);
+  try{ localStorage.setItem('ep_invoice_cfg', JSON.stringify(invoiceConfig)); }catch(e){}
+  if(fbReady) queuedWrite('invoiceConfig', invoiceConfig);
+}
+
+function loadInvoiceConfigFromFirebase(){
+  if(!fbReady) return;
+  db.ref('invoiceConfig').on('value', snap=>{
+    const v=snap.val();
+    if(v && typeof v==='object'){
+      Object.assign(invoiceConfig, v);
+      try{ localStorage.setItem('ep_invoice_cfg', JSON.stringify(invoiceConfig)); }catch(e){}
+    }
+  }, ()=>{});
+}
+
+// ── Recalcul du total dans la modal ──
+function invRecalc(){
+  const h  = parseFloat(document.getElementById('inv-hours').value)||0;
+  const r  = parseFloat(document.getElementById('inv-rate').value)||0;
+  const ht = h * r;
+  const tvaVal = document.getElementById('inv-tva').value;
+  let tvaAmt = 0, tvaLabel = '';
+  if(tvaVal==='non_applicable'||tvaVal==='0'){
+    tvaLabel = tvaVal==='non_applicable' ? 'TVA non applicable (art.293B du CGI)' : 'Exonéré de TVA';
+  } else {
+    const pct = parseFloat(tvaVal);
+    tvaAmt = ht * pct/100;
+    tvaLabel = `TVA ${pct}% : ${fmtMoney(tvaAmt)}`;
+  }
+  const ttc = ht + tvaAmt;
+  const box = document.getElementById('inv-total-preview');
+  if(!box) return;
+  if(!h || !r){ box.innerHTML='<span style="color:var(--text3)">Renseigne les heures et le taux pour voir le total</span>'; return; }
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div><span style="color:var(--text2)">${h.toLocaleString('fr-FR')} h × ${fmtMoney(r)}/h</span></div>
+      <div><strong style="font-size:16px;color:var(--text1)">Total HT : ${fmtMoney(ht)}</strong></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px;">${tvaLabel}${tvaAmt>0?` → TTC : <strong style="color:var(--green2)">${fmtMoney(ttc)}</strong>`:''}</div>`;
+}
+
+// ── Import automatique des heures du mois filtré ──
+function invImportHours(){
+  const list = planningFilteredList().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(!list.length){ showToast('Aucune heure pour ce mois / cet intervenant','info'); return; }
+  // Description : concatenation de toutes les missions
+  const missions = [...new Set(list.map(h=>h.mission).filter(Boolean))];
+  const desc = missions.join(' + ');
+  document.getElementById('inv-desc').value = desc;
+  // Total heures
+  const totalH = list.reduce((s,h)=>s+(parseFloat(h.hours)||0),0);
+  document.getElementById('inv-hours').value = totalH;
+  // Taux : prend le plus fréquent parmi les entrées qui en ont un
+  const rates = list.map(h=>parseFloat(h.rate)||0).filter(r=>r>0);
+  if(rates.length){
+    const freq = {}; rates.forEach(r=>{ freq[r]=(freq[r]||0)+1; });
+    const dominantRate = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0][0];
+    document.getElementById('inv-rate').value = dominantRate;
+  }
+  invRecalc();
+  showToast(`${list.length} entrée(s) importée(s) · ${totalH}h au total`,'success');
+}
+
+// ── Formatage IBAN (espaces tous les 4 chiffres) ──
+function invFormatIban(){
+  const el = document.getElementById('inv-iban'); if(!el) return;
+  el.value = el.value.replace(/\s+/g,'').replace(/(.{4})/g,'$1 ').trim().toUpperCase();
+}
+
+// ── Ouvrir la modal ──
+function openInvoiceModal(){
+  const cfg = invoiceConfig;
+  // Pré-remplit les champs prestataire depuis la config sauvegardée
+  document.getElementById('inv-prest-name').value    = cfg.prestName    ||'';
+  document.getElementById('inv-prest-address').value = cfg.prestAddress  ||'';
+  document.getElementById('inv-prest-siret').value   = cfg.prestSiret   ||'';
+  document.getElementById('inv-prest-email').value   = cfg.prestEmail   ||'';
+  document.getElementById('inv-prest-phone').value   = cfg.prestPhone   ||'';
+  document.getElementById('inv-iban').value          = cfg.iban         ||'';
+  document.getElementById('inv-bic').value           = cfg.bic          ||'';
+  document.getElementById('inv-tva').value           = cfg.tva          ||'non_applicable';
+  document.getElementById('inv-legal').value         = cfg.legal        ||'Paiement sous 30 jours à réception de la facture';
+  // Date du jour
+  document.getElementById('inv-date').value = new Date().toISOString().slice(0,10);
+  // Numéro auto (on pré-calcule, l'utilisateur peut modifier)
+  const workerFilter = (document.getElementById('plan-worker')||{}).value||'';
+  document.getElementById('inv-number').value = nextInvoiceNumber(workerFilter||cfg.prestName||'');
+  // Champs client et prestations vides
+  ['inv-cli-name','inv-cli-phone','inv-cli-address','inv-cli-email','inv-desc','inv-hours','inv-rate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // Datalist clients depuis la base clients + historique événements
+  const cliDl = document.getElementById('inv-cli-list');
+  if(cliDl){
+    const names = [...new Set([
+      ...clients.map(c=>c.company||''),
+      ...events.map(e=>e.clientCompany||e.client||'')
+    ].filter(Boolean).sort())];
+    cliDl.innerHTML = names.map(n=>`<option value="${esc(n)}">`).join('');
+  }
+  document.getElementById('inv-total-preview').innerHTML = '<span style="color:var(--text3)">Renseigne les heures et le taux pour voir le total</span>';
+  document.getElementById('invoice-modal-overlay').style.display='flex';
+}
+function closeInvoiceModal(){ document.getElementById('invoice-modal-overlay').style.display='none'; }
+
+// ── Génération du document PDF ──
+function generateInvoice(){
+  // Validation
+  const num    = document.getElementById('inv-number').value.trim();
+  const date   = document.getElementById('inv-date').value;
+  const pName  = document.getElementById('inv-prest-name').value.trim();
+  const cName  = document.getElementById('inv-cli-name').value.trim();
+  const desc   = document.getElementById('inv-desc').value.trim();
+  const hours  = parseFloat(document.getElementById('inv-hours').value)||0;
+  const rate   = parseFloat(document.getElementById('inv-rate').value)||0;
+  if(!num||!date||!pName||!cName||!desc||!hours||!rate){
+    showToast('Remplis les champs obligatoires (*)','error'); return;
+  }
+  // Sauvegarde config auto + incrémente le numéro
+  saveInvoiceConfig();
+  const yr = date.slice(0,4);
+  recordInvoiceNumber(yr);
+  try{ localStorage.setItem('ep_invoice_cfg', JSON.stringify(invoiceConfig)); }catch(e){}
+
+  // Données
+  const pAddress = document.getElementById('inv-prest-address').value.trim();
+  const pSiret   = document.getElementById('inv-prest-siret').value.trim();
+  const pEmail   = document.getElementById('inv-prest-email').value.trim();
+  const pPhone   = document.getElementById('inv-prest-phone').value.trim();
+  const cPhone   = document.getElementById('inv-cli-phone').value.trim();
+  const cAddress = document.getElementById('inv-cli-address').value.trim();
+  const cEmail   = document.getElementById('inv-cli-email').value.trim();
+  const iban     = document.getElementById('inv-iban').value.trim();
+  const bic      = document.getElementById('inv-bic').value.trim();
+  const tvaVal   = document.getElementById('inv-tva').value;
+  const legal    = document.getElementById('inv-legal').value.trim();
+  const totalHT  = hours * rate;
+  let tvaAmt = 0;
+  if(tvaVal!=='non_applicable' && tvaVal!=='0') tvaAmt = totalHT * parseFloat(tvaVal)/100;
+  const totalTTC = totalHT + tvaAmt;
+  const fmtD = d=>{ try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return d;} };
+
+  // Rendu TVA
+  let tvaHtml = '';
+  if(tvaVal==='non_applicable') tvaHtml = `<p class="tva-note">TVA NON APPLICABLE (art.293B du CGI)</p>`;
+  else if(tvaVal==='0')         tvaHtml = `<p class="tva-note">Exonéré de TVA</p>`;
+  else tvaHtml = `
+    <tr><td colspan="3" style="font-size:13px;padding-top:6px;"></td><td style="font-size:13px;">TVA ${tvaVal}%</td><td class="r">${fmtMoney(tvaAmt)}</td></tr>
+    <tr class="total-row"><td colspan="4"><strong>TOTAL TTC</strong></td><td class="r"><strong>${fmtMoney(totalTTC)}</strong></td></tr>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facture ${esc(num)}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1a1a1a;background:#fff;padding:30px 36px;}
+  .page{max-width:760px;margin:0 auto;}
+  h1.inv-title{text-align:center;font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border:2px solid #1a1a1a;padding:10px 20px;display:inline-block;margin:0 auto 28px;min-width:320px;}
+  .title-wrap{text-align:center;margin-bottom:28px;}
+  .parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
+  .party-block{padding:14px 16px;border:1px solid #ccc;border-radius:6px;}
+  .party-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:5px;}
+  .party-line{font-size:13px;line-height:1.65;color:#222;}
+  .party-line.bold{font-weight:700;font-size:14px;}
+  .meta-row{display:flex;justify-content:flex-end;margin-bottom:22px;font-size:13px;}
+  .meta-row span{margin-left:24px;}
+  .meta-row strong{color:#1a1a1a;}
+  .desc-block{margin-bottom:20px;}
+  .desc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:6px;}
+  .desc-text{font-size:13px;line-height:1.7;color:#222;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:5px;padding:10px 14px;}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  thead tr{background:#1a1a1a;color:#fff;}
+  thead th{padding:9px 12px;font-size:12px;font-weight:700;text-align:left;letter-spacing:.4px;}
+  thead th.r{text-align:right;}
+  tbody tr{border-bottom:1px solid #e8e8e8;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody td{padding:10px 12px;font-size:13px;}
+  tbody td.r{text-align:right;}
+  .total-row{background:#f2f2f2;font-weight:700;font-size:14px;}
+  .total-row td{padding:11px 12px;border-top:2px solid #1a1a1a;}
+  .total-row .r{font-size:16px;}
+  .tva-note{font-size:12px;color:#555;font-style:italic;text-align:right;margin-top:4px;margin-bottom:10px;}
+  .payment-block{border-top:1px solid #ccc;padding-top:16px;margin-top:8px;}
+  .payment-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:8px;}
+  .payment-line{font-size:13px;line-height:1.7;color:#222;}
+  .legal-note{font-size:11px;color:#888;margin-top:18px;border-top:1px solid #eee;padding-top:12px;text-align:center;}
+  .noprint{text-align:center;margin-top:24px;}
+  .noprint button{background:#1a1a1a;border:none;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;font-size:15px;cursor:pointer;}
+  .noprint p{font-size:12px;color:#888;margin-top:8px;}
+  @media print{.noprint{display:none!important;} body{padding:0;}}
+  @media(max-width:560px){.parties{grid-template-columns:1fr;} body{padding:14px;} h1.inv-title{font-size:16px;min-width:0;width:100%;}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="title-wrap">
+    <h1 class="inv-title">FACTURE ${esc(num)}</h1>
+  </div>
+
+  <div class="parties">
+    <div class="party-block">
+      <div class="party-label">Prestataire</div>
+      <div class="party-line bold">${esc(pName)}</div>
+      ${pAddress?`<div class="party-line">${esc(pAddress)}</div>`:''}
+      ${pSiret?`<div class="party-line">${esc(pSiret)}</div>`:''}
+      ${pEmail?`<div class="party-line">${esc(pEmail)}</div>`:''}
+      ${pPhone?`<div class="party-line">${esc(pPhone)}</div>`:''}
+    </div>
+    <div class="party-block">
+      <div class="party-label">Client</div>
+      <div class="party-line bold">${esc(cName)}</div>
+      ${cAddress?`<div class="party-line">${esc(cAddress)}</div>`:''}
+      ${cPhone?`<div class="party-line">${esc(cPhone)}</div>`:''}
+      ${cEmail?`<div class="party-line">${esc(cEmail)}</div>`:''}
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <span>Date : <strong>${fmtD(date)}</strong></span>
+  </div>
+
+  <div class="desc-block">
+    <div class="desc-label">Description des prestations</div>
+    <div class="desc-text">${esc(desc).replace(/\n/g,'<br>')}</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Prestation</th>
+        <th class="r" style="width:16%">Nombre d'heures</th>
+        <th class="r" style="width:17%">Taux horaire</th>
+        <th class="r" style="width:17%">Total HT (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Prestation de services</td>
+        <td class="r"><strong>${hours.toLocaleString('fr-FR')}</strong></td>
+        <td class="r">${fmtMoney(rate)}</td>
+        <td class="r"><strong>${fmtMoney(totalHT)}</strong></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"><strong>TOTAL HT</strong></td>
+        <td class="r"><strong>${fmtMoney(totalHT)}</strong></td>
+      </tr>
+      ${tvaAmt>0?`<tr><td colspan="3" style="font-size:13px;">TVA ${tvaVal}%</td><td class="r">${fmtMoney(tvaAmt)}</td></tr><tr class="total-row"><td colspan="3"><strong>TOTAL TTC</strong></td><td class="r"><strong>${fmtMoney(totalTTC)}</strong></td></tr>`:''}
+    </tbody>
+  </table>
+  ${tvaVal==='non_applicable'?`<p class="tva-note">TVA NON APPLICABLE (art.293B du CGI)</p>`:''}
+  ${tvaVal==='0'?`<p class="tva-note">Exonéré de TVA</p>`:''}
+
+  ${(iban||bic)?`
+  <div class="payment-block">
+    <div class="payment-label">Modalités de paiement</div>
+    ${iban?`<div class="payment-line">IBAN : <strong>${esc(iban)}</strong>${bic?`  —  BIC : <strong>${esc(bic)}</strong>`:''}</div>`:''}
+  </div>`:''}
+
+  ${legal?`<div class="legal-note">${esc(legal)}</div>`:''}
+
+</div>
+<div class="noprint">
+  <button onclick="window.print()">⬇️ Télécharger / Imprimer (PDF)</button>
+  <p>Dans la fenêtre d'impression, choisissez « Enregistrer en PDF ».</p>
+</div>
+</body>
+</html>`;
+
+  const w = window.open('','_blank');
+  if(!w){ showToast('Autorise les pop-ups pour générer la facture','error'); return; }
+  w.document.write(html);
+  w.document.close();
+  closeInvoiceModal();
+  showToast(`Facture ${num} générée ✓`,'success');
+}
+
+// ══════════════════════════════════════════════════════
 // STATISTIQUES / BILAN
 // ══════════════════════════════════════════════════════
 function emptyMini(t){ return `<div style="font-size:12px;color:var(--text3);padding:8px 0">${t}</div>`; }
@@ -2443,7 +2912,7 @@ async function runSyncDiagnostic(){
   const nodes=[
     ['events','Événements'],['stock','Stock'],['hours','Heures'],['catalogue','Catalogue'],
     ['clients','Clients'],['basePricing','Tarifs de base'],['drivers','Livreurs'],
-    ['deliveries','Livraisons'],['config','Configuration']
+    ['deliveries','Livraisons'],['config','Configuration'],['invoiceConfig','Config facture']
   ];
   box.innerHTML='<div style="font-size:13px;color:var(--text2)">🧪 Test en cours…</div>';
   let html='', okCount=0;
