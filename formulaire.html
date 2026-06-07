@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Demande de Location — Events Café</title>
-<meta name="theme-color" content="#060D1A">
+<meta name="theme-color" content="#1A130C">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Events Café">
@@ -14,29 +14,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Fonds : bleu nuit sombre (harmonisé Events Café) */
-  --bg0: #060D1A;
-  --bg1: #0A1424;
-  --bg2: #0F1D34;
-  --bg3: #142844;
-  --bg4: #1B3358;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(96,165,250,0.16);
-  --border3: rgba(96,165,250,0.28);
-  --text1: #EAF1FB;
-  --text2: #9DB4D4;
-  --text3: #5B7299;
-  /* Bleu clair lumineux (remplace l'or) */
-  --gold: #3B9EFF;
-  --gold2: #60A5FA;
-  --gold3: #BAE6FD;
-  /* Bleu accent (remplace le café) */
-  --coffee: #1E6FD9;
-  --coffee2: #0F2042;
-  --accent: #38BDF8;
-  --accent2: #7DD3FC;
-  --green: #22C55E;
-  --green2: #34D399;
+  /* Fonds : espresso chaleureux (vibe café, plus accueillant) */
+  --bg0: #1A130C;
+  --bg1: #221A11;
+  --bg2: #2B2117;
+  --bg3: #362A1D;
+  --bg4: #443524;
+  --border: rgba(255,236,210,0.08);
+  --border2: rgba(232,163,77,0.18);
+  --border3: rgba(232,163,77,0.34);
+  --text1: #F7EFE3;
+  --text2: #D2BFA6;
+  --text3: #9C876B;
+  /* Ambre / caramel chaleureux (accent principal) */
+  --gold: #E8A34D;
+  --gold2: #F4BC6E;
+  --gold3: #FBE0B4;
+  /* Café accent */
+  --coffee: #B5752F;
+  --coffee2: #3A2A18;
+  --accent: #E8A34D;
+  --accent2: #F4BC6E;
+  --green: #5BBF7B;
+  --green2: #7FD79A;
   --font-head: 'Outfit', sans-serif;
   --font-body: 'Outfit', sans-serif;
 }
@@ -44,94 +44,131 @@
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);min-height:100vh;line-height:1.6;}
 
-/* GRAIN */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+/* Halo chaleureux en fond */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(900px 500px at 50% -120px, rgba(232,163,77,.10), transparent 70%),
+  radial-gradient(700px 500px at 110% 10%, rgba(181,117,47,.08), transparent 70%);
+  pointer-events:none;z-index:0;}
+/* GRAIN doux */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 
 /* HERO */
-.hero{position:relative;overflow:hidden;padding:72px 40px 56px;text-align:center;}
-.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(59,158,255,.14) 0%,transparent 70%);pointer-events:none;}
-.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,255,.5),transparent);}
-/* Logo grain de café */
+.hero{position:relative;overflow:hidden;padding:72px 40px 56px;text-align:center;z-index:1;}
+.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:620px;height:300px;background:radial-gradient(ellipse,rgba(232,163,77,.18) 0%,transparent 70%);pointer-events:none;}
+.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,163,77,.55),transparent);}
 .hero-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:18px;}
-.bean{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--coffee),var(--coffee2));position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 0 2px rgba(96,165,250,.4);}
-.bean::after{content:'';position:absolute;width:3px;height:30px;background:var(--gold);border-radius:3px;transform:rotate(18deg);opacity:.85;}
+.bean{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#C98A3F,#6B4422);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45),inset 0 0 0 2px rgba(251,224,180,.45);}
+.bean::after{content:'';position:absolute;width:3px;height:30px;background:var(--gold3);border-radius:3px;transform:rotate(18deg);opacity:.9;}
 .brand-name{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1;}
 .brand-name span{color:var(--gold);}
 .brand-slogan{font-family:var(--font-head);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);margin-top:3px;}
-.hero-logo{font-family:var(--font-head);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:18px;}
-.hero-logo span{color:var(--gold);}
 .hero-title{font-family:var(--font-head);font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px;}
 .hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero-sub{font-size:16px;color:var(--text2);max-width:480px;margin:0 auto 32px;font-weight:300;}
+.hero-sub{font-size:16px;color:var(--text2);max-width:500px;margin:0 auto 32px;font-weight:300;}
 .hero-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);background:var(--bg2);}
-
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 15px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);background:var(--bg2);}
 
 /* FORM CONTAINER */
-.form-wrap{max-width:720px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
+.form-wrap{max-width:760px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
 
 /* PROGRESS */
 .progress-bar{display:flex;gap:0;margin-bottom:36px;align-items:center;}
 .progress-step{display:flex;align-items:center;gap:8px;flex:1;}
 .progress-step:not(:last-child)::after{content:'';flex:1;height:1px;background:var(--border2);margin:0 8px;}
 .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);transition:all .3s;}
-.step-dot.active{background:linear-gradient(135deg,#3B9EFF,#1E6FD9);color:#000;border-color:transparent;box-shadow:0 0 16px rgba(59,158,255,.3);}
+.step-dot.active{background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;border-color:transparent;box-shadow:0 0 16px rgba(232,163,77,.35);}
 .step-dot.done{background:var(--green);border-color:var(--green);color:#fff;}
 .step-label{font-size:11px;color:var(--text3);white-space:nowrap;}
 
 /* SECTIONS */
-.form-section{margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .3s;}
-.form-section:focus-within{border-color:var(--border3);}
-.section-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.section-num{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#3B9EFF,#1E6FD9);color:#000;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.section-title{font-family:var(--font-head);font-size:15px;font-weight:600;}
-.section-sub{font-size:12px;color:var(--text3);margin-left:auto;}
+.form-section{margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .3s,box-shadow .3s;box-shadow:0 1px 0 rgba(255,255,255,.02) inset;}
+.form-section:focus-within{border-color:var(--border3);box-shadow:0 8px 30px rgba(0,0,0,.25);}
+.section-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(232,163,77,.05),transparent);}
+.section-num{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-title{font-family:var(--font-head);font-size:16px;font-weight:600;}
+.section-sub{font-size:12px;color:var(--text3);margin-left:auto;text-align:right;}
 .section-body{padding:18px 22px;}
 
 /* FORM ELEMENTS */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .form-row.single{grid-template-columns:1fr;}
 .form-row.thirds{grid-template-columns:1fr 1fr 1fr;}
+.form-row:last-child{margin-bottom:0;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
-.form-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:500;}
+.form-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;}
 .form-label .req{color:var(--gold);margin-left:2px;}
-.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;color:var(--text1);font-family:var(--font-body);font-size:14px;transition:all .2s;width:100%;}
+.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:11px;padding:11px 14px;color:var(--text1);font-family:var(--font-body);font-size:14px;transition:all .2s;width:100%;}
 .form-input::placeholder{color:var(--text3);}
-.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,158,11,.08);}
-.form-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5168' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,163,77,.14);}
+.form-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239C876B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
 .form-select option{background:var(--bg2);}
 .form-textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.field-hint{font-size:11px;color:var(--text3);margin-top:-8px;margin-bottom:6px;}
 
 /* DATE RANGE */
-.date-range{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px;}
-.date-arrow{font-size:18px;color:var(--text3);text-align:center;padding-bottom:10px;}
+.date-range{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;}
+.date-arrow{font-size:18px;color:var(--text3);text-align:center;padding-bottom:11px;}
 
+/* SEGMENTED (type de location) */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.seg-opt{border:1px solid var(--border2);background:var(--bg3);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;gap:12px;align-items:flex-start;}
+.seg-opt:hover{border-color:var(--border3);}
+.seg-opt.sel{border-color:var(--gold);background:rgba(232,163,77,.08);box-shadow:0 0 0 3px rgba(232,163,77,.10);}
+.seg-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.seg-opt.sel .seg-radio{border-color:var(--gold);}
+.seg-opt.sel .seg-radio::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--gold);}
+.seg-t{font-size:14px;font-weight:600;color:var(--text1);}
+.seg-d{font-size:11px;color:var(--text3);margin-top:2px;}
 
-/* MATERIAL GRID */
-.mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.mat-cat-hdr{grid-column:1/-1;font-size:10px;color:var(--accent2);text-transform:uppercase;letter-spacing:.7px;padding:6px 2px 2px;border-bottom:1px solid var(--border2);margin-top:6px;font-weight:500;}
-.mat-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;transition:all .25s;cursor:default;position:relative;}
-.mat-card.has-qty{border-color:rgba(59,158,255,.3);background:rgba(59,158,255,.06);}
-.mat-card:hover{border-color:var(--border2);}
-.mat-icon{font-size:18px;margin-bottom:4px;}
-.mat-name{font-size:10px;color:var(--text2);margin-bottom:8px;line-height:1.25;}
-.mat-qty-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;}
-.qty-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#06101F;}
-.qty-val{min-width:28px;text-align:center;font-weight:700;font-size:16px;font-family:var(--font-head);}
+/* PACKS */
+.pack-cat{font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:8px;}
+.pack-cat:first-child{margin-top:0;}
+.pack-cat::after{content:'';flex:1;height:1px;background:var(--border2);}
+.pack-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pack-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:16px;transition:all .25s;position:relative;display:flex;flex-direction:column;}
+.pack-card.featured{border-color:var(--border2);background:linear-gradient(180deg,rgba(232,163,77,.07),var(--bg3));}
+.pack-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,163,77,.12);}
+.pack-tag{position:absolute;top:-9px;right:14px;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;padding:3px 9px;border-radius:20px;}
+.pack-name{font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:3px;}
+.pack-desc{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.4;}
+.pack-incl{list-style:none;margin-bottom:14px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.pack-incl li{font-size:12px;color:var(--text2);display:flex;gap:8px;align-items:flex-start;line-height:1.4;}
+.pack-incl li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.pack-swap{display:flex;gap:9px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 11px;margin-bottom:12px;cursor:pointer;}
+.pack-swap input{margin-top:2px;accent-color:var(--gold);width:15px;height:15px;flex-shrink:0;cursor:pointer;}
+.pack-swap-txt{font-size:11px;color:var(--text2);line-height:1.4;}
+.pack-swap-txt b{color:var(--gold2);}
+.pack-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;}
+.pack-price{font-size:12px;color:var(--gold2);font-weight:600;}
+.pack-price span{color:var(--text3);font-weight:400;}
+
+/* QTY CONTROL */
+.qty-ctrl{display:flex;align-items:center;gap:10px;}
+.qty-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#3A2913;}
+.qty-val{min-width:24px;text-align:center;font-weight:700;font-size:17px;font-family:var(--font-head);}
 .qty-val.active{color:var(--gold2);}
 
+/* ADD-ONS */
+.addon-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.addon-card{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .2s;}
+.addon-card.sel{border-color:var(--gold);background:rgba(232,163,77,.06);}
+.addon-info{min-width:0;}
+.addon-name{font-size:13px;font-weight:600;color:var(--text1);}
+.addon-price{font-size:11px;color:var(--gold2);margin-top:1px;}
+.addon-price.free{color:var(--text3);}
+
 /* SUMMARY */
-.summary-box{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-top:14px;display:none;}
+.summary-box{background:linear-gradient(180deg,rgba(232,163,77,.06),var(--bg3));border:1px solid var(--border2);border-radius:14px;padding:16px;margin-top:18px;display:none;}
 .summary-box.visible{display:block;}
-.summary-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
+.summary-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;font-weight:600;}
 .summary-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.summary-chip{font-size:12px;padding:4px 12px;border-radius:6px;background:rgba(59,158,255,.12);color:var(--gold2);border:1px solid rgba(59,158,255,.2);font-weight:500;}
+.summary-chip{font-size:12px;padding:5px 12px;border-radius:8px;background:rgba(232,163,77,.14);color:var(--gold2);border:1px solid rgba(232,163,77,.26);font-weight:500;}
 
 /* SUBMIT */
 .submit-area{text-align:center;padding:8px 0;}
-.submit-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#3B9EFF,#1E6FD9);color:#06101F;font-family:var(--font-head);font-size:16px;font-weight:700;padding:16px 40px;border-radius:12px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;}
-.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(59,158,255,.3);}
+.submit-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;font-family:var(--font-head);font-size:16px;font-weight:700;padding:16px 42px;border-radius:14px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(232,163,77,.34);}
 .submit-btn:active{transform:translateY(0);}
 .submit-btn .arrow{font-size:20px;transition:transform .2s;}
 .submit-btn:hover .arrow{transform:translateX(4px);}
@@ -144,24 +181,28 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 @keyframes pop{0%{transform:scale(0.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
 .success-title{font-family:var(--font-head);font-size:32px;font-weight:800;margin-bottom:12px;}
 .success-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.success-sub{font-size:16px;color:var(--text2);margin-bottom:32px;max-width:420px;margin-left:auto;margin-right:auto;}
-.success-card{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px 24px;max-width:500px;margin:0 auto 24px;text-align:left;}
-.success-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.success-sub{font-size:16px;color:var(--text2);margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;}
+.success-card{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px 24px;max-width:520px;margin:0 auto 24px;text-align:left;}
+.success-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .success-row:last-child{border:none;}
-.success-row-label{color:var(--text3);}
+.success-row-label{color:var(--text3);white-space:nowrap;}
 .success-row-val{color:var(--text1);font-weight:500;text-align:right;}
-.reset-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--text2);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .2s;}
+.reset-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;color:var(--text2);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .2s;}
 .reset-btn:hover{background:var(--bg4);color:var(--text1);}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
-.toast.success{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green2);}
-.toast.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
+.toast.success{background:rgba(91,191,123,.16);border:1px solid rgba(91,191,123,.32);color:var(--green2);}
+.toast.error{background:rgba(224,108,86,.16);border:1px solid rgba(224,108,86,.34);color:#f3b3a3;}
+.toast.info{background:rgba(232,163,77,.16);border:1px solid rgba(232,163,77,.3);color:var(--gold2);}
 
-@media(max-width:600px){
+@media(max-width:640px){
   .form-row{grid-template-columns:1fr;}
-  .mat-grid{grid-template-columns:1fr 1fr 1fr;}
+  .form-row.thirds{grid-template-columns:1fr;}
+  .pack-grid{grid-template-columns:1fr;}
+  .addon-grid{grid-template-columns:1fr;}
+  .seg{grid-template-columns:1fr;}
   .hero{padding:50px 20px 40px;}
   .form-wrap{padding:0 16px 60px;}
   .date-range{grid-template-columns:1fr;}.date-arrow{display:none;}
@@ -170,7 +211,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 </style>
 </head>
 <body>
-
 
 <!-- HERO -->
 <div class="hero">
@@ -183,15 +223,13 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div class="brand-slogan">Call · Install · Smile</div>
     </div>
   </div>
-  <h1 class="hero-title">Votre demande de<br><em>location de matériel</em></h1>
-  <p class="hero-sub">Remplissez ce formulaire pour nous soumettre votre demande. Notre équipe revient vers vous sous 24h. ☕</p>
-  <div class="hero-badges" id="hero-badges-dynamic">
-    <span class="hero-badge">💧 Fontaines à eau</span>
-    <span class="hero-badge">☕ Machines à café</span>
-    <span class="hero-badge">🌰 Café Grains</span>
-    <span class="hero-badge">🧊 Réfrigérateurs</span>
-    <span class="hero-badge">🪑 Tables & Chaises</span>
-    <span class="hero-badge">🌀 Ventilateurs</span>
+  <h1 class="hero-title">Réservez votre<br><em>pause café & boissons</em></h1>
+  <p class="hero-sub">Dites-nous tout sur votre événement ou votre bureau : on s'occupe du café chaud, de l'eau fraîche et de la logistique. Réponse de notre équipe sous 24h.</p>
+  <div class="hero-badges">
+    <span class="hero-badge">Machines à café</span>
+    <span class="hero-badge">Fontaines à eau</span>
+    <span class="hero-badge">Packs clé en main</span>
+    <span class="hero-badge">Installation incluse</span>
   </div>
 </div>
 
@@ -200,127 +238,179 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
   <!-- PROGRESS -->
   <div class="progress-bar" id="progress-bar">
-    <div class="progress-step"><div class="step-dot active" id="step1-dot">1</div><span class="step-label">Vos infos</span></div>
-    <div class="progress-step"><div class="step-dot" id="step2-dot">2</div><span class="step-label">L'événement</span></div>
-    <div class="progress-step"><div class="step-dot" id="step3-dot">3</div><span class="step-label">Matériel</span></div>
+    <div class="progress-step"><div class="step-dot active" id="step1-dot">1</div><span class="step-label">Facturation</span></div>
+    <div class="progress-step"><div class="step-dot" id="step2-dot">2</div><span class="step-label">Livraison</span></div>
+    <div class="progress-step"><div class="step-dot" id="step3-dot">3</div><span class="step-label">Votre sélection</span></div>
     <div class="progress-step"><div class="step-dot" id="step4-dot">4</div><span class="step-label">Confirmation</span></div>
   </div>
 
-  <!-- SECTION 1: CLIENT -->
+  <!-- SECTION 1: FACTURATION -->
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">1</div>
-      <div class="section-title">Vos coordonnées</div>
-      <div class="section-sub">Informations de contact</div>
+      <div class="section-title">Coordonnées de facturation</div>
+      <div class="section-sub">Qui réglera la prestation ?</div>
     </div>
     <div class="section-body">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Société / Organisation <span class="req">*</span></label>
-          <input class="form-input" id="f-client" type="text" placeholder="ex: Groupe Publicis" oninput="updateProgress()">
+          <label class="form-label">Raison sociale <span class="req">*</span></label>
+          <input class="form-input" id="f-billing-name" type="text" placeholder="ex: Groupe Publicis SAS" oninput="updateProgress()">
         </div>
         <div class="form-group">
-          <label class="form-label">Votre nom & prénom <span class="req">*</span></label>
-          <input class="form-input" id="f-nom" type="text" placeholder="Jean Dupont" oninput="updateProgress()">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Adresse email <span class="req">*</span></label>
-          <input class="form-input" id="f-email" type="email" placeholder="jean@societe.com" oninput="updateProgress()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Téléphone</label>
-          <input class="form-input" id="f-tel" type="tel" placeholder="+33 6 00 00 00 00">
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- SECTION 2: ÉVÉNEMENT -->
-  <div class="form-section">
-    <div class="section-head">
-      <div class="section-num">2</div>
-      <div class="section-title">L'événement</div>
-      <div class="section-sub">Lieu & dates</div>
-    </div>
-    <div class="section-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nom du salon / événement <span class="req">*</span></label>
-          <input class="form-input" id="f-salon" type="text" placeholder="Festival de Cannes" oninput="updateProgress()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Type d'événement</label>
-          <select class="form-select" id="f-type">
-            <option value="">Sélectionner...</option>
-            <option>Festival / Cinéma</option>
-            <option>Salon professionnel</option>
-            <option>Conférence / Congrès</option>
-            <option>Sportif</option>
-            <option>Corporate / Entreprise</option>
-            <option>Institutionnel</option>
-            <option>Autre</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">N° ou nom du stand <span class="req">*</span></label>
-          <input class="form-input" id="f-stand" type="text" placeholder="Stand B12 - Palais des Festivals" oninput="updateProgress()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Ville / Adresse du lieu</label>
-          <input class="form-input" id="f-lieu" type="text" placeholder="Cannes, Palais des Festivals">
+          <label class="form-label">SIRET / N° TVA <span class="req">*</span></label>
+          <input class="form-input" id="f-siret" type="text" placeholder="ex: 123 456 789 00012 / FR..." oninput="updateProgress()">
         </div>
       </div>
       <div class="form-row single">
         <div class="form-group">
-          <label class="form-label">📍 Adresse complète de livraison <span class="req">*</span></label>
+          <label class="form-label">Adresse de facturation <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-billing-address" placeholder="Numéro, rue, code postal, ville" style="min-height:60px;" oninput="updateProgress()"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Téléphone <span class="req">*</span></label>
+          <input class="form-input" id="f-billing-phone" type="tel" placeholder="+33 6 00 00 00 00" oninput="updateProgress()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Adresse email <span class="req">*</span></label>
+          <input class="form-input" id="f-billing-email" type="email" placeholder="compta@societe.com" oninput="updateProgress()">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Interlocuteur (nom & prénom)</label>
+          <input class="form-input" id="f-contact-name" type="text" placeholder="Jean Dupont">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: LIVRAISON -->
+  <div class="form-section">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-title">Coordonnées de livraison</div>
+      <div class="section-sub">Où & quand livrer ?</div>
+    </div>
+    <div class="section-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nom de l'événement <span class="req">*</span></label>
+          <input class="form-input" id="f-salon" type="text" placeholder="ex: Festival de Cannes 2026" oninput="updateProgress()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom / N° du stand <span class="req">*</span></label>
+          <input class="form-input" id="f-stand" type="text" placeholder="ex: Stand B12 – Hall 3" oninput="updateProgress()">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">Adresse complète de livraison <span class="req">*</span></label>
           <textarea class="form-textarea" id="f-delivery-address" placeholder="Numéro, rue, bâtiment, hall, accès, code... (où doit-on livrer le matériel ?)" style="min-height:64px;" oninput="updateProgress()"></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">👤 Contact sur place (à appeler à la livraison)</label>
+          <label class="form-label">Contact sur place (à appeler à la livraison)</label>
           <input class="form-input" id="f-onsite-name" type="text" placeholder="ex: Marie, responsable stand">
         </div>
         <div class="form-group">
-          <label class="form-label">📞 Téléphone du contact sur place</label>
+          <label class="form-label">Téléphone du contact sur place</label>
           <input class="form-input" id="f-onsite-phone" type="tel" placeholder="+33 6 00 00 00 00">
         </div>
       </div>
-      <div class="date-range">
+
+      <div class="form-row single" style="margin-bottom:10px;">
         <div class="form-group">
-          <label class="form-label">📦 Date de montage <span class="req">*</span></label>
-          <input class="form-input" id="f-start" type="date" oninput="updateProgress()">
+          <label class="form-label">Type de location <span class="req">*</span></label>
         </div>
-        <div class="date-arrow">→</div>
-        <div class="form-group">
-          <label class="form-label">📤 Date de démontage / retour <span class="req">*</span></label>
-          <input class="form-input" id="f-end" type="date" oninput="updateProgress()">
+      </div>
+      <div class="seg" id="rental-seg">
+        <div class="seg-opt sel" id="seg-ponctuelle" onclick="setRentalType('ponctuelle')">
+          <div class="seg-radio"></div>
+          <div>
+            <div class="seg-t">Location ponctuelle</div>
+            <div class="seg-d">Un événement, un salon : montage puis démontage.</div>
+          </div>
+        </div>
+        <div class="seg-opt" id="seg-mensuelle" onclick="setRentalType('mensuelle')">
+          <div class="seg-radio"></div>
+          <div>
+            <div class="seg-t">Location mensuelle</div>
+            <div class="seg-d">Bureau ou autre : tournée récurrente chaque mois.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates : ponctuelle -->
+      <div id="dates-ponctuelle">
+        <div class="date-range">
+          <div class="form-group">
+            <label class="form-label">Date de montage <span class="req">*</span></label>
+            <input class="form-input" id="f-start" type="date" oninput="updateProgress()">
+          </div>
+          <div class="date-arrow">→</div>
+          <div class="form-group">
+            <label class="form-label">Date de démontage / retour <span class="req">*</span></label>
+            <input class="form-input" id="f-end" type="date" oninput="updateProgress()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates : mensuelle -->
+      <div id="dates-mensuelle" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date de début <span class="req">*</span></label>
+            <input class="form-input" id="f-tour-start" type="date" oninput="updateProgress()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jusqu'à quand ? <span class="req">*</span></label>
+            <input class="form-input" id="f-tour-until" type="date" oninput="updateProgress()">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Fréquence de tournée dans le mois <span class="req">*</span></label>
+            <select class="form-select" id="f-tour-freq" oninput="updateProgress()" onchange="updateProgress()">
+              <option value="">Sélectionner...</option>
+              <option>1 passage / mois</option>
+              <option>2 passages / mois</option>
+              <option>3 passages / mois</option>
+              <option>1 passage / semaine</option>
+              <option>2 passages / semaine</option>
+              <option>Sur demande / à définir</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SECTION 3: MATERIAL -->
+  <!-- SECTION 3: SÉLECTION (PACKS) -->
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">3</div>
-      <div class="section-title">Matériel souhaité</div>
-      <div class="section-sub">Quantités par type</div>
+      <div class="section-title">Votre sélection</div>
+      <div class="section-sub">Packs & options</div>
     </div>
     <div class="section-body">
-      <div class="mat-grid" id="f-mat-grid"></div>
-      <div class="summary-box" id="mat-summary">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Choisissez un ou plusieurs packs. Le café, l'eau et les consommables de base sont déjà inclus dans chaque pack.</div>
+
+      <div id="packs-container"></div>
+
+      <div class="pack-cat" style="margin-top:24px;">Options & suppléments</div>
+      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;">Tarifs hors taxes, en supplément de votre pack.</div>
+      <div class="addon-grid" id="addons-container"></div>
+
+      <div class="summary-box" id="sel-summary">
         <div class="summary-title">Récapitulatif de votre sélection</div>
-        <div class="summary-chips" id="mat-summary-chips"></div>
+        <div class="summary-chips" id="sel-summary-chips"></div>
       </div>
     </div>
   </div>
-
 
   <!-- SECTION 4: NOTES -->
   <div class="form-section">
@@ -368,9 +458,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 <!-- SUCCESS SCREEN -->
 <div class="success-screen" id="success-screen">
-  <div class="success-icon">🎉</div>
+  <div class="success-icon">☕</div>
   <h2 class="success-title">Demande envoyée<br><em>avec succès !</em></h2>
-  <p class="success-sub">Votre demande a bien été transmise à notre équipe. Nous vous contacterons dans les 24 heures pour confirmer la disponibilité du matériel.</p>
+  <p class="success-sub">Votre demande a bien été transmise à notre équipe. Nous vous contacterons dans les 24 heures pour confirmer la disponibilité et préparer votre devis.</p>
   <div class="success-card" id="success-details"></div>
   <button class="reset-btn" onclick="resetForm()">↩ Faire une nouvelle demande</button>
 </div>
@@ -383,91 +473,225 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="firebase-config.js"></script>
 
-
 <script>
 // ============================================================
-// FORMULAIRE CLIENT — envoi vers Firebase (noeud "events")
-// Catalogue 100% dynamique : chargé depuis Firebase /catalogue
-// (mis à jour automatiquement depuis le dashboard)
+// FORMULAIRE CLIENT — Events Café
+// Sélection par PACKS (clé en main) + options/suppléments.
+// Envoi vers Firebase (noeud "events") + notification email équipe.
 // ============================================================
 
-// Catalogue de secours si Firebase indisponible
-const DEFAULT_CATALOGUE = [
-  {id:'fontaine_eau',  label:'Fontaine à eau',         icon:'💧', cat:'Eau & Boissons', active:true},
-  {id:'bonbonne',      label:'Bonbonne d\'eau',         icon:'🫙', cat:'Eau & Boissons', active:true},
-  {id:'gobelet',       label:'Gobelets (lot 100)',       icon:'🥤', cat:'Eau & Boissons', active:true},
-  {id:'nespresso',     label:'Nespresso Zenus',          icon:'☕', cat:'Machines Café',  active:true},
-  {id:'nespresso_g220',label:'Nespresso Gemini 220 ★',  icon:'☕', cat:'Machines Café',  active:true},
-  {id:'nespresso_g200',label:'Nespresso Gemini 200',    icon:'☕', cat:'Machines Café',  active:true},
-  {id:'covim',         label:'Machine Covim',            icon:'☕', cat:'Machines Café',  active:true},
-  {id:'lavazza',       label:'Machine Lavazza',          icon:'☕', cat:'Machines Café',  active:true},
-  {id:'machine_grains',label:'Machine Café Grains',     icon:'⚙️', cat:'Café Grains',    active:true},
-  {id:'cafe_grains',   label:'Café Grains (kg)',         icon:'🌰', cat:'Café Grains',    active:true},
-  {id:'cafe_pods',     label:'Café Pods (boîte 50)',     icon:'📦', cat:'Consommables',   active:true},
-  {id:'frigo_petit',   label:'Frigo 50L',                icon:'🧊', cat:'Réfrigération',  active:true},
-  {id:'frigo_grand',   label:'Frigo 200L',               icon:'🧊', cat:'Réfrigération',  active:true},
-  {id:'table_pliante', label:'Tables pliantes',          icon:'🪑', cat:'Mobilier',       active:true},
-  {id:'chaise_pliante',label:'Chaises pliantes',         icon:'🪑', cat:'Mobilier',       active:true},
-  {id:'ventilateur',   label:'Ventilateurs',             icon:'🌀', cat:'Ventilation',    active:true},
+// ---------- Catalogue PACKS (clé en main) ----------
+// Le café / l'eau / les consommables de base sont inclus dans chaque pack.
+const PACKS = [
+  // — Packs Events (offres tout-en-un) —
+  { id:'pack_events_base', cat:'Packs Events', name:'Pack Events — Base', featured:true,
+    desc:"L'essentiel café + eau pour un stand.",
+    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets','1 machine Covim150 (café + consommables inclus)'],
+    swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
+  { id:'pack_events_complet', cat:'Packs Events', name:'Pack Events — Complet', featured:true, tag:'Le + complet',
+    desc:'Pour les stands à forte affluence.',
+    includes:['1 fontaine à eau','2 bonbonnes d\'eau','200 gobelets','1 machine Covim150 (café + consommables inclus)','1 frigo table top'],
+    swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
+
+  // — Machines à café (à l'unité, consommables inclus) —
+  { id:'covim150', cat:'Machines à café', name:'Covim150',
+    desc:'Machine Covim, prête à l\'emploi.',
+    includes:['Machine Covim','Café inclus','Consommables inclus'] },
+  { id:'lavazza150', cat:'Machines à café', name:'Lavazza150',
+    desc:'Machine Lavazza, prête à l\'emploi.',
+    includes:['Machine Lavazza','Café inclus','Consommables inclus'] },
+  { id:'gemini400', cat:'Machines à café', name:'Gemini400',
+    desc:'Nespresso Gemini, gros débit.',
+    includes:['Machine Nespresso Gemini','Café inclus','Consommables inclus'] },
+  { id:'zenius200', cat:'Machines à café', name:'Zenius200',
+    desc:'Nespresso Zenius + 200 capsules.',
+    includes:['Machine Nespresso Zenius','200 capsules de café','Touillettes & sucre inclus'] },
+
+  // — Eau —
+  { id:'fontaine', cat:'Eau', name:'Fontaine à eau', tag:'Kit eau',
+    desc:'Kit eau complet, prêt à servir.',
+    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets'] },
 ];
 
-// STOCK_META = produits actifs uniquement (mis à jour depuis le catalogue)
-let STOCK_META = DEFAULT_CATALOGUE.filter(p => p.active !== false);
+// ---------- Options / suppléments (prix HT) ----------
+const ADDONS = [
+  { id:'chaise',        name:'Chaise pliante' },
+  { id:'table',         name:'Table pliante' },
+  { id:'ventilateur',   name:'Ventilateur' },
+  { id:'mousseur',      name:'Mousseur à lait', price:30 },
+  { id:'bouilloire',    name:'Bouilloire', price:30 },
+  { id:'pack_the',      name:'Pack thé', price:75 },
+  { id:'gobelets_sup',  name:'Gobelets suppl. (lot 100)', price:5.9 },
+  { id:'bonbonne_sup',  name:"Bonbonne d'eau suppl.", price:19.9, priceAlone:23.9,
+    note:'19,90€ avec une fontaine/pack · 23,90€ seule' },
+  { id:'kit_conso',     name:'Kit consommables suppl.' },
+];
 
-// Construit le catalogue depuis une liste de produits (dashboard format)
-function applyDashboardCatalogue(catData){
-  if(!Array.isArray(catData) || !catData.length) return;
-  // Ne garder que les produits actifs (active !== false)
-  STOCK_META = catData.filter(p => p.active !== false).map(p => ({
-    id: p.id,
-    label: p.label || p.id,
-    icon: p.icon || '📦',
-    cat: p.cat || 'Autre',
-    desc: p.desc || '',
-    unit: p.unit || '',
-  }));
-  buildMatGrid();
-  updateHeroBadges();
+// Quantités sélectionnées
+const sel = {};         // packs : { packId: qty }
+const swapped = {};     // packs Events : { packId: true } => Covim150 remplacée par Zenius200
+const addonSel = {};    // options : { addonId: qty }
+
+function eur(n){ return (n%1===0? n : n.toFixed(2).replace('.',',')) + '€ HT'; }
+
+// ---------- Construction des cartes PACKS ----------
+function buildPacks(){
+  const cont = document.getElementById('packs-container');
+  // Rendu groupé par catégorie
+  const cats = [...new Set(PACKS.map(p=>p.cat))];
+  cont.innerHTML = cats.map(cat => {
+    const items = PACKS.filter(p=>p.cat===cat);
+    return `<div class="pack-cat">${cat}</div><div class="pack-grid">` +
+      items.map(p => packCardHtml(p)).join('') + `</div>`;
+  }).join('');
+}
+function packCardHtml(p){
+  const qty = sel[p.id] || 0;
+  const swap = p.swap ? `
+    <label class="pack-swap" onclick="event.stopPropagation()">
+      <input type="checkbox" id="swap-${p.id}" ${swapped[p.id]?'checked':''} onchange="toggleSwap('${p.id}')">
+      <span class="pack-swap-txt">${p.swap.label} <b>(+${p.swap.extra}€ HT)</b></span>
+    </label>` : '';
+  return `<div class="pack-card${p.featured?' featured':''}${qty>0?' sel':''}" id="pk-${p.id}">
+    ${p.tag?`<div class="pack-tag">${p.tag}</div>`:''}
+    <div class="pack-name">${p.name}</div>
+    <div class="pack-desc">${p.desc}</div>
+    <ul class="pack-incl">${p.includes.map(i=>`<li>${i}</li>`).join('')}</ul>
+    ${swap}
+    <div class="pack-foot">
+      <span class="pack-price">Sur devis</span>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="adjPack('${p.id}',-1)">−</button>
+        <span class="qty-val${qty>0?' active':''}" id="pq-${p.id}">${qty}</span>
+        <button class="qty-btn" onclick="adjPack('${p.id}',1)">+</button>
+      </div>
+    </div>
+  </div>`;
+}
+function adjPack(id, d){
+  const v = Math.max(0, (sel[id]||0) + d);
+  if(v===0) delete sel[id]; else sel[id]=v;
+  const qEl = document.getElementById('pq-'+id);
+  qEl.textContent = v; qEl.className = 'qty-val' + (v>0?' active':'');
+  document.getElementById('pk-'+id).classList.toggle('sel', v>0);
+  updateSummary(); updateProgress();
+}
+function toggleSwap(id){
+  swapped[id] = document.getElementById('swap-'+id).checked;
+  updateSummary();
 }
 
-// Met à jour les badges dans le hero selon les catégories actives du catalogue
-function updateHeroBadges(){
-  const badgesEl = document.getElementById('hero-badges-dynamic');
-  if(!badgesEl) return;
-  const cats = {};
-  STOCK_META.forEach(p => {
-    const c = p.cat || 'Autre';
-    if(!cats[c]) cats[c] = p.icon;
+// ---------- Construction des add-ons ----------
+function buildAddons(){
+  const cont = document.getElementById('addons-container');
+  cont.innerHTML = ADDONS.map(a => {
+    const qty = addonSel[a.id]||0;
+    let priceTxt, priceCls='addon-price';
+    if(a.id==='bonbonne_sup'){ priceTxt = a.note; }
+    else if(a.price){ priceTxt = '+'+eur(a.price); }
+    else { priceTxt = 'Sur devis'; priceCls += ' free'; }
+    return `<div class="addon-card${qty>0?' sel':''}" id="ad-${a.id}">
+      <div class="addon-info">
+        <div class="addon-name">${a.name}</div>
+        <div class="${priceCls}">${priceTxt}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="adjAddon('${a.id}',-1)">−</button>
+        <span class="qty-val${qty>0?' active':''}" id="aq-${a.id}">${qty}</span>
+        <button class="qty-btn" onclick="adjAddon('${a.id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function adjAddon(id, d){
+  const v = Math.max(0, (addonSel[id]||0) + d);
+  if(v===0) delete addonSel[id]; else addonSel[id]=v;
+  const qEl = document.getElementById('aq-'+id);
+  qEl.textContent = v; qEl.className = 'qty-val' + (v>0?' active':'');
+  document.getElementById('ad-'+id).classList.toggle('sel', v>0);
+  updateSummary(); updateProgress();
+}
+
+// A-t-on une fontaine / un pack incluant de l'eau ? (pour le tarif bonbonne suppl.)
+function hasWaterBase(){
+  return ['fontaine','pack_events_base','pack_events_complet'].some(id => (sel[id]||0) > 0);
+}
+
+// ---------- Récapitulatif ----------
+function selectionChips(){
+  const chips = [];
+  PACKS.forEach(p => {
+    const q = sel[p.id]||0;
+    if(q>0){
+      let label = `${q}× ${p.name}`;
+      if(p.swap && swapped[p.id]) label += ' (→ Zenius200 +'+p.swap.extra+'€)';
+      chips.push(label);
+    }
   });
-  badgesEl.innerHTML = Object.entries(cats).map(([c,icon]) =>
-    `<span class="hero-badge">${icon} ${c}</span>`
-  ).join('');
+  ADDONS.forEach(a => {
+    const q = addonSel[a.id]||0;
+    if(q>0){
+      let label = `${q}× ${a.name}`;
+      if(a.id==='bonbonne_sup'){ label += ` (${hasWaterBase()?'19,90':'23,90'}€ HT)`; }
+      chips.push(label);
+    }
+  });
+  return chips;
+}
+function updateSummary(){
+  const chips = selectionChips();
+  const box = document.getElementById('sel-summary');
+  const wrap = document.getElementById('sel-summary-chips');
+  if(chips.length){
+    box.classList.add('visible');
+    wrap.innerHTML = chips.map(c=>`<span class="summary-chip">${c}</span>`).join('');
+  } else box.classList.remove('visible');
 }
 
-// ---------- Firebase init + chargement catalogue ----------
+// ---------- Type de location ----------
+let rentalType = 'ponctuelle';
+function setRentalType(t){
+  rentalType = t;
+  document.getElementById('seg-ponctuelle').classList.toggle('sel', t==='ponctuelle');
+  document.getElementById('seg-mensuelle').classList.toggle('sel', t==='mensuelle');
+  document.getElementById('dates-ponctuelle').style.display = t==='ponctuelle' ? '' : 'none';
+  document.getElementById('dates-mensuelle').style.display = t==='mensuelle' ? '' : 'none';
+  updateProgress();
+}
+
+// ---------- Progression ----------
+function val(id){ const el=document.getElementById(id); return el? el.value.trim() : ''; }
+function step1ok(){ return val('f-billing-name') && val('f-siret') && val('f-billing-address') && val('f-billing-phone') && val('f-billing-email'); }
+function step2ok(){
+  const base = val('f-salon') && val('f-stand') && val('f-delivery-address');
+  if(rentalType==='ponctuelle') return base && val('f-start') && val('f-end');
+  return base && val('f-tour-start') && val('f-tour-until') && val('f-tour-freq');
+}
+function step3ok(){ return Object.keys(sel).length>0 || Object.keys(addonSel).length>0; }
+function updateProgress(){
+  const s1=step1ok(), s2=step2ok(), s3=step3ok();
+  setStep(1, s1?'done':'active');
+  setStep(2, s2?'done':(s1?'active':''));
+  setStep(3, s3?'done':(s2?'active':''));
+  setStep(4, (s1&&s2&&s3)?'active':'');
+}
+function setStep(n, state){
+  const el = document.getElementById('step'+n+'-dot');
+  el.className = 'step-dot' + (state==='active'?' active':state==='done'?' done':'');
+  el.textContent = state==='done' ? '✓' : n;
+}
+
+// ---------- Firebase init + email config ----------
 let db = null, fbReady = false;
 (function initFirebase(){
   const cfg = window.FIREBASE_CONFIG;
   if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
-    try {
-      firebase.initializeApp(cfg);
-      db = firebase.database();
-      fbReady = true;
-      // Charger le catalogue depuis Firebase (écoute en temps réel)
-      db.ref('catalogue').on('value', snap => {
-        const val = snap.val();
-        if(val) applyDashboardCatalogue(Array.isArray(val) ? val : Object.values(val));
-      }, () => { /* si non autorisé : garder le catalogue par défaut */ });
-    }
+    try { firebase.initializeApp(cfg); db = firebase.database(); fbReady = true; }
     catch(e){ console.error('Firebase init error', e); }
   }
 })();
 
-// ---------- EmailJS : notification automatique à l'équipe ----------
-// La config est définie dans le dashboard (onglet Réglages) puis partagée via Firebase.
 let emailCfg = {};
-// Config définie en dur dans firebase-config.js (window.EMAILJS_CONFIG) — 100% fiable,
-// ne dépend PAS des règles de sécurité Firebase. C'est la source prioritaire.
 function fileEmailCfg(){
   const c = window.EMAILJS_CONFIG;
   if(c && c.pubkey && !String(c.pubkey).includes('COLLE') && c.service && c.template) return c;
@@ -490,198 +714,180 @@ async function ensureEmailCfg(){
   try{ const snap = await db.ref('config/emailjs').once('value'); const v = snap.val(); if(v) emailCfg = v; }catch(e){}
   return emailCfg;
 }
-function emMaterialText(mat){
-  const list = Object.entries(mat||{}).map(([k,v])=>{ const si=STOCK_META.find(s=>s.id===k); if(!si||!v)return null; return `   • ${v}× ${si.label}`; }).filter(Boolean);
-  return list.length ? list.join('\n') : '   • (aucun matériel précisé)';
+
+// ---------- Données de sélection -> structures envoyées ----------
+function buildSelectionData(){
+  const packs = [], addons = [], material = {}, itemLabels = {};
+  PACKS.forEach(p => {
+    const q = sel[p.id]||0;
+    if(q>0){
+      const sw = !!(p.swap && swapped[p.id]);
+      packs.push({ id:p.id, name:p.name, qty:q, swap:sw, swapExtra: sw? p.swap.extra : 0 });
+      material[p.id] = q;
+      itemLabels[p.id] = p.name + (sw? ' (→ Zenius200)' : '');
+    }
+  });
+  ADDONS.forEach(a => {
+    const q = addonSel[a.id]||0;
+    if(q>0){
+      let price = a.price || 0;
+      if(a.id==='bonbonne_sup') price = hasWaterBase()? a.price : a.priceAlone;
+      addons.push({ id:a.id, name:a.name, qty:q, price });
+      material[a.id] = q;
+      itemLabels[a.id] = a.name;
+    }
+  });
+  return { packs, addons, material, itemLabels };
 }
-async function sendFormEmail(row, mat){
+function selectionText(packs, addons){
+  const lines = [];
+  packs.forEach(p => lines.push(`   • ${p.qty}× ${p.name}${p.swap?` (Covim150 remplacée par Zenius200, +${p.swapExtra}€ HT)`:''}`));
+  addons.forEach(a => lines.push(`   • ${a.qty}× ${a.name}${a.price?` (+${(a.price%1===0?a.price:a.price.toFixed(2)).toString().replace('.',',')}€ HT)`:''}`));
+  return lines.length ? lines.join('\n') : '   • (aucune sélection précisée)';
+}
+
+async function sendFormEmail(row, packs, addons){
   await ensureEmailCfg();
-  if(typeof emailjs==='undefined'){ console.warn('EmailJS non chargé sur le formulaire'); return; }
-  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template){
-    console.warn('EmailJS : config absente (ni window.EMAILJS_CONFIG ni config/emailjs dans Firebase). Email non envoyé.');
-    return;
-  }
+  if(typeof emailjs==='undefined'){ console.warn('EmailJS non chargé'); return; }
+  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template){ console.warn('EmailJS : config absente'); return; }
+  const datesTxt = row.rentalType==='mensuelle'
+    ? `Location mensuelle · Début : ${formatDate(row.start)} → ${formatDate(row.end)} · Fréquence : ${row.tourFreq||'—'}`
+    : `Montage : ${formatDate(row.start)} → Démontage : ${formatDate(row.end)}`;
   const message =
-`Un client vient de remplir le formulaire de réservation 🎉
+`Un client vient de remplir le formulaire de réservation.
 
-🏢 Client : ${row.client}
-📞 Contact : ${row.contact||'—'}
-🎪 Salon / événement : ${row.salon||'—'}
-🪧 Stand : ${row.stand||'—'}
-📍 Lieu : ${row.lieu||'—'}
-🚚 Adresse de livraison : ${row.deliveryAddress||'—'}
-👤 Contact sur place : ${row.onSiteName||'—'}${row.onSitePhone?' / '+row.onSitePhone:''}
-🏷️ Type : ${row.type||'—'}
-📦 Montage : ${formatDate(row.start)}
-📤 Retour : ${formatDate(row.end)}
-☕ Matériel souhaité :
-${emMaterialText(mat)}
-📝 Précisions : ${row.notes||'—'}
-🔎 Connu via : ${row.source||'—'}
+FACTURATION
+Raison sociale : ${row.billingName}
+SIRET / TVA : ${row.siret||'—'}
+Adresse : ${row.billingAddress||'—'}
+Tél : ${row.billingPhone||'—'} · Email : ${row.email||'—'}
+Interlocuteur : ${row.clientName||'—'}
 
-➡️ Connecte-toi au dashboard : la demande arrive en "📩 Devis à envoyer".`;
+LIVRAISON
+Événement : ${row.salon||'—'}
+Stand : ${row.stand||'—'}
+Adresse de livraison : ${row.deliveryAddress||'—'}
+Contact sur place : ${row.onSiteName||'—'}${row.onSitePhone?' / '+row.onSitePhone:''}
+Type : ${row.rentalType==='mensuelle'?'Location mensuelle':'Location ponctuelle'}
+${datesTxt}
+
+SÉLECTION
+${selectionText(packs, addons)}
+
+Précisions : ${row.notes||'—'}
+Connu via : ${row.source||'—'}
+
+➡️ Connecte-toi au dashboard : la demande arrive en "Devis à envoyer".`;
   const recipients = [
     { email: emailCfg.email1, name: emailCfg.name1 },
     { email: emailCfg.email2, name: emailCfg.name2 }
   ].filter(r => r.email);
-  if(!recipients.length){ console.warn('EmailJS : aucune adresse de réception configurée'); return; }
+  if(!recipients.length){ console.warn('EmailJS : aucune adresse de réception'); return; }
   try{
     emailjs.init(emailCfg.pubkey);
     for(const r of recipients){
       await emailjs.send(emailCfg.service, emailCfg.template, {
         to_email: r.email,
         to_name: r.name || 'Équipe',
-        subject: '[Events Café] 📋 Nouvelle demande client — ' + row.client,
+        subject: '[Events Café] Nouvelle demande — ' + row.billingName,
         message: message,
         time: new Date().toLocaleString('fr-FR')
       });
     }
-    console.log('Email formulaire envoyé à', recipients.map(r=>r.email).join(', '));
     showToast('Équipe notifiée par email ✓','success');
-  }catch(e){ console.error('Erreur envoi email formulaire :', e); }
+  }catch(e){ console.error('Erreur envoi email :', e); }
 }
 
-// ---------- Grille matériel ----------
-function buildMatGrid(){
-  // Mémoriser les quantités déjà saisies avant le rebuild (important pour reload depuis Firebase)
-  const prevQtys = {};
-  STOCK_META.forEach(si => {
-    const el = document.getElementById('qty-'+si.id);
-    if(el) prevQtys[si.id] = parseInt(el.textContent||'0') || 0;
-  });
-
-  let html='', lastCat='';
-  if(!STOCK_META.length){
-    document.getElementById('f-mat-grid').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px 0">Chargement du catalogue...</div>';
-    return;
-  }
-  STOCK_META.forEach(si=>{
-    if(si.cat!==lastCat){
-      html+=`<div class="mat-cat-hdr">${si.cat}</div>`;
-      lastCat=si.cat;
-    }
-    const qty = prevQtys[si.id] || 0;
-    const descTitle = si.desc ? ` title="${si.desc}"` : '';
-    html+=`<div class="mat-card${qty>0?' has-qty':''}" id="mc-${si.id}"${descTitle}>
-      <div class="mat-icon">${si.icon}</div>
-      <div class="mat-name">${si.label}${si.unit?`<br><span style="font-size:9px;color:var(--text3)">${si.unit}</span>`:''}</div>
-      <div class="mat-qty-ctrl">
-        <button class="qty-btn" onclick="adjMat('${si.id}',-1)">−</button>
-        <span class="qty-val${qty>0?' active':''}" id="qty-${si.id}">${qty}</span>
-        <button class="qty-btn" onclick="adjMat('${si.id}',1)">+</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById('f-mat-grid').innerHTML=html;
-}
-function adjMat(sid, delta){
-  const el = document.getElementById('qty-'+sid);
-  const val = Math.max(0, (parseInt(el.textContent||'0')||0) + delta);
-  el.textContent = val;
-  el.className = 'qty-val' + (val > 0 ? ' active' : '');
-  document.getElementById('mc-'+sid).className = 'mat-card' + (val > 0 ? ' has-qty' : '');
-  updateSummary(); updateProgress();
-}
-function getMatValues(){
-  const mat = {};
-  STOCK_META.forEach(si => { const v = parseInt(document.getElementById('qty-'+si.id)?.textContent||'0'); if(v > 0) mat[si.id] = v; });
-  return mat;
-}
-
-
-function updateSummary(){
-  const mat = getMatValues();
-  const box = document.getElementById('mat-summary');
-  const chips = document.getElementById('mat-summary-chips');
-  const entries = Object.entries(mat).filter(([,v])=>v>0);
-  if(entries.length){
-    box.classList.add('visible');
-    chips.innerHTML = entries.map(([k,v]) => { const si = STOCK_META.find(s=>s.id===k); return `<span class="summary-chip">${si.icon} ${v}× ${si.label}</span>`; }).join('');
-  } else box.classList.remove('visible');
-}
-function updateProgress(){
-  const s1 = document.getElementById('f-client').value && document.getElementById('f-nom').value && document.getElementById('f-email').value;
-  const s2 = document.getElementById('f-salon').value && document.getElementById('f-stand').value && document.getElementById('f-delivery-address').value && document.getElementById('f-start').value && document.getElementById('f-end').value;
-  const s3 = Object.keys(getMatValues()).length > 0;
-  setStep(1, s1 ? 'done' : 'active');
-  setStep(2, s2 ? 'done' : (s1 ? 'active' : ''));
-  setStep(3, s3 ? 'done' : (s2 ? 'active' : ''));
-  setStep(4, (s1&&s2&&s3) ? 'active' : '');
-}
-function setStep(n, state){
-  const el = document.getElementById('step'+n+'-dot');
-  el.className = 'step-dot' + (state==='active'?' active':state==='done'?' done':'');
-  el.textContent = state==='done' ? '✓' : n;
-}
-
+// ---------- Soumission ----------
 async function submitForm(){
-  const client = document.getElementById('f-client').value.trim();
-  const nom = document.getElementById('f-nom').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const salon = document.getElementById('f-salon').value.trim();
-  const stand = document.getElementById('f-stand').value.trim();
-  const start = document.getElementById('f-start').value;
-  const end = document.getElementById('f-end').value;
-  const deliveryAddress = document.getElementById('f-delivery-address').value.trim();
-  if(!client||!nom||!email){ showToast('Merci de renseigner vos coordonnées','error'); return; }
-  if(!salon||!stand||!start||!end){ showToast('Merci de renseigner l\'événement et les dates','error'); return; }
-  if(!deliveryAddress){ showToast('Merci d\'indiquer l\'adresse de livraison','error'); return; }
-  if(end < start){ showToast('La date de retour doit être après le montage','error'); return; }
-  const mat = getMatValues();
-  const tel = document.getElementById('f-tel').value;
-  const onSiteName = document.getElementById('f-onsite-name').value.trim();
-  const onSitePhone = document.getElementById('f-onsite-phone').value.trim();
+  // Validation section 1
+  if(!step1ok()){ showToast('Merci de compléter les coordonnées de facturation','error'); return; }
+  // Validation section 2
+  const salon = val('f-salon'), stand = val('f-stand'), deliveryAddress = val('f-delivery-address');
+  if(!salon||!stand||!deliveryAddress){ showToast("Merci de renseigner l'événement et l'adresse de livraison",'error'); return; }
+
+  let start, end, tourFreq = '';
+  if(rentalType==='ponctuelle'){
+    start = val('f-start'); end = val('f-end');
+    if(!start||!end){ showToast('Merci d\'indiquer les dates de montage et démontage','error'); return; }
+    if(end < start){ showToast('La date de démontage doit être après le montage','error'); return; }
+  } else {
+    start = val('f-tour-start'); end = val('f-tour-until'); tourFreq = val('f-tour-freq');
+    if(!start||!end||!tourFreq){ showToast('Merci de compléter les infos de la location mensuelle','error'); return; }
+    if(end < start){ showToast('La date de fin doit être après le début','error'); return; }
+  }
+  if(!step3ok()){ showToast('Merci de sélectionner au moins un pack ou une option','error'); return; }
+
+  const { packs, addons, material, itemLabels } = buildSelectionData();
+  const billingName = val('f-billing-name');
+  const clientName  = val('f-contact-name');
+  const email       = val('f-billing-email');
+  const phone       = val('f-billing-phone');
+
   const row = {
-    client: `${client} (${nom})`,
-    clientCompany: client,
-    clientName: nom,
-    email: email,
+    // Compatibilité dashboard
+    client: clientName ? `${billingName} (${clientName})` : billingName,
+    clientCompany: billingName,
+    clientName: clientName,
     salon, stand,
-    type: document.getElementById('f-type').value,
-    lieu: document.getElementById('f-lieu').value,
+    type: rentalType==='mensuelle' ? 'Location mensuelle' : 'Location ponctuelle',
+    lieu: '',
     deliveryAddress,
-    onSiteName, onSitePhone,
+    onSiteName: val('f-onsite-name'),
+    onSitePhone: val('f-onsite-phone'),
     start, end,
     status: 'devis_a_envoyer',
-    notes: `${document.getElementById('f-notes').value}${document.getElementById('f-budget').value?' | Budget: '+document.getElementById('f-budget').value:''}`,
-    material: mat,
-    contact: `${email}${tel?' / '+tel:''}`,
-    source: document.getElementById('f-source').value || '',
+    contact: `${email}${phone?' / '+phone:''}`,
+    source: val('f-source'),
     origin: 'formulaire',
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    // Facturation
+    billingName, siret: val('f-siret'), billingAddress: val('f-billing-address'),
+    billingPhone: phone, email,
+    // Location
+    rentalType, tourFreq,
+    // Sélection
+    material, itemLabels, packs, addons,
+    notes: `${val('f-notes')}${val('f-budget')?' | Budget: '+val('f-budget'):''}`
   };
+
   const btn = document.querySelector('.submit-btn');
   btn.style.pointerEvents='none'; btn.style.opacity='.7';
   try {
     if(fbReady){ const r = db.ref('events').push(); await r.set(Object.assign({id:r.key}, row)); }
     else { const pending = JSON.parse(localStorage.getItem('ep_events')||'[]'); pending.push(Object.assign({id:'loc_'+Date.now()}, row)); localStorage.setItem('ep_events', JSON.stringify(pending)); }
-    sendFormEmail(row, mat);  // 📧 notifie l'équipe par email (fiable même dashboard fermé)
-    showSuccess(row, mat);
+    sendFormEmail(row, packs, addons);
+    showSuccess(row, packs, addons);
   } catch(e){ console.error(e); showToast('Erreur lors de l\'envoi, réessayez','error'); }
   btn.style.pointerEvents=''; btn.style.opacity='';
 }
 
-
-function showSuccess(ev, mat){
+function showSuccess(ev, packs, addons){
   document.getElementById('form-wrap').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
-  const matText = Object.entries(mat).map(([k,v]) => { const si = STOCK_META.find(s=>s.id===k); return si ? `${si.icon} ${v}× ${si.label}` : ''; }).join(', ') || '—';
+  const selTxt = [...packs.map(p=>`${p.qty}× ${p.name}${p.swap?' (→ Zenius200)':''}`), ...addons.map(a=>`${a.qty}× ${a.name}`)].join(', ') || '—';
+  const datesRow = ev.rentalType==='mensuelle'
+    ? `<div class="success-row"><span class="success-row-label">Location mensuelle</span><span class="success-row-val">${formatDate(ev.start)} → ${formatDate(ev.end)}<br>${ev.tourFreq||''}</span></div>`
+    : `<div class="success-row"><span class="success-row-label">Montage</span><span class="success-row-val">${formatDate(ev.start)}</span></div>
+       <div class="success-row"><span class="success-row-label">Démontage</span><span class="success-row-val">${formatDate(ev.end)}</span></div>`;
   document.getElementById('success-details').innerHTML = `
-    <div class="success-row"><span class="success-row-label">Client</span><span class="success-row-val">${ev.client}</span></div>
+    <div class="success-row"><span class="success-row-label">Société</span><span class="success-row-val">${ev.billingName}</span></div>
     <div class="success-row"><span class="success-row-label">Événement</span><span class="success-row-val">${ev.salon}</span></div>
     <div class="success-row"><span class="success-row-label">Stand</span><span class="success-row-val">${ev.stand}</span></div>
-    <div class="success-row"><span class="success-row-label">Livraison</span><span class="success-row-val" style="max-width:280px;text-align:right">${ev.deliveryAddress||'—'}</span></div>
-    <div class="success-row"><span class="success-row-label">Montage</span><span class="success-row-val">${formatDate(ev.start)}</span></div>
-    <div class="success-row"><span class="success-row-label">Démontage</span><span class="success-row-val">${formatDate(ev.end)}</span></div>
-    <div class="success-row"><span class="success-row-label">Matériel</span><span class="success-row-val" style="max-width:280px;text-align:right">${matText}</span></div>`;
+    <div class="success-row"><span class="success-row-label">Livraison</span><span class="success-row-val" style="max-width:280px">${ev.deliveryAddress||'—'}</span></div>
+    ${datesRow}
+    <div class="success-row"><span class="success-row-label">Sélection</span><span class="success-row-val" style="max-width:280px">${selTxt}</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display = 'block';
   document.getElementById('success-screen').classList.remove('show');
-  ['f-client','f-nom','f-email','f-tel','f-salon','f-stand','f-lieu','f-delivery-address','f-onsite-name','f-onsite-phone','f-start','f-end','f-notes','f-budget','f-type','f-source'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  STOCK_META.forEach(si => { const el = document.getElementById('qty-'+si.id); if(el){ el.textContent='0'; el.className='qty-val'; } const mc = document.getElementById('mc-'+si.id); if(mc) mc.className='mat-card'; });
-  updateSummary(); updateProgress();
+  ['f-billing-name','f-siret','f-billing-address','f-billing-phone','f-billing-email','f-contact-name','f-salon','f-stand','f-delivery-address','f-onsite-name','f-onsite-phone','f-start','f-end','f-tour-start','f-tour-until','f-tour-freq','f-notes','f-budget','f-source'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  Object.keys(sel).forEach(k=>delete sel[k]);
+  Object.keys(swapped).forEach(k=>delete swapped[k]);
+  Object.keys(addonSel).forEach(k=>delete addonSel[k]);
+  setRentalType('ponctuelle');
+  buildPacks(); buildAddons(); updateSummary(); updateProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function formatDate(d){ if(!d) return '—'; return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
@@ -692,8 +898,9 @@ function showToast(msg, type='info'){
 }
 
 // INIT
-buildMatGrid();
-updateHeroBadges();
+buildPacks();
+buildAddons();
+setRentalType('ponctuelle');
 updateProgress();
 loadEmailCfg();
 </script>

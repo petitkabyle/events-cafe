@@ -155,6 +155,8 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
 .ev-card.paye::before{background:var(--green);}
 .ev-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;}
 .ev-name{font-family:var(--font-head);font-size:14px;font-weight:600;}
+.ev-name-main{font-size:16px;font-weight:700;color:var(--text1);}
+.ev-name-stand{font-size:13px;font-weight:500;color:var(--text2);}
 .ev-client{font-size:12px;color:var(--text2);margin-top:1px;}
 .badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;}
 .badge-blue{background:rgba(59,130,246,.15);color:var(--accent2);border:1px solid rgba(59,130,246,.25);}
@@ -577,7 +579,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
         <div class="filters-row">
           <input class="filter-input" type="text" placeholder="🔍  Client, salon, stand..." id="search-input" oninput="applyFilters()">
           <select class="filter-sel" id="filter-status" onchange="applyFilters()"><option value="actifs">Statuts actifs (défaut)</option><option value="devis_a_envoyer">📩 Devis à envoyer</option><option value="devis_envoye">📨 Devis envoyé</option><option value="attente_facturation">🧾 À facturer</option><option value="confirmé">✅ Confirmé</option><option value="livré">🚚 Livré</option><option value="non_payé">⏳ Non payé</option><option value="payé">💶 Payé</option><option value="all">Tout afficher</option></select>
-          <select class="filter-sel" id="filter-type" onchange="applyFilters()"><option value="">Tous les types</option><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select>
+          <select class="filter-sel" id="filter-type" onchange="applyFilters()"><option value="">Tous les types</option><option>Location ponctuelle</option><option>Location mensuelle</option><option>Festival / Cinéma</option><option>Salon professionnel</option><option>Conférence / Congrès</option><option>Sportif</option><option>Corporate / Entreprise</option><option>Autre</option></select>
+        </div>
+        <div class="filters-row" style="margin-top:-6px;">
+          <select class="filter-sel" id="filter-salon" onchange="applyFilters()"><option value="">🎪 Tous les événements / salons</option></select>
+          <select class="filter-sel" id="filter-ville" onchange="applyFilters()"><option value="">📍 Toutes les villes</option></select>
+          <select class="filter-sel" id="filter-client" onchange="applyFilters()"><option value="">👤 Tous les clients</option></select>
+          <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;" onclick="resetEventFilters()">✕ Réinitialiser</button>
         </div>
         <div id="events-list"></div>
       </div>
@@ -1105,7 +1113,14 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
       <!-- SECTION PRESTATAIRE -->
       <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span>Prestataire (vous)</span>
-        <span style="font-size:10px;color:var(--green2);font-weight:400;text-transform:none;letter-spacing:0">✓ Sauvegardé automatiquement</span>
+        <span style="font-size:10px;color:var(--green2);font-weight:400;text-transform:none;letter-spacing:0">✓ Sauvegardé par intervenant</span>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label class="form-label">👤 Intervenant (chacun sa fiche & sa numérotation)</label>
+          <input class="form-input" id="inv-worker" list="inv-worker-list" placeholder="ex: Soane" oninput="onInvoiceWorkerChange()" autocomplete="off">
+          <datalist id="inv-worker-list"></datalist>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1956,7 +1971,7 @@ function renderCalEventList(){
 function renderEvCard(ev){
   const sc=statusBadge(ev.status);
   const cc=statusCard(ev.status);
-  const mats=Object.entries(ev.material||{}).map(([k,v])=>{const si=STOCK_META.find(s=>s.id===k);if(!si||!parseInt(v))return'';return`<span class="mat-chip" style="background:${si.color}22;color:${si.color}">${si.icon} ${v}× ${si.label}</span>`;}).join('');
+  const mats=Object.entries(ev.material||{}).map(([k,v])=>{const si=STOCK_META.find(s=>s.id===k);const lbl=si?si.label:(ev.itemLabels&&ev.itemLabels[k]);const ic=si?si.icon:'•';const col=si?si.color:'var(--gold)';if(!lbl||!parseInt(v))return'';return`<span class="mat-chip" style="background:${col}22;color:${col}">${ic} ${v}× ${lbl}</span>`;}).join('');
   const amt=parseFloat(ev.amount)||0;
   const money=amt>0?`<span>💶 ${fmtMoney(amt)} ${ev.paid?'· <span style="color:var(--green2)">payé ✅</span>':'· <span style="color:var(--orange)">non payé</span>'}</span>`:'';
   // Encart devis
@@ -1967,8 +1982,11 @@ function renderEvCard(ev){
     <button class="btn-xs" style="border-color:rgba(139,92,246,.3);color:#c4b5fd" onclick="openQuoteModal('${ev.id}')">${sent?'👁 Revoir / renvoyer':'📨 Préparer le devis'}</button>
   </div>`;
   return`<div class="ev-card ${cc}">
-    <div class="ev-top"><div><div class="ev-name">${ev.salon||''}${ev.stand?` — ${ev.stand}`:''}</div><div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div></div><span class="badge ${sc}">${statusIcon(ev.status)} ${statusLabel(ev.status)}</span></div>
-    <div class="ev-meta"><span>📦 Montage : ${formatDate(ev.start)}</span><span>📤 Démontage : ${formatDate(ev.end)}</span><span>🏷 ${ev.type||'—'}</span>${ev.contact?`<span>📞 ${ev.contact}</span>`:''}${money}</div>
+    <div class="ev-top"><div><div class="ev-name"><span class="ev-name-main">${ev.salon||'Événement'}</span>${ev.stand?`<span class="ev-name-stand"> · ${ev.stand}</span>`:''}</div><div class="ev-client">👤 ${ev.client||''}${ev.lieu?' · 📍 '+ev.lieu:''}</div></div><span class="badge ${sc}">${statusIcon(ev.status)} ${statusLabel(ev.status)}</span></div>
+    <div class="ev-meta">${ev.rentalType==='mensuelle'
+      ? `<span>🔁 Mensuel · début : ${formatDate(ev.start)}</span><span>🏁 jusqu'au ${formatDate(ev.end)}</span>${ev.tourFreq?`<span>📆 ${ev.tourFreq}</span>`:''}`
+      : `<span>📦 Montage : ${formatDate(ev.start)}</span><span>📤 Démontage : ${formatDate(ev.end)}</span>`}<span>🏷 ${ev.type||'—'}</span>${ev.contact?`<span>📞 ${ev.contact}</span>`:''}${money}</div>
+    ${ev.billingName||ev.siret?`<div class="ev-meta" style="margin-top:-2px"><span>🧾 ${ev.billingName||ev.clientCompany||''}${ev.siret?' · SIRET/TVA : '+ev.siret:''}</span></div>`:''}
     ${ev.deliveryAddress?`<div class="ev-meta" style="margin-top:-2px"><span>🚚 ${ev.deliveryAddress}</span>${ev.onSiteName||ev.onSitePhone?`<span>👤 ${ev.onSiteName||''}${ev.onSitePhone?' · '+ev.onSitePhone:''}</span>`:''}</div>`:''}
     ${mats?`<div class="mat-chips">${mats}</div>`:''}
     ${quoteBox}
@@ -1982,10 +2000,33 @@ function renderEvCard(ev){
     </div></div>`;
 }
 
+function populateEventFilters(){
+  const cfg=[
+    {id:'filter-salon', key:'salon', def:'🎪 Tous les événements / salons'},
+    {id:'filter-ville', key:'lieu',  def:'📍 Toutes les villes'},
+    {id:'filter-client',key:'clientCompany', alt:'client', def:'👤 Tous les clients'},
+  ];
+  cfg.forEach(c=>{
+    const sel=document.getElementById(c.id); if(!sel) return;
+    const cur=sel.value;
+    const vals=[...new Set(events.map(e=>(e[c.key]||(c.alt?e[c.alt]:'')||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
+    sel.innerHTML=`<option value="">${c.def}</option>`+vals.map(v=>`<option ${v===cur?'selected':''}>${v}</option>`).join('');
+  });
+}
+function resetEventFilters(){
+  ['search-input','filter-salon','filter-ville','filter-client'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const st=document.getElementById('filter-status'); if(st) st.value='actifs';
+  const tp=document.getElementById('filter-type'); if(tp) tp.value='';
+  applyFilters();
+}
 function applyFilters(){
+  populateEventFilters();
   const q=(document.getElementById('search-input').value||'').toLowerCase();
   const st=document.getElementById('filter-status').value;
   const tp=document.getElementById('filter-type').value;
+  const fSalon=(document.getElementById('filter-salon')||{}).value||'';
+  const fVille=(document.getElementById('filter-ville')||{}).value||'';
+  const fClient=(document.getElementById('filter-client')||{}).value||'';
   const f=events.filter(ev=>{
     const s=normStatus(ev.status);
     if(q&&!(ev.client||'').toLowerCase().includes(q)&&!(ev.salon||'').toLowerCase().includes(q)&&!(ev.stand||'').toLowerCase().includes(q))return false;
@@ -1993,6 +2034,9 @@ function applyFilters(){
     else if(st==='all'){ /* tout afficher */ }
     else if(st && s!==st) return false;
     if(tp&&ev.type!==tp)return false;
+    if(fSalon&&(ev.salon||'').trim()!==fSalon)return false;
+    if(fVille&&(ev.lieu||'').trim()!==fVille)return false;
+    if(fClient&&(ev.clientCompany||ev.client||'').trim()!==fClient)return false;
     return true;
   }).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
   document.getElementById('events-list').innerHTML=f.length?f.map(renderEvCard).join(''):'<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Aucun résultat</div></div>';
@@ -2157,27 +2201,59 @@ function copyPlanningSummary(){
 // ══════════════════════════════════════════════════════
 
 // ── Données de configuration facture ──
-// invoiceConfig = { prestName, prestAddress, prestSiret, prestEmail, prestPhone, iban, bic, tva, legal, lastNumber }
+// invoiceConfig = { prestName, ... , history, profiles:{ [workerKey]: {prestName,...,history} } }
 let invoiceConfig = {};
+let currentInvoiceWorker = '';
 (function loadInvoiceConfig(){
   try{ invoiceConfig = JSON.parse(localStorage.getItem('ep_invoice_cfg')||'{}'); }catch(e){ invoiceConfig = {}; }
 })();
 
-// ── Numérotation automatique ──
-// Génère le numéro suivant basé sur l'historique des factures de l'année en cours.
-// Format configurable — par défaut : NOM AAAA-XXX (ex: SINDJI 2026-008)
-function nextInvoiceNumber(clientName){
+// ── Profils par intervenant (évite tout quiproquo entre employés) ──
+function workerKey(name){ return (name||'').trim().toLowerCase(); }
+// Retourne la fiche de l'intervenant (ou la config globale en repli pour rétro-compat)
+function getWorkerProfile(name){
+  const k = workerKey(name);
+  if(k && invoiceConfig.profiles && invoiceConfig.profiles[k]) return invoiceConfig.profiles[k];
+  return invoiceConfig; // repli : config historique partagée
+}
+function setWorkerProfile(name, prof){
+  const k = workerKey(name);
+  if(!k){ Object.assign(invoiceConfig, prof); return; }
+  if(!invoiceConfig.profiles) invoiceConfig.profiles = {};
+  const prev = invoiceConfig.profiles[k] || {};
+  invoiceConfig.profiles[k] = Object.assign(prev, prof);
+}
+
+// ── Numérotation automatique (séquence propre à chaque intervenant) ──
+// Format : NOM AAAA-XXX (ex: SOANE 2026-008)
+function nextInvoiceNumber(workerName){
   const yr = new Date().getFullYear();
-  const hist = invoiceConfig.history || {};
-  const key = yr;
-  const current = hist[key] || 0;
-  const next = current + 1;
-  const prefix = clientName ? clientName.split(' ')[0].toUpperCase() : 'FAC';
+  const prof = getWorkerProfile(workerName);
+  const hist = prof.history || {};
+  const next = (hist[yr] || 0) + 1;
+  const prefix = workerName ? workerName.split(' ')[0].toUpperCase() : 'FAC';
   return `${prefix} ${yr}-${String(next).padStart(3,'0')}`;
 }
 function recordInvoiceNumber(year){
-  if(!invoiceConfig.history) invoiceConfig.history = {};
-  invoiceConfig.history[year] = (invoiceConfig.history[year]||0) + 1;
+  const prof = getWorkerProfile(currentInvoiceWorker);
+  if(!prof.history) prof.history = {};
+  prof.history[year] = (prof.history[year]||0) + 1;
+}
+
+// Recharge les champs du formulaire facture depuis la fiche de l'intervenant saisi
+function onInvoiceWorkerChange(){
+  currentInvoiceWorker = (document.getElementById('inv-worker').value||'').trim();
+  const p = getWorkerProfile(currentInvoiceWorker);
+  document.getElementById('inv-prest-name').value    = p.prestName    || currentInvoiceWorker || '';
+  document.getElementById('inv-prest-address').value = p.prestAddress || '';
+  document.getElementById('inv-prest-siret').value   = p.prestSiret   || '';
+  document.getElementById('inv-prest-email').value   = p.prestEmail   || '';
+  document.getElementById('inv-prest-phone').value   = p.prestPhone   || '';
+  document.getElementById('inv-iban').value          = p.iban         || '';
+  document.getElementById('inv-bic').value           = p.bic          || '';
+  document.getElementById('inv-tva').value           = p.tva          || 'non_applicable';
+  document.getElementById('inv-legal').value         = p.legal        || 'Paiement sous 30 jours à réception de la facture';
+  document.getElementById('inv-number').value        = nextInvoiceNumber(currentInvoiceWorker || p.prestName || '');
 }
 
 // ── Sauvegarde config (localStorage + Firebase) ──
@@ -2192,9 +2268,16 @@ async function saveInvoiceConfig(){
     bic:          document.getElementById('inv-bic').value.trim(),
     tva:          document.getElementById('inv-tva').value,
     legal:        document.getElementById('inv-legal').value.trim(),
-    history:      invoiceConfig.history||{},
   };
-  Object.assign(invoiceConfig, cfg);
+  currentInvoiceWorker = (document.getElementById('inv-worker')||{}).value||currentInvoiceWorker||'';
+  if(workerKey(currentInvoiceWorker)){
+    // Sauvegarde dans la fiche de l'intervenant (préserve son historique)
+    setWorkerProfile(currentInvoiceWorker, cfg);
+  } else {
+    // Pas d'intervenant nommé : config globale historique
+    Object.assign(invoiceConfig, cfg);
+    if(!invoiceConfig.history) invoiceConfig.history = {};
+  }
   try{ localStorage.setItem('ep_invoice_cfg', JSON.stringify(invoiceConfig)); }catch(e){}
   if(fbReady) queuedWrite('invoiceConfig', invoiceConfig);
 }
@@ -2267,21 +2350,17 @@ function invFormatIban(){
 // ── Ouvrir la modal ──
 function openInvoiceModal(){
   const cfg = invoiceConfig;
-  // Pré-remplit les champs prestataire depuis la config sauvegardée
-  document.getElementById('inv-prest-name').value    = cfg.prestName    ||'';
-  document.getElementById('inv-prest-address').value = cfg.prestAddress  ||'';
-  document.getElementById('inv-prest-siret').value   = cfg.prestSiret   ||'';
-  document.getElementById('inv-prest-email').value   = cfg.prestEmail   ||'';
-  document.getElementById('inv-prest-phone').value   = cfg.prestPhone   ||'';
-  document.getElementById('inv-iban').value          = cfg.iban         ||'';
-  document.getElementById('inv-bic').value           = cfg.bic          ||'';
-  document.getElementById('inv-tva').value           = cfg.tva          ||'non_applicable';
-  document.getElementById('inv-legal').value         = cfg.legal        ||'Paiement sous 30 jours à réception de la facture';
+  // Intervenant : pré-rempli depuis le filtre planning (chacun sa fiche)
+  const workerFilter = (document.getElementById('plan-worker')||{}).value||'';
+  currentInvoiceWorker = workerFilter || '';
+  const workers = [...new Set(hoursList.map(h=>h.worker).filter(Boolean))];
+  const wdl = document.getElementById('inv-worker-list');
+  if(wdl) wdl.innerHTML = workers.map(w=>`<option value="${esc(w)}">`).join('');
+  const wInput = document.getElementById('inv-worker'); if(wInput) wInput.value = currentInvoiceWorker;
+  // Pré-remplit la fiche prestataire de cet intervenant (ou config globale en repli)
+  onInvoiceWorkerChange();
   // Date du jour
   document.getElementById('inv-date').value = new Date().toISOString().slice(0,10);
-  // Numéro auto (on pré-calcule, l'utilisateur peut modifier)
-  const workerFilter = (document.getElementById('plan-worker')||{}).value||'';
-  document.getElementById('inv-number').value = nextInvoiceNumber(workerFilter||cfg.prestName||'');
   // Champs client et prestations vides
   ['inv-cli-name','inv-cli-phone','inv-cli-address','inv-cli-email','inv-desc','inv-hours','inv-rate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   // Datalist clients depuis la base clients + historique événements
@@ -2316,6 +2395,7 @@ function generateInvoice(){
   const yr = date.slice(0,4);
   recordInvoiceNumber(yr);
   try{ localStorage.setItem('ep_invoice_cfg', JSON.stringify(invoiceConfig)); }catch(e){}
+  if(fbReady) queuedWrite('invoiceConfig', invoiceConfig);
 
   // Données
   const pAddress = document.getElementById('inv-prest-address').value.trim();
