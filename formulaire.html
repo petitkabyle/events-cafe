@@ -3,40 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Demande de Location — Events Café</title>
-<meta name="theme-color" content="#1A130C">
+<title>Demande de Location — EauService by Events Café</title>
+<meta name="theme-color" content="#060D1A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Events Café">
+<meta name="apple-mobile-web-app-title" content="EauService">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Fonds : espresso chaleureux (vibe café, plus accueillant) */
-  --bg0: #1A130C;
-  --bg1: #221A11;
-  --bg2: #2B2117;
-  --bg3: #362A1D;
-  --bg4: #443524;
-  --border: rgba(255,236,210,0.08);
-  --border2: rgba(232,163,77,0.18);
-  --border3: rgba(232,163,77,0.34);
-  --text1: #F7EFE3;
-  --text2: #D2BFA6;
-  --text3: #9C876B;
-  /* Ambre / caramel chaleureux (accent principal) */
-  --gold: #E8A34D;
-  --gold2: #F4BC6E;
-  --gold3: #FBE0B4;
-  /* Café accent */
-  --coffee: #B5752F;
-  --coffee2: #3A2A18;
-  --accent: #E8A34D;
-  --accent2: #F4BC6E;
-  --green: #5BBF7B;
-  --green2: #7FD79A;
+  /* Fonds : bleu nuit sombre (harmonisé Events Café) */
+  --bg0: #060D1A;
+  --bg1: #0A1424;
+  --bg2: #0F1D34;
+  --bg3: #142844;
+  --bg4: #1B3358;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(96,165,250,0.16);
+  --border3: rgba(96,165,250,0.28);
+  --text1: #EAF1FB;
+  --text2: #9DB4D4;
+  --text3: #5B7299;
+  /* Bleu clair lumineux */
+  --gold: #3B9EFF;
+  --gold2: #60A5FA;
+  --gold3: #BAE6FD;
+  /* Bleu accent */
+  --coffee: #1E6FD9;
+  --coffee2: #0F2042;
+  --accent: #38BDF8;
+  --accent2: #7DD3FC;
+  --green: #22C55E;
+  --green2: #34D399;
   --font-head: 'Outfit', sans-serif;
   --font-body: 'Outfit', sans-serif;
 }
@@ -46,18 +46,18 @@ body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);min-h
 
 /* Halo chaleureux en fond */
 body::before{content:'';position:fixed;inset:0;background:
-  radial-gradient(900px 500px at 50% -120px, rgba(232,163,77,.10), transparent 70%),
-  radial-gradient(700px 500px at 110% 10%, rgba(181,117,47,.08), transparent 70%);
+  radial-gradient(900px 500px at 50% -120px, rgba(59,158,255,.10), transparent 70%),
+  radial-gradient(700px 500px at 110% 10%, rgba(30,111,217,.08), transparent 70%);
   pointer-events:none;z-index:0;}
 /* GRAIN doux */
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 
 /* HERO */
 .hero{position:relative;overflow:hidden;padding:72px 40px 56px;text-align:center;z-index:1;}
-.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:620px;height:300px;background:radial-gradient(ellipse,rgba(232,163,77,.18) 0%,transparent 70%);pointer-events:none;}
-.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(232,163,77,.55),transparent);}
+.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:620px;height:300px;background:radial-gradient(ellipse,rgba(59,158,255,.18) 0%,transparent 70%);pointer-events:none;}
+.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,255,.55),transparent);}
 .hero-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:18px;}
-.bean{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#C98A3F,#6B4422);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45),inset 0 0 0 2px rgba(251,224,180,.45);}
+.bean{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#1E6FD9,#0F2042);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45),inset 0 0 0 2px rgba(96,165,250,.4);}
 .bean::after{content:'';position:absolute;width:3px;height:30px;background:var(--gold3);border-radius:3px;transform:rotate(18deg);opacity:.9;}
 .brand-name{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1;}
 .brand-name span{color:var(--gold);}
@@ -76,15 +76,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .progress-step{display:flex;align-items:center;gap:8px;flex:1;}
 .progress-step:not(:last-child)::after{content:'';flex:1;height:1px;background:var(--border2);margin:0 8px;}
 .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);transition:all .3s;}
-.step-dot.active{background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;border-color:transparent;box-shadow:0 0 16px rgba(232,163,77,.35);}
+.step-dot.active{background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;border-color:transparent;box-shadow:0 0 16px rgba(59,158,255,.35);}
 .step-dot.done{background:var(--green);border-color:var(--green);color:#fff;}
 .step-label{font-size:11px;color:var(--text3);white-space:nowrap;}
 
 /* SECTIONS */
 .form-section{margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .3s,box-shadow .3s;box-shadow:0 1px 0 rgba(255,255,255,.02) inset;}
 .form-section:focus-within{border-color:var(--border3);box-shadow:0 8px 30px rgba(0,0,0,.25);}
-.section-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(232,163,77,.05),transparent);}
-.section-num{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(59,158,255,.05),transparent);}
+.section-num{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .section-title{font-family:var(--font-head);font-size:16px;font-weight:600;}
 .section-sub{font-size:12px;color:var(--text3);margin-left:auto;text-align:right;}
 .section-body{padding:18px 22px;}
@@ -99,7 +99,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .form-label .req{color:var(--gold);margin-left:2px;}
 .form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:11px;padding:11px 14px;color:var(--text1);font-family:var(--font-body);font-size:14px;transition:all .2s;width:100%;}
 .form-input::placeholder{color:var(--text3);}
-.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,163,77,.14);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(59,158,255,.14);}
 .form-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239C876B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
 .form-select option{background:var(--bg2);}
 .form-textarea{resize:vertical;min-height:80px;line-height:1.6;}
@@ -113,7 +113,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 .seg-opt{border:1px solid var(--border2);background:var(--bg3);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;gap:12px;align-items:flex-start;}
 .seg-opt:hover{border-color:var(--border3);}
-.seg-opt.sel{border-color:var(--gold);background:rgba(232,163,77,.08);box-shadow:0 0 0 3px rgba(232,163,77,.10);}
+.seg-opt.sel{border-color:var(--gold);background:rgba(59,158,255,.08);box-shadow:0 0 0 3px rgba(59,158,255,.10);}
 .seg-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border3);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .seg-opt.sel .seg-radio{border-color:var(--gold);}
 .seg-opt.sel .seg-radio::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--gold);}
@@ -126,9 +126,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .pack-cat::after{content:'';flex:1;height:1px;background:var(--border2);}
 .pack-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .pack-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:16px;transition:all .25s;position:relative;display:flex;flex-direction:column;}
-.pack-card.featured{border-color:var(--border2);background:linear-gradient(180deg,rgba(232,163,77,.07),var(--bg3));}
-.pack-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,163,77,.12);}
-.pack-tag{position:absolute;top:-9px;right:14px;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;padding:3px 9px;border-radius:20px;}
+.pack-card.featured{border-color:var(--border2);background:linear-gradient(180deg,rgba(59,158,255,.07),var(--bg3));}
+.pack-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(59,158,255,.12);}
+.pack-tag{position:absolute;top:-9px;right:14px;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;padding:3px 9px;border-radius:20px;}
 .pack-name{font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:3px;}
 .pack-desc{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.4;}
 .pack-incl{list-style:none;margin-bottom:14px;display:flex;flex-direction:column;gap:5px;flex:1;}
@@ -145,30 +145,30 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* QTY CONTROL */
 .qty-ctrl{display:flex;align-items:center;gap:10px;}
 .qty-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#3A2913;}
+.qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#06101F;}
 .qty-val{min-width:24px;text-align:center;font-weight:700;font-size:17px;font-family:var(--font-head);}
 .qty-val.active{color:var(--gold2);}
 
 /* ADD-ONS */
 .addon-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .addon-card{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .2s;}
-.addon-card.sel{border-color:var(--gold);background:rgba(232,163,77,.06);}
+.addon-card.sel{border-color:var(--gold);background:rgba(59,158,255,.06);}
 .addon-info{min-width:0;}
 .addon-name{font-size:13px;font-weight:600;color:var(--text1);}
 .addon-price{font-size:11px;color:var(--gold2);margin-top:1px;}
 .addon-price.free{color:var(--text3);}
 
 /* SUMMARY */
-.summary-box{background:linear-gradient(180deg,rgba(232,163,77,.06),var(--bg3));border:1px solid var(--border2);border-radius:14px;padding:16px;margin-top:18px;display:none;}
+.summary-box{background:linear-gradient(180deg,rgba(59,158,255,.06),var(--bg3));border:1px solid var(--border2);border-radius:14px;padding:16px;margin-top:18px;display:none;}
 .summary-box.visible{display:block;}
 .summary-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;font-weight:600;}
 .summary-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.summary-chip{font-size:12px;padding:5px 12px;border-radius:8px;background:rgba(232,163,77,.14);color:var(--gold2);border:1px solid rgba(232,163,77,.26);font-weight:500;}
+.summary-chip{font-size:12px;padding:5px 12px;border-radius:8px;background:rgba(59,158,255,.14);color:var(--gold2);border:1px solid rgba(59,158,255,.26);font-weight:500;}
 
 /* SUBMIT */
 .submit-area{text-align:center;padding:8px 0;}
-.submit-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#F4BC6E,#D08A33);color:#3A2913;font-family:var(--font-head);font-size:16px;font-weight:700;padding:16px 42px;border-radius:14px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;}
-.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(232,163,77,.34);}
+.submit-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;font-family:var(--font-head);font-size:16px;font-weight:700;padding:16px 42px;border-radius:14px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(59,158,255,.34);}
 .submit-btn:active{transform:translateY(0);}
 .submit-btn .arrow{font-size:20px;transition:transform .2s;}
 .submit-btn:hover .arrow{transform:translateX(4px);}
@@ -195,7 +195,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.success{background:rgba(91,191,123,.16);border:1px solid rgba(91,191,123,.32);color:var(--green2);}
 .toast.error{background:rgba(224,108,86,.16);border:1px solid rgba(224,108,86,.34);color:#f3b3a3;}
-.toast.info{background:rgba(232,163,77,.16);border:1px solid rgba(232,163,77,.3);color:var(--gold2);}
+.toast.info{background:rgba(59,158,255,.16);border:1px solid rgba(59,158,255,.3);color:var(--gold2);}
 
 @media(max-width:640px){
   .form-row{grid-template-columns:1fr;}
@@ -219,8 +219,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="hero-brand">
     <div class="bean" aria-hidden="true"></div>
     <div style="text-align:left">
-      <div class="brand-name">Events<span> Café</span></div>
-      <div class="brand-slogan">Call · Install · Smile</div>
+      <div class="brand-name">Eau<span>Service</span></div>
+      <div class="brand-slogan">by Events Café</div>
     </div>
   </div>
   <h1 class="hero-title">Réservez votre<br><em>pause café & boissons</em></h1>
@@ -484,22 +484,22 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 // Le café / l'eau / les consommables de base sont inclus dans chaque pack.
 const PACKS = [
   // — Packs Events (offres tout-en-un) —
-  { id:'pack_events_base', cat:'Packs Events', name:'Pack Events — Base', featured:true,
+  { id:'pack_events_base', cat:'Packs Events', name:'Pack Events — Base', featured:true, price:240,
     desc:"L'essentiel café + eau pour un stand.",
-    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets','1 machine Covim150 (café + consommables inclus)'],
+    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets','1 machine Covim150 (kit 150 — 150 capsules + consommables)'],
     swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
-  { id:'pack_events_complet', cat:'Packs Events', name:'Pack Events — Complet', featured:true, tag:'Le + complet',
+  { id:'pack_events_complet', cat:'Packs Events', name:'Pack Events — Complet', featured:true, tag:'Le + complet', price:320,
     desc:'Pour les stands à forte affluence.',
-    includes:['1 fontaine à eau','2 bonbonnes d\'eau','200 gobelets','1 machine Covim150 (café + consommables inclus)','1 frigo table top'],
+    includes:['1 fontaine à eau','2 bonbonnes d\'eau','200 gobelets','1 machine Covim150 (kit 150 — 150 capsules + consommables)','1 frigo table top'],
     swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
 
   // — Machines à café (à l'unité, consommables inclus) —
   { id:'covim150', cat:'Machines à café', name:'Covim150',
-    desc:'Machine Covim, prête à l\'emploi.',
-    includes:['Machine Covim','Café inclus','Consommables inclus'] },
+    desc:'Machine Covim, kit 150 prêt à l\'emploi.',
+    includes:['Machine Covim','Kit 150 — 150 capsules de café','Consommables inclus'] },
   { id:'lavazza150', cat:'Machines à café', name:'Lavazza150',
-    desc:'Machine Lavazza, prête à l\'emploi.',
-    includes:['Machine Lavazza','Café inclus','Consommables inclus'] },
+    desc:'Machine Lavazza, kit 150 prêt à l\'emploi.',
+    includes:['Machine Lavazza','Kit 150 — 150 capsules de café','Consommables inclus'] },
   { id:'gemini400', cat:'Machines à café', name:'Gemini400',
     desc:'Nespresso Gemini, gros débit.',
     includes:['Machine Nespresso Gemini','Café inclus','Consommables inclus'] },
@@ -515,12 +515,13 @@ const PACKS = [
 
 // ---------- Options / suppléments (prix HT) ----------
 const ADDONS = [
+  { id:'fontaine_sup',  name:'Fontaine à eau suppl.', note:'kit eau : 1 bonbonne + 100 gobelets' },
   { id:'chaise',        name:'Chaise pliante' },
   { id:'table',         name:'Table pliante' },
   { id:'ventilateur',   name:'Ventilateur' },
   { id:'mousseur',      name:'Mousseur à lait', price:30 },
   { id:'bouilloire',    name:'Bouilloire', price:30 },
-  { id:'pack_the',      name:'Pack thé', price:75 },
+  { id:'pack_the',      name:'Assortiment de thés', price:75 },
   { id:'gobelets_sup',  name:'Gobelets suppl. (lot 100)', price:5.9 },
   { id:'bonbonne_sup',  name:"Bonbonne d'eau suppl.", price:19.9, priceAlone:23.9,
     note:'19,90€ avec une fontaine/pack · 23,90€ seule' },
@@ -559,7 +560,7 @@ function packCardHtml(p){
     <ul class="pack-incl">${p.includes.map(i=>`<li>${i}</li>`).join('')}</ul>
     ${swap}
     <div class="pack-foot">
-      <span class="pack-price">Sur devis</span>
+      <span class="pack-price">${p.price?eur(p.price):'Sur devis'}</span>
       <div class="qty-ctrl">
         <button class="qty-btn" onclick="adjPack('${p.id}',-1)">−</button>
         <span class="qty-val${qty>0?' active':''}" id="pq-${p.id}">${qty}</span>
@@ -587,9 +588,10 @@ function buildAddons(){
   cont.innerHTML = ADDONS.map(a => {
     const qty = addonSel[a.id]||0;
     let priceTxt, priceCls='addon-price';
-    if(a.id==='bonbonne_sup'){ priceTxt = a.note; }
-    else if(a.price){ priceTxt = '+'+eur(a.price); }
+    if(a.price){ priceTxt = '+'+eur(a.price); }
+    else if(a.note){ priceTxt = a.note; priceCls += ' free'; }
     else { priceTxt = 'Sur devis'; priceCls += ' free'; }
+    if(a.id==='bonbonne_sup'){ priceTxt = a.note; priceCls='addon-price'; }
     return `<div class="addon-card${qty>0?' sel':''}" id="ad-${a.id}">
       <div class="addon-info">
         <div class="addon-name">${a.name}</div>
@@ -614,7 +616,8 @@ function adjAddon(id, d){
 
 // A-t-on une fontaine / un pack incluant de l'eau ? (pour le tarif bonbonne suppl.)
 function hasWaterBase(){
-  return ['fontaine','pack_events_base','pack_events_complet'].some(id => (sel[id]||0) > 0);
+  const packBase = ['fontaine','pack_events_base','pack_events_complet'].some(id => (sel[id]||0) > 0);
+  return packBase || (addonSel['fontaine_sup']||0) > 0;
 }
 
 // ---------- Récapitulatif ----------
@@ -789,7 +792,7 @@ Connu via : ${row.source||'—'}
       await emailjs.send(emailCfg.service, emailCfg.template, {
         to_email: r.email,
         to_name: r.name || 'Équipe',
-        subject: '[Events Café] Nouvelle demande — ' + row.billingName,
+        subject: '[EauService by Events Café] Nouvelle demande — ' + row.billingName,
         message: message,
         time: new Date().toLocaleString('fr-FR')
       });
