@@ -8,8 +8,8 @@ Tous les prix sont **hors taxes (HT)**. Les prix de base des packs/machines sont
 
 | Pack | Contenu inclus | Notes |
 |------|----------------|-------|
-| **Pack Events — Base** | 1 fontaine à eau + 1 bonbonne + 100 gobelets + 1 machine **Covim150** (café + consommables inclus) | Option : remplacer la Covim150 par une **Zenius200** → **+40 € HT** |
-| **Pack Events — Complet** | 1 fontaine à eau + 2 bonbonnes + 200 gobelets + 1 machine **Covim150** (café + consommables inclus) + 1 frigo table top | Option : remplacer la Covim150 par une **Zenius200** → **+40 € HT** |
+| **Pack Events — Base** (**240 € HT**) | 1 fontaine à eau + 1 bonbonne + 100 gobelets + 1 machine **Covim150** (kit 150 — 150 capsules + consommables) | Option : remplacer la Covim150 par une **Zenius200** → **+40 € HT** |
+| **Pack Events — Complet** (**320 € HT**) | 1 fontaine à eau + 2 bonbonnes + 200 gobelets + 1 machine **Covim150** (kit 150 — 150 capsules + consommables) + 1 frigo table top | Option : remplacer la Covim150 par une **Zenius200** → **+40 € HT** |
 
 ## Machines à café (à l'unité, consommables inclus)
 
@@ -17,8 +17,8 @@ Tous les prix sont **hors taxes (HT)**. Les prix de base des packs/machines sont
 |------|----------------|
 | **Zenius200** | Machine Nespresso Zenius + 200 capsules de café + touillettes & sucre |
 | **Gemini400** | Machine Nespresso Gemini + café + consommables |
-| **Lavazza150** | Machine Lavazza + café + consommables |
-| **Covim150** | Machine Covim + café + consommables |
+| **Lavazza150** | Machine Lavazza + kit 150 (150 capsules) + consommables |
+| **Covim150** | Machine Covim + kit 150 (150 capsules) + consommables |
 
 ## Eau
 
@@ -32,7 +32,8 @@ Tous les prix sont **hors taxes (HT)**. Les prix de base des packs/machines sont
 |--------|---------|
 | Mousseur à lait | +30 € |
 | Bouilloire | +30 € |
-| Pack thé | +75 € |
+| Assortiment de thés | +75 € |
+| Fontaine à eau supplémentaire (kit eau : 1 bonbonne + 100 gobelets) | sur devis |
 | Gobelets supplémentaires (lot 100) | +5,90 € |
 | Bonbonne d'eau supplémentaire | **19,90 €** si une fontaine/pack est déjà pris · **23,90 €** si commandée seule |
 | Kit consommables supplémentaire | sur devis |
