@@ -532,6 +532,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
       </div>
       <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;">Se connecter</button>
       <div id="login-error" style="font-size:12px;color:#fca5a5;margin-top:10px;text-align:center;display:none;"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:12px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;">🔒 Tu resteras connecté sur cet appareil — pas besoin de te reconnecter à chaque fois.</div>
     </div>
     <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6;">
       Comptes gérés dans Firebase → Authentication.<br>Mot de passe oublié ? <a href="#" onclick="doResetPassword();return false;" style="color:var(--accent2);">Réinitialiser par email</a>
@@ -4235,6 +4236,13 @@ function showLoginScreen(){
   try{ document.getElementById('loading-screen').style.display='none'; }catch(e){}
   try{ document.getElementById('app').style.display='none'; }catch(e){}
   const ls=document.getElementById('login-screen'); if(ls) ls.style.display='flex';
+  // Pré-remplit le dernier email utilisé sur cet appareil (confort, on ne stocke jamais le mot de passe)
+  try{
+    const last=localStorage.getItem('ec_last_email');
+    const em=document.getElementById('login-email');
+    if(last && em && !em.value){ em.value=last; const pw=document.getElementById('login-pass'); if(pw) setTimeout(()=>pw.focus(),100); }
+    else if(em && !em.value){ setTimeout(()=>em.focus(),100); }
+  }catch(e){}
 }
 
 function bootApp(){
@@ -4270,8 +4278,11 @@ function doLogin(){
   if(!email||!pass){ if(errEl){errEl.textContent='Email et mot de passe requis.';errEl.style.display='block';} return; }
   if(!auth){ if(errEl){errEl.textContent='Authentification Firebase indisponible.';errEl.style.display='block';} return; }
   const btn=document.getElementById('login-btn'); if(btn){btn.disabled=true;btn.textContent='Connexion…';}
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(()=>{ /* onAuthStateChanged démarre l'app */ })
+  // Persistance LOCALE : la session reste mémorisée sur cet appareil (pas besoin de se reconnecter à chaque fois)
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch(()=>{})
+    .then(()=> auth.signInWithEmailAndPassword(email, pass))
+    .then(()=>{ try{ localStorage.setItem('ec_last_email', email); }catch(e){} /* onAuthStateChanged démarre l'app */ })
     .catch(e=>{ if(errEl){errEl.textContent=authErrMsg(e);errEl.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Se connecter';} });
 }
 function doResetPassword(){
