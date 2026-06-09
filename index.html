@@ -1950,7 +1950,17 @@ function loadEmailConfig(){
 function getEvColor(ev){return EV_COLORS[events.indexOf(ev)%EV_COLORS.length];}
 function getLockedStock(){
   const l={};STOCK_META.forEach(s=>l[s.id]=0);
-  events.forEach(ev=>{if(!isStockLocked(ev.status))return;const exp=expandMaterial(ev.material);Object.entries(exp).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
+  events.forEach(ev=>{
+    const st = normStatus(ev.status);
+    const reserved = isStockLocked(st);          // matériel durable réservé (événement actif, non clôturé)
+    const consumed = reserved || st==='payé';    // consommables : restent déduits même une fois payé/clôturé
+    if(!reserved && !consumed) return;           // au stade devis : rien n'est déduit
+    const exp = expandMaterial(ev.material);
+    Object.entries(exp).forEach(([k,v])=>{
+      const take = CONSUMABLE_IDS.includes(k) ? consumed : reserved;
+      if(take) l[k]=(l[k]||0)+(parseInt(v)||0);
+    });
+  });
   return l;
 }
 function formatDate(d){if(!d)return'—';return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
@@ -2850,6 +2860,10 @@ const PACK_COMPONENTS = {
   gobelets_sup:        {gobelet:2},
   bonbonne_sup:        {bonbonne:1}
 };
+// Consommables : une fois l'événement livré/terminé, ils sont CONSOMMÉS et ne
+// reviennent pas dans le stock (contrairement au matériel durable : machines,
+// fontaines, frigos, mobilier… qui sont rendus une fois l'événement clôturé).
+const CONSUMABLE_IDS = ['cafe_pods', 'cafe_caps_nespresso', 'gobelet', 'bonbonne', 'cafe_grains'];
 // Composants d'un identifiant composite (pack/alias formulaire), ou null si c'est un article simple
 function packComponents(id){
   if(PACK_COMPONENTS[id]) return PACK_COMPONENTS[id];
