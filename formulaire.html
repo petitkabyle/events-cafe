@@ -197,7 +197,14 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .toast.error{background:rgba(224,108,86,.16);border:1px solid rgba(224,108,86,.34);color:#f3b3a3;}
 .toast.info{background:rgba(59,158,255,.16);border:1px solid rgba(59,158,255,.3);color:var(--gold2);}
 
+/* LANGUAGE SWITCH */
+.lang-switch{position:fixed;top:14px;right:14px;z-index:50;display:inline-flex;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.35);}
+.lang-btn{border:none;background:transparent;color:var(--text2);font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.5px;padding:7px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.lang-btn.active{background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;}
+.lang-btn:not(.active):hover{color:var(--text1);background:var(--bg3);}
+
 @media(max-width:640px){
+  .lang-switch{top:10px;right:10px;}
   .form-row{grid-template-columns:1fr;}
   .form-row.thirds{grid-template-columns:1fr;}
   .pack-grid{grid-template-columns:1fr;}
@@ -212,6 +219,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 </head>
 <body>
 
+<!-- LANGUAGE SWITCH -->
+<div class="lang-switch" role="group" aria-label="Language">
+  <button type="button" class="lang-btn active" id="lang-fr" onclick="applyLang('fr')">🇫🇷 FR</button>
+  <button type="button" class="lang-btn" id="lang-en" onclick="applyLang('en')">🇬🇧 EN</button>
+</div>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-glow"></div>
@@ -223,13 +236,13 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div class="brand-slogan">by Events Café</div>
     </div>
   </div>
-  <h1 class="hero-title">Réservez votre<br><em>pause café & boissons</em></h1>
-  <p class="hero-sub">Dites-nous tout sur votre événement ou votre bureau : on s'occupe du café chaud, de l'eau fraîche et de la logistique. Réponse de notre équipe sous 24h.</p>
+  <h1 class="hero-title" data-i18n="hero_title">Réservez votre<br><em>pause café &amp; boissons</em></h1>
+  <p class="hero-sub" data-i18n="hero_sub">Dites-nous tout sur votre événement ou votre bureau : on s'occupe du café chaud, de l'eau fraîche et de la logistique. Réponse de notre équipe sous 24h.</p>
   <div class="hero-badges">
-    <span class="hero-badge">Machines à café</span>
-    <span class="hero-badge">Fontaines à eau</span>
-    <span class="hero-badge">Packs clé en main</span>
-    <span class="hero-badge">Installation incluse</span>
+    <span class="hero-badge" data-i18n="badge_machines">Machines à café</span>
+    <span class="hero-badge" data-i18n="badge_fountains">Fontaines à eau</span>
+    <span class="hero-badge" data-i18n="badge_packs">Packs clé en main</span>
+    <span class="hero-badge" data-i18n="badge_install">Installation incluse</span>
   </div>
 </div>
 
@@ -238,50 +251,50 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
   <!-- PROGRESS -->
   <div class="progress-bar" id="progress-bar">
-    <div class="progress-step"><div class="step-dot active" id="step1-dot">1</div><span class="step-label">Facturation</span></div>
-    <div class="progress-step"><div class="step-dot" id="step2-dot">2</div><span class="step-label">Livraison</span></div>
-    <div class="progress-step"><div class="step-dot" id="step3-dot">3</div><span class="step-label">Votre sélection</span></div>
-    <div class="progress-step"><div class="step-dot" id="step4-dot">4</div><span class="step-label">Confirmation</span></div>
+    <div class="progress-step"><div class="step-dot active" id="step1-dot">1</div><span class="step-label" data-i18n="step_billing">Facturation</span></div>
+    <div class="progress-step"><div class="step-dot" id="step2-dot">2</div><span class="step-label" data-i18n="step_delivery">Livraison</span></div>
+    <div class="progress-step"><div class="step-dot" id="step3-dot">3</div><span class="step-label" data-i18n="step_selection">Votre sélection</span></div>
+    <div class="progress-step"><div class="step-dot" id="step4-dot">4</div><span class="step-label" data-i18n="step_confirm">Confirmation</span></div>
   </div>
 
   <!-- SECTION 1: FACTURATION -->
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">1</div>
-      <div class="section-title">Coordonnées de facturation</div>
-      <div class="section-sub">Qui réglera la prestation ?</div>
+      <div class="section-title" data-i18n="s1_title">Coordonnées de facturation</div>
+      <div class="section-sub" data-i18n="s1_sub">Qui réglera la prestation ?</div>
     </div>
     <div class="section-body">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Raison sociale <span class="req">*</span></label>
-          <input class="form-input" id="f-billing-name" type="text" placeholder="ex: Groupe Publicis SAS" oninput="updateProgress()">
+          <label class="form-label" data-i18n="lbl_company">Raison sociale <span class="req">*</span></label>
+          <input class="form-input" id="f-billing-name" type="text" data-i18n-ph="ph_company" placeholder="ex: Groupe Publicis SAS" oninput="updateProgress()">
         </div>
         <div class="form-group">
-          <label class="form-label">SIRET / N° TVA <span class="req">*</span></label>
-          <input class="form-input" id="f-siret" type="text" placeholder="ex: 123 456 789 00012 / FR..." oninput="updateProgress()">
+          <label class="form-label" data-i18n="lbl_siret">SIRET / N° TVA <span class="req">*</span></label>
+          <input class="form-input" id="f-siret" type="text" data-i18n-ph="ph_siret" placeholder="ex: 123 456 789 00012 / FR..." oninput="updateProgress()">
         </div>
       </div>
       <div class="form-row single">
         <div class="form-group">
-          <label class="form-label">Adresse de facturation <span class="req">*</span></label>
-          <textarea class="form-textarea" id="f-billing-address" placeholder="Numéro, rue, code postal, ville" style="min-height:60px;" oninput="updateProgress()"></textarea>
+          <label class="form-label" data-i18n="lbl_billing_address">Adresse de facturation <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-billing-address" data-i18n-ph="ph_billing_address" placeholder="Numéro, rue, code postal, ville" style="min-height:60px;" oninput="updateProgress()"></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Téléphone <span class="req">*</span></label>
+          <label class="form-label" data-i18n="lbl_phone">Téléphone <span class="req">*</span></label>
           <input class="form-input" id="f-billing-phone" type="tel" placeholder="+33 6 00 00 00 00" oninput="updateProgress()">
         </div>
         <div class="form-group">
-          <label class="form-label">Adresse email <span class="req">*</span></label>
+          <label class="form-label" data-i18n="lbl_email">Adresse email <span class="req">*</span></label>
           <input class="form-input" id="f-billing-email" type="email" placeholder="compta@societe.com" oninput="updateProgress()">
         </div>
       </div>
       <div class="form-row single">
         <div class="form-group">
-          <label class="form-label">Interlocuteur (nom & prénom)</label>
-          <input class="form-input" id="f-contact-name" type="text" placeholder="Jean Dupont">
+          <label class="form-label" data-i18n="lbl_contact">Interlocuteur (nom & prénom)</label>
+          <input class="form-input" id="f-contact-name" type="text" data-i18n-ph="ph_contact" placeholder="Jean Dupont">
         </div>
       </div>
     </div>
@@ -291,55 +304,55 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">2</div>
-      <div class="section-title">Coordonnées de livraison</div>
-      <div class="section-sub">Où & quand livrer ?</div>
+      <div class="section-title" data-i18n="s2_title">Coordonnées de livraison</div>
+      <div class="section-sub" data-i18n="s2_sub">Où & quand livrer ?</div>
     </div>
     <div class="section-body">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Nom de l'événement <span class="req">*</span></label>
-          <input class="form-input" id="f-salon" type="text" placeholder="ex: Festival de Cannes 2026" oninput="updateProgress()">
+          <label class="form-label" data-i18n="lbl_event">Nom de l'événement <span class="req">*</span></label>
+          <input class="form-input" id="f-salon" type="text" data-i18n-ph="ph_event" placeholder="ex: Festival de Cannes 2026" oninput="updateProgress()">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom / N° du stand <span class="req">*</span></label>
-          <input class="form-input" id="f-stand" type="text" placeholder="ex: Stand B12 – Hall 3" oninput="updateProgress()">
+          <label class="form-label" data-i18n="lbl_stand">Nom / N° du stand <span class="req">*</span></label>
+          <input class="form-input" id="f-stand" type="text" data-i18n-ph="ph_stand" placeholder="ex: Stand B12 – Hall 3" oninput="updateProgress()">
         </div>
       </div>
       <div class="form-row single">
         <div class="form-group">
-          <label class="form-label">Adresse complète de livraison <span class="req">*</span></label>
-          <textarea class="form-textarea" id="f-delivery-address" placeholder="Numéro, rue, bâtiment, hall, accès, code... (où doit-on livrer le matériel ?)" style="min-height:64px;" oninput="updateProgress()"></textarea>
+          <label class="form-label" data-i18n="lbl_delivery_address">Adresse complète de livraison <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-delivery-address" data-i18n-ph="ph_delivery_address" placeholder="Numéro, rue, bâtiment, hall, accès, code... (où doit-on livrer le matériel ?)" style="min-height:64px;" oninput="updateProgress()"></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Contact sur place (à appeler à la livraison)</label>
-          <input class="form-input" id="f-onsite-name" type="text" placeholder="ex: Marie, responsable stand">
+          <label class="form-label" data-i18n="lbl_onsite">Contact sur place (à appeler à la livraison)</label>
+          <input class="form-input" id="f-onsite-name" type="text" data-i18n-ph="ph_onsite" placeholder="ex: Marie, responsable stand">
         </div>
         <div class="form-group">
-          <label class="form-label">Téléphone du contact sur place</label>
+          <label class="form-label" data-i18n="lbl_onsite_phone">Téléphone du contact sur place</label>
           <input class="form-input" id="f-onsite-phone" type="tel" placeholder="+33 6 00 00 00 00">
         </div>
       </div>
 
       <div class="form-row single" style="margin-bottom:10px;">
         <div class="form-group">
-          <label class="form-label">Type de location <span class="req">*</span></label>
+          <label class="form-label" data-i18n="lbl_rental_type">Type de location <span class="req">*</span></label>
         </div>
       </div>
       <div class="seg" id="rental-seg">
         <div class="seg-opt sel" id="seg-ponctuelle" onclick="setRentalType('ponctuelle')">
           <div class="seg-radio"></div>
           <div>
-            <div class="seg-t">Location ponctuelle</div>
-            <div class="seg-d">Un événement, un salon : montage puis démontage.</div>
+            <div class="seg-t" data-i18n="seg_punctual_t">Location ponctuelle</div>
+            <div class="seg-d" data-i18n="seg_punctual_d">Un événement, un salon : montage puis démontage.</div>
           </div>
         </div>
         <div class="seg-opt" id="seg-mensuelle" onclick="setRentalType('mensuelle')">
           <div class="seg-radio"></div>
           <div>
-            <div class="seg-t">Location mensuelle</div>
-            <div class="seg-d">Bureau ou autre : tournée récurrente chaque mois.</div>
+            <div class="seg-t" data-i18n="seg_monthly_t">Location mensuelle</div>
+            <div class="seg-d" data-i18n="seg_monthly_d">Bureau ou autre : tournée récurrente chaque mois.</div>
           </div>
         </div>
       </div>
@@ -348,12 +361,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div id="dates-ponctuelle">
         <div class="date-range">
           <div class="form-group">
-            <label class="form-label">Date de montage <span class="req">*</span></label>
+            <label class="form-label" data-i18n="lbl_setup_date">Date de montage <span class="req">*</span></label>
             <input class="form-input" id="f-start" type="date" oninput="updateProgress()">
           </div>
           <div class="date-arrow">→</div>
           <div class="form-group">
-            <label class="form-label">Date de démontage / retour <span class="req">*</span></label>
+            <label class="form-label" data-i18n="lbl_teardown_date">Date de démontage / retour <span class="req">*</span></label>
             <input class="form-input" id="f-end" type="date" oninput="updateProgress()">
           </div>
         </div>
@@ -363,25 +376,25 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div id="dates-mensuelle" style="display:none;">
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Date de début <span class="req">*</span></label>
+            <label class="form-label" data-i18n="lbl_start_date">Date de début <span class="req">*</span></label>
             <input class="form-input" id="f-tour-start" type="date" oninput="updateProgress()">
           </div>
           <div class="form-group">
-            <label class="form-label">Jusqu'à quand ? <span class="req">*</span></label>
+            <label class="form-label" data-i18n="lbl_until">Jusqu'à quand ? <span class="req">*</span></label>
             <input class="form-input" id="f-tour-until" type="date" oninput="updateProgress()">
           </div>
         </div>
         <div class="form-row single">
           <div class="form-group">
-            <label class="form-label">Fréquence de tournée dans le mois <span class="req">*</span></label>
+            <label class="form-label" data-i18n="lbl_freq">Fréquence de tournée dans le mois <span class="req">*</span></label>
             <select class="form-select" id="f-tour-freq" oninput="updateProgress()" onchange="updateProgress()">
-              <option value="">Sélectionner...</option>
-              <option>1 passage / mois</option>
-              <option>2 passages / mois</option>
-              <option>3 passages / mois</option>
-              <option>1 passage / semaine</option>
-              <option>2 passages / semaine</option>
-              <option>Sur demande / à définir</option>
+              <option value="" data-i18n="opt_select">Sélectionner...</option>
+              <option data-i18n="freq_1m">1 passage / mois</option>
+              <option data-i18n="freq_2m">2 passages / mois</option>
+              <option data-i18n="freq_3m">3 passages / mois</option>
+              <option data-i18n="freq_1w">1 passage / semaine</option>
+              <option data-i18n="freq_2w">2 passages / semaine</option>
+              <option data-i18n="freq_ondemand">Sur demande / à définir</option>
             </select>
           </div>
         </div>
@@ -393,20 +406,20 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">3</div>
-      <div class="section-title">Votre sélection</div>
-      <div class="section-sub">Packs & options</div>
+      <div class="section-title" data-i18n="s3_title">Votre sélection</div>
+      <div class="section-sub" data-i18n="s3_sub">Packs & options</div>
     </div>
     <div class="section-body">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Choisissez un ou plusieurs packs. Le café, l'eau et les consommables de base sont déjà inclus dans chaque pack.</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px;" data-i18n="s3_intro">Choisissez un ou plusieurs packs. Le café, l'eau et les consommables de base sont déjà inclus dans chaque pack.</div>
 
       <div id="packs-container"></div>
 
-      <div class="pack-cat" style="margin-top:24px;">Options & suppléments</div>
-      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;">Tarifs hors taxes, en supplément de votre pack.</div>
+      <div class="pack-cat" style="margin-top:24px;" data-i18n="s3_addons">Options & suppléments</div>
+      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;" data-i18n="s3_addons_note">Tarifs hors taxes, en supplément de votre pack.</div>
       <div class="addon-grid" id="addons-container"></div>
 
       <div class="summary-box" id="sel-summary">
-        <div class="summary-title">Récapitulatif de votre sélection</div>
+        <div class="summary-title" data-i18n="s3_summary">Récapitulatif de votre sélection</div>
         <div class="summary-chips" id="sel-summary-chips"></div>
       </div>
     </div>
@@ -416,31 +429,31 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="form-section">
     <div class="section-head">
       <div class="section-num">4</div>
-      <div class="section-title">Informations complémentaires</div>
-      <div class="section-sub">Optionnel</div>
+      <div class="section-title" data-i18n="s4_title">Informations complémentaires</div>
+      <div class="section-sub" data-i18n="s4_sub">Optionnel</div>
     </div>
     <div class="section-body">
       <div class="form-row single">
         <div class="form-group">
-          <label class="form-label">Précisions, besoins spécifiques, horaires d'accès...</label>
-          <textarea class="form-textarea" id="f-notes" placeholder="Ex: Accès au stand possible dès 7h le matin, prévoir installation électrique 230V, nombre de personnes attendues sur le stand..."></textarea>
+          <label class="form-label" data-i18n="lbl_notes">Précisions, besoins spécifiques, horaires d'accès...</label>
+          <textarea class="form-textarea" id="f-notes" data-i18n-ph="ph_notes" placeholder="Ex: Accès au stand possible dès 7h le matin, prévoir installation électrique 230V, nombre de personnes attendues sur le stand..."></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Comment avez-vous entendu parler de nous ?</label>
+          <label class="form-label" data-i18n="lbl_source">Comment avez-vous entendu parler de nous ?</label>
           <select class="form-select" id="f-source">
-            <option value="">Sélectionner...</option>
-            <option>Recommandation / Bouche à oreille</option>
-            <option>Recherche internet</option>
-            <option>Réseaux sociaux</option>
-            <option>Déjà client</option>
-            <option>Autre</option>
+            <option value="" data-i18n="opt_select">Sélectionner...</option>
+            <option data-i18n="src_reco">Recommandation / Bouche à oreille</option>
+            <option data-i18n="src_web">Recherche internet</option>
+            <option data-i18n="src_social">Réseaux sociaux</option>
+            <option data-i18n="src_client">Déjà client</option>
+            <option data-i18n="src_other">Autre</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Budget estimé (optionnel)</label>
-          <input class="form-input" id="f-budget" type="text" placeholder="ex: 500€ - 1000€">
+          <label class="form-label" data-i18n="lbl_budget">Budget estimé (optionnel)</label>
+          <input class="form-input" id="f-budget" type="text" data-i18n-ph="ph_budget" placeholder="ex: 500€ - 1000€">
         </div>
       </div>
     </div>
@@ -449,9 +462,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <!-- SUBMIT -->
   <div class="submit-area">
     <button class="submit-btn" onclick="submitForm()">
-      Envoyer ma demande <span class="arrow">→</span>
+      <span data-i18n="submit_btn">Envoyer ma demande</span> <span class="arrow">→</span>
     </button>
-    <div class="submit-note">Votre demande sera transmise directement à notre équipe. Réponse sous 24h ouvrées.</div>
+    <div class="submit-note" data-i18n="submit_note">Votre demande sera transmise directement à notre équipe. Réponse sous 24h ouvrées.</div>
   </div>
 
 </div>
@@ -459,10 +472,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- SUCCESS SCREEN -->
 <div class="success-screen" id="success-screen">
   <div class="success-icon">☕</div>
-  <h2 class="success-title">Demande envoyée<br><em>avec succès !</em></h2>
-  <p class="success-sub">Votre demande a bien été transmise à notre équipe. Nous vous contacterons dans les 24 heures pour confirmer la disponibilité et préparer votre devis.</p>
+  <h2 class="success-title" data-i18n="success_title">Demande envoyée<br><em>avec succès !</em></h2>
+  <p class="success-sub" data-i18n="success_sub">Votre demande a bien été transmise à notre équipe. Un <strong>accusé de réception récapitulatif</strong> vient de vous être envoyé par email. Nous vous contacterons sous 24h pour confirmer la disponibilité et préparer votre devis.</p>
   <div class="success-card" id="success-details"></div>
-  <button class="reset-btn" onclick="resetForm()">↩ Faire une nouvelle demande</button>
+  <button class="reset-btn" onclick="resetForm()" data-i18n="success_reset">↩ Faire une nouvelle demande</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -470,6 +483,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- Firebase (compat) + config -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="firebase-config.js"></script>
 
@@ -484,65 +498,202 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 // Le café / l'eau / les consommables de base sont inclus dans chaque pack.
 const PACKS = [
   // — Packs Events (offres tout-en-un) —
-  { id:'pack_events_base', cat:'Packs Events', name:'Pack Events — Base', featured:true, price:240,
-    desc:"L'essentiel café + eau pour un stand.",
+  { id:'pack_events_base', cat:'Packs Events', cat_en:'Events Packs', name:'Pack Events — Base', name_en:'Events Pack — Basic', featured:true, price:240,
+    desc:"L'essentiel café + eau pour un stand.", desc_en:'The coffee + water essentials for a stand.',
     includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets','1 machine Covim150 (kit 150 — 150 capsules + consommables)'],
-    swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
-  { id:'pack_events_complet', cat:'Packs Events', name:'Pack Events — Complet', featured:true, tag:'Le + complet', price:320,
-    desc:'Pour les stands à forte affluence.',
+    includes_en:['1 water fountain','1 water bottle','100 cups','1 Covim150 machine (kit 150 — 150 capsules + supplies)'],
+    swap:{ label:'Remplacer la Covim150 par une Zenius200', label_en:'Swap the Covim150 for a Zenius200', extra:40 } },
+  { id:'pack_events_complet', cat:'Packs Events', cat_en:'Events Packs', name:'Pack Events — Complet', name_en:'Events Pack — Complete', featured:true, tag:'Le + complet', tag_en:'Most complete', price:320,
+    desc:'Pour les stands à forte affluence.', desc_en:'For high-traffic stands.',
     includes:['1 fontaine à eau','2 bonbonnes d\'eau','200 gobelets','1 machine Covim150 (kit 150 — 150 capsules + consommables)','1 frigo table top'],
-    swap:{ label:'Remplacer la Covim150 par une Zenius200', extra:40 } },
+    includes_en:['1 water fountain','2 water bottles','200 cups','1 Covim150 machine (kit 150 — 150 capsules + supplies)','1 table-top fridge'],
+    swap:{ label:'Remplacer la Covim150 par une Zenius200', label_en:'Swap the Covim150 for a Zenius200', extra:40 } },
 
   // — Machines à café (à l'unité, consommables inclus) —
-  { id:'covim150', cat:'Machines à café', name:'Covim150',
-    desc:'Machine Covim, kit 150 prêt à l\'emploi.',
-    includes:['Machine Covim','Kit 150 — 150 capsules de café','Consommables inclus'] },
-  { id:'lavazza150', cat:'Machines à café', name:'Lavazza150',
-    desc:'Machine Lavazza, kit 150 prêt à l\'emploi.',
-    includes:['Machine Lavazza','Kit 150 — 150 capsules de café','Consommables inclus'] },
-  { id:'gemini400', cat:'Machines à café', name:'Gemini400',
-    desc:'Nespresso Gemini, gros débit.',
-    includes:['Machine Nespresso Gemini','Café inclus','Consommables inclus'] },
-  { id:'zenius200', cat:'Machines à café', name:'Zenius200',
-    desc:'Nespresso Zenius + 200 capsules.',
-    includes:['Machine Nespresso Zenius','200 capsules de café','Touillettes & sucre inclus'] },
+  { id:'covim150', cat:'Machines à café', cat_en:'Coffee machines', name:'Covim150', name_en:'Covim150',
+    desc:'Machine Covim, kit 150 prêt à l\'emploi.', desc_en:'Covim machine, kit 150 ready to use.',
+    includes:['Machine Covim','Kit 150 — 150 capsules de café','Consommables inclus'],
+    includes_en:['Covim machine','Kit 150 — 150 coffee capsules','Supplies included'] },
+  { id:'lavazza150', cat:'Machines à café', cat_en:'Coffee machines', name:'Lavazza150', name_en:'Lavazza150',
+    desc:'Machine Lavazza, kit 150 prêt à l\'emploi.', desc_en:'Lavazza machine, kit 150 ready to use.',
+    includes:['Machine Lavazza','Kit 150 — 150 capsules de café','Consommables inclus'],
+    includes_en:['Lavazza machine','Kit 150 — 150 coffee capsules','Supplies included'] },
+  { id:'gemini400', cat:'Machines à café', cat_en:'Coffee machines', name:'Gemini400', name_en:'Gemini400',
+    desc:'Nespresso Gemini, gros débit.', desc_en:'Nespresso Gemini, high output.',
+    includes:['Machine Nespresso Gemini','Café inclus','Consommables inclus'],
+    includes_en:['Nespresso Gemini machine','Coffee included','Supplies included'] },
+  { id:'zenius200', cat:'Machines à café', cat_en:'Coffee machines', name:'Zenius200', name_en:'Zenius200',
+    desc:'Nespresso Zenius + 200 capsules.', desc_en:'Nespresso Zenius + 200 capsules.',
+    includes:['Machine Nespresso Zenius','200 capsules de café','Touillettes & sucre inclus'],
+    includes_en:['Nespresso Zenius machine','200 coffee capsules','Stirrers & sugar included'] },
 
   // — Eau —
-  { id:'fontaine', cat:'Eau', name:'Fontaine à eau', tag:'Kit eau',
-    desc:'Kit eau complet, prêt à servir.',
-    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets'] },
+  { id:'fontaine', cat:'Eau', cat_en:'Water', name:'Fontaine à eau', name_en:'Water fountain', tag:'Kit eau', tag_en:'Water kit',
+    desc:'Kit eau complet, prêt à servir.', desc_en:'Complete water kit, ready to serve.',
+    includes:['1 fontaine à eau','1 bonbonne d\'eau','100 gobelets'],
+    includes_en:['1 water fountain','1 water bottle','100 cups'] },
 ];
 
 // ---------- Options / suppléments (prix HT) ----------
 const ADDONS = [
-  { id:'fontaine_sup',  name:'Fontaine à eau suppl.', note:'kit eau : 1 bonbonne + 100 gobelets' },
-  { id:'chaise',        name:'Chaise pliante' },
-  { id:'table',         name:'Table pliante' },
-  { id:'ventilateur',   name:'Ventilateur' },
-  { id:'mousseur',      name:'Mousseur à lait', price:30 },
-  { id:'bouilloire',    name:'Bouilloire', price:30 },
-  { id:'pack_the',      name:'Assortiment de thés', price:75 },
-  { id:'gobelets_sup',  name:'Gobelets suppl. (lot 100)', price:5.9 },
-  { id:'bonbonne_sup',  name:"Bonbonne d'eau suppl.", price:19.9, priceAlone:23.9,
-    note:'19,90€ avec une fontaine/pack · 23,90€ seule' },
-  { id:'kit_conso',     name:'Kit consommables suppl.' },
+  { id:'fontaine_sup',  name:'Fontaine à eau suppl.', name_en:'Extra water fountain', note:'kit eau : 1 bonbonne + 100 gobelets', note_en:'water kit: 1 bottle + 100 cups' },
+  { id:'chaise',        name:'Chaise pliante', name_en:'Folding chair' },
+  { id:'table',         name:'Table pliante', name_en:'Folding table' },
+  { id:'ventilateur',   name:'Ventilateur', name_en:'Fan' },
+  { id:'mousseur',      name:'Mousseur à lait', name_en:'Milk frother', price:30 },
+  { id:'bouilloire',    name:'Bouilloire', name_en:'Kettle', price:30 },
+  { id:'pack_the',      name:'Assortiment de thés', name_en:'Tea assortment', price:75 },
+  { id:'gobelets_sup',  name:'Gobelets suppl. (lot 100)', name_en:'Extra cups (pack of 100)', price:5.9 },
+  { id:'bonbonne_sup',  name:"Bonbonne d'eau suppl.", name_en:'Extra water bottle', price:19.9, priceAlone:23.9,
+    note:'19,90€ avec une fontaine/pack · 23,90€ seule', note_en:'€19.90 with a fountain/pack · €23.90 on its own' },
+  { id:'kit_conso',     name:'Kit consommables suppl.', name_en:'Extra supplies kit' },
 ];
 
-// Quantités sélectionnées
+// ============================================================
+// I18N — Bilingue FR / EN
+// ============================================================
+let LANG = (function(){ try{ const s=localStorage.getItem('ec_lang'); if(s==='fr'||s==='en') return s; }catch(e){} return (navigator.language||'fr').slice(0,2).toLowerCase()==='en'?'en':'fr'; })();
+
+const I18N = {
+  fr:{
+    hero_title:'Réservez votre<br><em>pause café &amp; boissons</em>',
+    hero_sub:"Dites-nous tout sur votre événement ou votre bureau : on s'occupe du café chaud, de l'eau fraîche et de la logistique. Réponse de notre équipe sous 24h.",
+    badge_machines:'Machines à café', badge_fountains:'Fontaines à eau', badge_packs:'Packs clé en main', badge_install:'Installation incluse',
+    step_billing:'Facturation', step_delivery:'Livraison', step_selection:'Votre sélection', step_confirm:'Confirmation',
+    s1_title:'Coordonnées de facturation', s1_sub:'Qui réglera la prestation ?',
+    lbl_company:'Raison sociale <span class="req">*</span>', ph_company:'ex: Groupe Publicis SAS',
+    lbl_siret:'SIRET / N° TVA <span class="req">*</span>', ph_siret:'ex: 123 456 789 00012 / FR...',
+    lbl_billing_address:'Adresse de facturation <span class="req">*</span>', ph_billing_address:'Numéro, rue, code postal, ville',
+    lbl_phone:'Téléphone <span class="req">*</span>', lbl_email:'Adresse email <span class="req">*</span>',
+    lbl_contact:'Interlocuteur (nom & prénom)', ph_contact:'Jean Dupont',
+    s2_title:'Coordonnées de livraison', s2_sub:'Où & quand livrer ?',
+    lbl_event:"Nom de l'événement <span class=\"req\">*</span>", ph_event:'ex: Festival de Cannes 2026',
+    lbl_stand:'Nom / N° du stand <span class="req">*</span>', ph_stand:'ex: Stand B12 – Hall 3',
+    lbl_delivery_address:'Adresse complète de livraison <span class="req">*</span>', ph_delivery_address:"Numéro, rue, bâtiment, hall, accès, code... (où doit-on livrer le matériel ?)",
+    lbl_onsite:'Contact sur place (à appeler à la livraison)', ph_onsite:'ex: Marie, responsable stand',
+    lbl_onsite_phone:'Téléphone du contact sur place',
+    lbl_rental_type:'Type de location <span class="req">*</span>',
+    seg_punctual_t:'Location ponctuelle', seg_punctual_d:'Un événement, un salon : montage puis démontage.',
+    seg_monthly_t:'Location mensuelle', seg_monthly_d:'Bureau ou autre : tournée récurrente chaque mois.',
+    lbl_setup_date:'Date de montage <span class="req">*</span>', lbl_teardown_date:'Date de démontage / retour <span class="req">*</span>',
+    lbl_start_date:'Date de début <span class="req">*</span>', lbl_until:"Jusqu'à quand ? <span class=\"req\">*</span>",
+    lbl_freq:'Fréquence de tournée dans le mois <span class="req">*</span>',
+    opt_select:'Sélectionner...', freq_1m:'1 passage / mois', freq_2m:'2 passages / mois', freq_3m:'3 passages / mois', freq_1w:'1 passage / semaine', freq_2w:'2 passages / semaine', freq_ondemand:'Sur demande / à définir',
+    s3_title:'Votre sélection', s3_sub:'Packs & options',
+    s3_intro:"Choisissez un ou plusieurs packs. Le café, l'eau et les consommables de base sont déjà inclus dans chaque pack.",
+    s3_addons:'Options & suppléments', s3_addons_note:'Tarifs hors taxes, en supplément de votre pack.',
+    s3_summary:'Récapitulatif de votre sélection',
+    s4_title:'Informations complémentaires', s4_sub:'Optionnel',
+    lbl_notes:"Précisions, besoins spécifiques, horaires d'accès...", ph_notes:'Ex: Accès au stand possible dès 7h le matin, prévoir installation électrique 230V, nombre de personnes attendues sur le stand...',
+    lbl_source:'Comment avez-vous entendu parler de nous ?',
+    src_reco:'Recommandation / Bouche à oreille', src_web:'Recherche internet', src_social:'Réseaux sociaux', src_client:'Déjà client', src_other:'Autre',
+    lbl_budget:'Budget estimé (optionnel)', ph_budget:'ex: 500€ - 1000€',
+    submit_btn:'Envoyer ma demande', submit_note:'Votre demande sera transmise directement à notre équipe. Réponse sous 24h ouvrées.',
+    success_title:'Demande envoyée<br><em>avec succès !</em>',
+    success_sub:'Votre demande a bien été transmise à notre équipe. Un <strong>accusé de réception récapitulatif</strong> vient de vous être envoyé par email. Nous vous contacterons sous 24h pour confirmer la disponibilité et préparer votre devis.',
+    success_reset:'↩ Faire une nouvelle demande',
+    // dynamiques
+    quote_on_request:'Sur devis', none_selected:'(aucune sélection précisée)',
+    err_billing:'Merci de compléter les coordonnées de facturation',
+    err_delivery:"Merci de renseigner l'événement et l'adresse de livraison",
+    err_dates_punctual:"Merci d'indiquer les dates de montage et démontage",
+    err_dates_order:'La date de démontage doit être après le montage',
+    err_dates_monthly:'Merci de compléter les infos de la location mensuelle',
+    err_dates_order2:'La date de fin doit être après le début',
+    err_select:'Merci de sélectionner au moins un pack ou une option',
+    err_send:"Erreur lors de l'envoi, réessayez",
+    team_notified:'Équipe notifiée par email ✓', ack_sent:'Accusé de réception envoyé au client ✓',
+    row_company:'Société', row_event:'Événement', row_stand:'Stand', row_delivery:'Livraison',
+    row_setup:'Montage', row_teardown:'Démontage', row_monthly:'Location mensuelle',
+    row_selection:'Sélection', row_ack:'📧 Accusé de réception', ack_sent_to:'envoyé à'
+  },
+  en:{
+    hero_title:'Book your<br><em>coffee &amp; drinks break</em>',
+    hero_sub:'Tell us all about your event or office: we handle the hot coffee, the chilled water and the logistics. Our team replies within 24h.',
+    badge_machines:'Coffee machines', badge_fountains:'Water fountains', badge_packs:'Turnkey packs', badge_install:'Installation included',
+    step_billing:'Billing', step_delivery:'Delivery', step_selection:'Your selection', step_confirm:'Confirmation',
+    s1_title:'Billing details', s1_sub:'Who will pay for the service?',
+    lbl_company:'Company name <span class="req">*</span>', ph_company:'e.g. Publicis Group Ltd',
+    lbl_siret:'Company / VAT number <span class="req">*</span>', ph_siret:'e.g. VAT / company registration no.',
+    lbl_billing_address:'Billing address <span class="req">*</span>', ph_billing_address:'Number, street, postcode, city',
+    lbl_phone:'Phone <span class="req">*</span>', lbl_email:'Email address <span class="req">*</span>',
+    lbl_contact:'Contact person (first & last name)', ph_contact:'John Smith',
+    s2_title:'Delivery details', s2_sub:'Where & when to deliver?',
+    lbl_event:'Event name <span class="req">*</span>', ph_event:'e.g. Cannes Festival 2026',
+    lbl_stand:'Booth name / number <span class="req">*</span>', ph_stand:'e.g. Booth B12 – Hall 3',
+    lbl_delivery_address:'Full delivery address <span class="req">*</span>', ph_delivery_address:'Number, street, building, hall, access, code... (where should we deliver?)',
+    lbl_onsite:'On-site contact (to call on delivery)', ph_onsite:'e.g. Marie, booth manager',
+    lbl_onsite_phone:'On-site contact phone',
+    lbl_rental_type:'Rental type <span class="req">*</span>',
+    seg_punctual_t:'One-off rental', seg_punctual_d:'One event or trade show: set-up then teardown.',
+    seg_monthly_t:'Monthly rental', seg_monthly_d:'Office or other: recurring visit every month.',
+    lbl_setup_date:'Set-up date <span class="req">*</span>', lbl_teardown_date:'Teardown / return date <span class="req">*</span>',
+    lbl_start_date:'Start date <span class="req">*</span>', lbl_until:'Until when? <span class="req">*</span>',
+    lbl_freq:'Visit frequency per month <span class="req">*</span>',
+    opt_select:'Select...', freq_1m:'1 visit / month', freq_2m:'2 visits / month', freq_3m:'3 visits / month', freq_1w:'1 visit / week', freq_2w:'2 visits / week', freq_ondemand:'On demand / to be defined',
+    s3_title:'Your selection', s3_sub:'Packs & options',
+    s3_intro:'Choose one or more packs. Coffee, water and basic supplies are already included in each pack.',
+    s3_addons:'Options & extras', s3_addons_note:'Prices excl. VAT, in addition to your pack.',
+    s3_summary:'Summary of your selection',
+    s4_title:'Additional information', s4_sub:'Optional',
+    lbl_notes:'Details, specific needs, access times...', ph_notes:'e.g. Booth access possible from 7am, please plan a 230V power supply, expected number of visitors on the booth...',
+    lbl_source:'How did you hear about us?',
+    src_reco:'Recommendation / Word of mouth', src_web:'Internet search', src_social:'Social media', src_client:'Existing customer', src_other:'Other',
+    lbl_budget:'Estimated budget (optional)', ph_budget:'e.g. €500 - €1000',
+    submit_btn:'Send my request', submit_note:'Your request will be sent directly to our team. Reply within 24 business hours.',
+    success_title:'Request sent<br><em>successfully!</em>',
+    success_sub:'Your request has been sent to our team. A <strong>summary acknowledgement</strong> has just been emailed to you. We will contact you within 24h to confirm availability and prepare your quote.',
+    success_reset:'↩ Make a new request',
+    // dynamic
+    quote_on_request:'On quote', none_selected:'(no selection specified)',
+    err_billing:'Please complete the billing details',
+    err_delivery:'Please fill in the event and delivery address',
+    err_dates_punctual:'Please indicate the set-up and teardown dates',
+    err_dates_order:'The teardown date must be after the set-up date',
+    err_dates_monthly:'Please complete the monthly rental details',
+    err_dates_order2:'The end date must be after the start date',
+    err_select:'Please select at least one pack or option',
+    err_send:'Error while sending, please try again',
+    team_notified:'Team notified by email ✓', ack_sent:'Acknowledgement sent to the client ✓',
+    row_company:'Company', row_event:'Event', row_stand:'Booth', row_delivery:'Delivery',
+    row_setup:'Set-up', row_teardown:'Teardown', row_monthly:'Monthly rental',
+    row_selection:'Selection', row_ack:'📧 Acknowledgement', ack_sent_to:'sent to'
+  }
+};
+function t(k){ return (I18N[LANG] && I18N[LANG][k]!=null) ? I18N[LANG][k] : (I18N.fr[k]!=null?I18N.fr[k]:k); }
+// Renvoie la valeur traduite d'un champ de PACKS/ADDONS (ex: 'name' -> name_en en anglais)
+function tf(obj, field){ if(LANG==='en' && obj[field+'_en']!=null) return obj[field+'_en']; return obj[field]; }
+function dateLocale(){ return LANG==='en' ? 'en-GB' : 'fr-FR'; }
+
+function applyLang(lang){
+  LANG = (lang==='en') ? 'en' : 'fr';
+  try{ localStorage.setItem('ec_lang', LANG); }catch(e){}
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=t(el.getAttribute('data-i18n')); if(v!=null) el.innerHTML=v; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const v=t(el.getAttribute('data-i18n-ph')); if(v!=null) el.setAttribute('placeholder', v); });
+  const fr=document.getElementById('lang-fr'), en=document.getElementById('lang-en');
+  if(fr) fr.classList.toggle('active', LANG==='fr');
+  if(en) en.classList.toggle('active', LANG==='en');
+  // Reconstruire les parties dynamiques
+  try{ buildPacks(); buildAddons(); updateSummary(); }catch(e){}
+}
+
+
 const sel = {};         // packs : { packId: qty }
 const swapped = {};     // packs Events : { packId: true } => Covim150 remplacée par Zenius200
 const addonSel = {};    // options : { addonId: qty }
 
-function eur(n){ return (n%1===0? n : n.toFixed(2).replace('.',',')) + '€ HT'; }
+function eur(n){ const num=(n%1===0)? n : (LANG==='en'? n.toFixed(2) : n.toFixed(2).replace('.',',')); return num + (LANG==='en'?'€ excl. VAT':'€ HT'); }
 
 // ---------- Construction des cartes PACKS ----------
 function buildPacks(){
   const cont = document.getElementById('packs-container');
-  // Rendu groupé par catégorie
+  // Rendu groupé par catégorie (libellé traduit)
   const cats = [...new Set(PACKS.map(p=>p.cat))];
   cont.innerHTML = cats.map(cat => {
     const items = PACKS.filter(p=>p.cat===cat);
-    return `<div class="pack-cat">${cat}</div><div class="pack-grid">` +
+    const catLabel = tf(items[0],'cat');
+    return `<div class="pack-cat">${catLabel}</div><div class="pack-grid">` +
       items.map(p => packCardHtml(p)).join('') + `</div>`;
   }).join('');
 }
@@ -551,16 +702,16 @@ function packCardHtml(p){
   const swap = p.swap ? `
     <label class="pack-swap" onclick="event.stopPropagation()">
       <input type="checkbox" id="swap-${p.id}" ${swapped[p.id]?'checked':''} onchange="toggleSwap('${p.id}')">
-      <span class="pack-swap-txt">${p.swap.label} <b>(+${p.swap.extra}€ HT)</b></span>
+      <span class="pack-swap-txt">${tf(p.swap,'label')} <b>(+${p.swap.extra}€ HT)</b></span>
     </label>` : '';
   return `<div class="pack-card${p.featured?' featured':''}${qty>0?' sel':''}" id="pk-${p.id}">
-    ${p.tag?`<div class="pack-tag">${p.tag}</div>`:''}
-    <div class="pack-name">${p.name}</div>
-    <div class="pack-desc">${p.desc}</div>
-    <ul class="pack-incl">${p.includes.map(i=>`<li>${i}</li>`).join('')}</ul>
+    ${p.tag?`<div class="pack-tag">${tf(p,'tag')}</div>`:''}
+    <div class="pack-name">${tf(p,'name')}</div>
+    <div class="pack-desc">${tf(p,'desc')}</div>
+    <ul class="pack-incl">${tf(p,'includes').map(i=>`<li>${i}</li>`).join('')}</ul>
     ${swap}
     <div class="pack-foot">
-      <span class="pack-price">${p.price?eur(p.price):'Sur devis'}</span>
+      <span class="pack-price">${p.price?eur(p.price):t('quote_on_request')}</span>
       <div class="qty-ctrl">
         <button class="qty-btn" onclick="adjPack('${p.id}',-1)">−</button>
         <span class="qty-val${qty>0?' active':''}" id="pq-${p.id}">${qty}</span>
@@ -589,12 +740,12 @@ function buildAddons(){
     const qty = addonSel[a.id]||0;
     let priceTxt, priceCls='addon-price';
     if(a.price){ priceTxt = '+'+eur(a.price); }
-    else if(a.note){ priceTxt = a.note; priceCls += ' free'; }
-    else { priceTxt = 'Sur devis'; priceCls += ' free'; }
-    if(a.id==='bonbonne_sup'){ priceTxt = a.note; priceCls='addon-price'; }
+    else if(a.note){ priceTxt = tf(a,'note'); priceCls += ' free'; }
+    else { priceTxt = t('quote_on_request'); priceCls += ' free'; }
+    if(a.id==='bonbonne_sup'){ priceTxt = tf(a,'note'); priceCls='addon-price'; }
     return `<div class="addon-card${qty>0?' sel':''}" id="ad-${a.id}">
       <div class="addon-info">
-        <div class="addon-name">${a.name}</div>
+        <div class="addon-name">${tf(a,'name')}</div>
         <div class="${priceCls}">${priceTxt}</div>
       </div>
       <div class="qty-ctrl">
@@ -626,7 +777,7 @@ function selectionChips(){
   PACKS.forEach(p => {
     const q = sel[p.id]||0;
     if(q>0){
-      let label = `${q}× ${p.name}`;
+      let label = `${q}× ${tf(p,'name')}`;
       if(p.swap && swapped[p.id]) label += ' (→ Zenius200 +'+p.swap.extra+'€)';
       chips.push(label);
     }
@@ -634,7 +785,7 @@ function selectionChips(){
   ADDONS.forEach(a => {
     const q = addonSel[a.id]||0;
     if(q>0){
-      let label = `${q}× ${a.name}`;
+      let label = `${q}× ${tf(a,'name')}`;
       if(a.id==='bonbonne_sup'){ label += ` (${hasWaterBase()?'19,90':'23,90'}€ HT)`; }
       chips.push(label);
     }
@@ -685,14 +836,27 @@ function setStep(n, state){
 }
 
 // ---------- Firebase init + email config ----------
-let db = null, fbReady = false;
+let db = null, fbReady = false, fbAuth = null;
+const authRequired = (window.REQUIRE_AUTH === true);
 (function initFirebase(){
   const cfg = window.FIREBASE_CONFIG;
   if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
     try { firebase.initializeApp(cfg); db = firebase.database(); fbReady = true; }
     catch(e){ console.error('Firebase init error', e); }
+    if(authRequired){
+      try{ fbAuth = firebase.auth(); }catch(e){ console.warn('Auth indisponible', e); fbAuth=null; }
+    }
   }
 })();
+
+// Connexion anonyme (best effort) : nécessaire quand les règles Firebase exigent
+// une authentification. Le client envoie sa demande sans créer de compte.
+async function ensureAnonAuth(){
+  if(!authRequired || !fbAuth) return;
+  try{
+    if(!fbAuth.currentUser){ await fbAuth.signInAnonymously(); }
+  }catch(e){ console.warn('Connexion anonyme impossible (Anonymous Auth désactivé ?)', e); }
+}
 
 let emailCfg = {};
 function fileEmailCfg(){
@@ -744,9 +908,12 @@ function buildSelectionData(){
 }
 function selectionText(packs, addons){
   const lines = [];
-  packs.forEach(p => lines.push(`   • ${p.qty}× ${p.name}${p.swap?` (Covim150 remplacée par Zenius200, +${p.swapExtra}€ HT)`:''}`));
-  addons.forEach(a => lines.push(`   • ${a.qty}× ${a.name}${a.price?` (+${(a.price%1===0?a.price:a.price.toFixed(2)).toString().replace('.',',')}€ HT)`:''}`));
-  return lines.length ? lines.join('\n') : '   • (aucune sélection précisée)';
+  const swapNote = LANG==='en' ? 'Covim150 swapped for Zenius200' : 'Covim150 remplacée par Zenius200';
+  const vat = LANG==='en' ? '€ excl. VAT' : '€ HT';
+  const nameOf = (arr,id,fallback)=>{ const o=arr.find(x=>x.id===id); return o? tf(o,'name') : fallback; };
+  packs.forEach(p => lines.push(`   • ${p.qty}× ${nameOf(PACKS,p.id,p.name)}${p.swap?` (${swapNote}, +${p.swapExtra}${vat})`:''}`));
+  addons.forEach(a => lines.push(`   • ${a.qty}× ${nameOf(ADDONS,a.id,a.name)}${a.price?` (+${(a.price%1===0?a.price:(LANG==='en'?a.price.toFixed(2):a.price.toFixed(2).replace('.',','))).toString()}${vat})`:''}`));
+  return lines.length ? lines.join('\n') : '   • '+t('none_selected');
 }
 
 async function sendFormEmail(row, packs, addons){
@@ -797,29 +964,122 @@ Connu via : ${row.source||'—'}
         time: new Date().toLocaleString('fr-FR')
       });
     }
-    showToast('Équipe notifiée par email ✓','success');
+    showToast(t('team_notified'),'success');
   }catch(e){ console.error('Erreur envoi email :', e); }
+}
+
+// ---------- Accusé de réception envoyé AU CLIENT ----------
+async function sendClientAck(row, packs, addons){
+  await ensureEmailCfg();
+  if(typeof emailjs==='undefined'){ console.warn('EmailJS non chargé (accusé client)'); return; }
+  if(!emailCfg.pubkey || !emailCfg.service || !emailCfg.template){ console.warn('EmailJS : config absente (accusé client)'); return; }
+  if(!row.email){ console.warn('Pas d\'email client : accusé de réception non envoyé'); return; }
+  const ref = 'EC-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(row.createdAt||Date.now()).slice(-4);
+  const en = LANG==='en';
+  let message, subject;
+  if(en){
+    const datesTxt = row.rentalType==='mensuelle'
+      ? `Monthly rental · Start: ${formatDate(row.start)} → ${formatDate(row.end)} · Frequency: ${row.tourFreq||'—'}`
+      : `Set-up: ${formatDate(row.start)}\nTeardown / return: ${formatDate(row.end)}`;
+    subject = 'Acknowledgement of your request — EauService by Events Café';
+    message =
+`Hello ${row.clientName || row.billingName || ''},
+
+✅ We acknowledge receipt of your rental request and thank you for it.
+Your request has been registered under reference ${ref}.
+
+Here is a summary of your request:
+
+YOUR DETAILS
+Company: ${row.billingName || '—'}
+Contact: ${row.clientName || '—'}
+Email: ${row.email || '—'} · Phone: ${row.billingPhone || '—'}
+
+EVENT & DELIVERY
+Event: ${row.salon || '—'}
+Booth: ${row.stand || '—'}
+Delivery address: ${row.deliveryAddress || '—'}
+${datesTxt}
+
+YOUR SELECTION
+${selectionText(packs, addons)}
+
+Notes provided: ${row.notes || '—'}
+
+📌 Next step: our team will get back to you within 24 business hours to confirm availability and send you your personalised quote.
+
+For any question, simply reply to this email.
+
+See you soon,
+The EauService by Events Café team`;
+  } else {
+    const datesTxt = row.rentalType==='mensuelle'
+      ? `Location mensuelle · Début : ${formatDate(row.start)} → ${formatDate(row.end)} · Fréquence : ${row.tourFreq||'—'}`
+      : `Montage : ${formatDate(row.start)}\nDémontage / retour : ${formatDate(row.end)}`;
+    subject = 'Accusé de réception de votre demande — EauService by Events Café';
+    message =
+`Bonjour ${row.clientName || row.billingName || ''},
+
+✅ Nous accusons réception de votre demande de location et nous vous en remercions.
+Votre demande a bien été enregistrée sous la référence ${ref}.
+
+Voici le récapitulatif de votre demande :
+
+VOS COORDONNÉES
+Société : ${row.billingName || '—'}
+Interlocuteur : ${row.clientName || '—'}
+Email : ${row.email || '—'} · Tél : ${row.billingPhone || '—'}
+
+ÉVÉNEMENT & LIVRAISON
+Événement : ${row.salon || '—'}
+Stand : ${row.stand || '—'}
+Adresse de livraison : ${row.deliveryAddress || '—'}
+${datesTxt}
+
+VOTRE SÉLECTION
+${selectionText(packs, addons)}
+
+Précisions transmises : ${row.notes || '—'}
+
+📌 Prochaine étape : notre équipe revient vers vous sous 24h ouvrées pour confirmer la disponibilité et vous adresser votre devis personnalisé.
+
+Pour toute question, répondez simplement à cet email.
+
+À très vite,
+L'équipe EauService by Events Café`;
+  }
+  try{
+    emailjs.init(emailCfg.pubkey);
+    await emailjs.send(emailCfg.service, emailCfg.template, {
+      to_email: row.email,
+      to_name: row.clientName || row.billingName || 'Client',
+      subject: subject,
+      message: message,
+      time: new Date().toLocaleString(dateLocale())
+    });
+    showToast(t('ack_sent'),'success');
+  }catch(e){ console.error('Erreur envoi accusé client :', e); }
 }
 
 // ---------- Soumission ----------
 async function submitForm(){
   // Validation section 1
-  if(!step1ok()){ showToast('Merci de compléter les coordonnées de facturation','error'); return; }
+  if(!step1ok()){ showToast(t('err_billing'),'error'); return; }
   // Validation section 2
   const salon = val('f-salon'), stand = val('f-stand'), deliveryAddress = val('f-delivery-address');
-  if(!salon||!stand||!deliveryAddress){ showToast("Merci de renseigner l'événement et l'adresse de livraison",'error'); return; }
+  if(!salon||!stand||!deliveryAddress){ showToast(t('err_delivery'),'error'); return; }
 
   let start, end, tourFreq = '';
   if(rentalType==='ponctuelle'){
     start = val('f-start'); end = val('f-end');
-    if(!start||!end){ showToast('Merci d\'indiquer les dates de montage et démontage','error'); return; }
-    if(end < start){ showToast('La date de démontage doit être après le montage','error'); return; }
+    if(!start||!end){ showToast(t('err_dates_punctual'),'error'); return; }
+    if(end < start){ showToast(t('err_dates_order'),'error'); return; }
   } else {
     start = val('f-tour-start'); end = val('f-tour-until'); tourFreq = val('f-tour-freq');
-    if(!start||!end||!tourFreq){ showToast('Merci de compléter les infos de la location mensuelle','error'); return; }
-    if(end < start){ showToast('La date de fin doit être après le début','error'); return; }
+    if(!start||!end||!tourFreq){ showToast(t('err_dates_monthly'),'error'); return; }
+    if(end < start){ showToast(t('err_dates_order2'),'error'); return; }
   }
-  if(!step3ok()){ showToast('Merci de sélectionner au moins un pack ou une option','error'); return; }
+  if(!step3ok()){ showToast(t('err_select'),'error'); return; }
 
   const { packs, addons, material, itemLabels } = buildSelectionData();
   const billingName = val('f-billing-name');
@@ -857,11 +1117,12 @@ async function submitForm(){
   const btn = document.querySelector('.submit-btn');
   btn.style.pointerEvents='none'; btn.style.opacity='.7';
   try {
-    if(fbReady){ const r = db.ref('events').push(); await r.set(Object.assign({id:r.key}, row)); }
+    if(fbReady){ await ensureAnonAuth(); const r = db.ref('events').push(); await r.set(Object.assign({id:r.key}, row)); }
     else { const pending = JSON.parse(localStorage.getItem('ep_events')||'[]'); pending.push(Object.assign({id:'loc_'+Date.now()}, row)); localStorage.setItem('ep_events', JSON.stringify(pending)); }
     sendFormEmail(row, packs, addons);
+    sendClientAck(row, packs, addons);
     showSuccess(row, packs, addons);
-  } catch(e){ console.error(e); showToast('Erreur lors de l\'envoi, réessayez','error'); }
+  } catch(e){ console.error(e); showToast(t('err_send'),'error'); }
   btn.style.pointerEvents=''; btn.style.opacity='';
 }
 
@@ -869,18 +1130,21 @@ function showSuccess(ev, packs, addons){
   document.getElementById('form-wrap').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
-  const selTxt = [...packs.map(p=>`${p.qty}× ${p.name}${p.swap?' (→ Zenius200)':''}`), ...addons.map(a=>`${a.qty}× ${a.name}`)].join(', ') || '—';
+  const nameP=(id,fb)=>{const o=PACKS.find(x=>x.id===id);return o?tf(o,'name'):fb;};
+  const nameA=(id,fb)=>{const o=ADDONS.find(x=>x.id===id);return o?tf(o,'name'):fb;};
+  const selTxt = [...packs.map(p=>`${p.qty}× ${nameP(p.id,p.name)}${p.swap?' (→ Zenius200)':''}`), ...addons.map(a=>`${a.qty}× ${nameA(a.id,a.name)}`)].join(', ') || '—';
   const datesRow = ev.rentalType==='mensuelle'
-    ? `<div class="success-row"><span class="success-row-label">Location mensuelle</span><span class="success-row-val">${formatDate(ev.start)} → ${formatDate(ev.end)}<br>${ev.tourFreq||''}</span></div>`
-    : `<div class="success-row"><span class="success-row-label">Montage</span><span class="success-row-val">${formatDate(ev.start)}</span></div>
-       <div class="success-row"><span class="success-row-label">Démontage</span><span class="success-row-val">${formatDate(ev.end)}</span></div>`;
+    ? `<div class="success-row"><span class="success-row-label">${t('row_monthly')}</span><span class="success-row-val">${formatDate(ev.start)} → ${formatDate(ev.end)}<br>${ev.tourFreq||''}</span></div>`
+    : `<div class="success-row"><span class="success-row-label">${t('row_setup')}</span><span class="success-row-val">${formatDate(ev.start)}</span></div>
+       <div class="success-row"><span class="success-row-label">${t('row_teardown')}</span><span class="success-row-val">${formatDate(ev.end)}</span></div>`;
   document.getElementById('success-details').innerHTML = `
-    <div class="success-row"><span class="success-row-label">Société</span><span class="success-row-val">${ev.billingName}</span></div>
-    <div class="success-row"><span class="success-row-label">Événement</span><span class="success-row-val">${ev.salon}</span></div>
-    <div class="success-row"><span class="success-row-label">Stand</span><span class="success-row-val">${ev.stand}</span></div>
-    <div class="success-row"><span class="success-row-label">Livraison</span><span class="success-row-val" style="max-width:280px">${ev.deliveryAddress||'—'}</span></div>
+    <div class="success-row"><span class="success-row-label">${t('row_company')}</span><span class="success-row-val">${ev.billingName}</span></div>
+    <div class="success-row"><span class="success-row-label">${t('row_event')}</span><span class="success-row-val">${ev.salon}</span></div>
+    <div class="success-row"><span class="success-row-label">${t('row_stand')}</span><span class="success-row-val">${ev.stand}</span></div>
+    <div class="success-row"><span class="success-row-label">${t('row_delivery')}</span><span class="success-row-val" style="max-width:280px">${ev.deliveryAddress||'—'}</span></div>
     ${datesRow}
-    <div class="success-row"><span class="success-row-label">Sélection</span><span class="success-row-val" style="max-width:280px">${selTxt}</span></div>`;
+    <div class="success-row"><span class="success-row-label">${t('row_selection')}</span><span class="success-row-val" style="max-width:280px">${selTxt}</span></div>
+    <div class="success-row"><span class="success-row-label">${t('row_ack')}</span><span class="success-row-val" style="max-width:280px">${ev.email?(t('ack_sent_to')+' '+ev.email):'—'}</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display = 'block';
@@ -893,7 +1157,7 @@ function resetForm(){
   buildPacks(); buildAddons(); updateSummary(); updateProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function formatDate(d){ if(!d) return '—'; return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function formatDate(d){ if(!d) return '—'; return new Date(d+'T12:00:00').toLocaleDateString(dateLocale(),{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 function showToast(msg, type='info'){
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = `toast ${type} show`;
@@ -906,6 +1170,7 @@ buildAddons();
 setRentalType('ponctuelle');
 updateProgress();
 loadEmailCfg();
+applyLang(LANG);
 </script>
 </body>
 </html>

@@ -516,6 +516,29 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
   <div style="font-size:12px;color:var(--text3);margin-top:4px;">Connexion Firebase...</div>
 </div>
 
+<!-- ÉCRAN DE CONNEXION (affiché uniquement si window.REQUIRE_AUTH = true) -->
+<div id="login-screen" class="loading-overlay" style="display:none;flex-direction:column;">
+  <div style="width:100%;max-width:340px;padding:0 20px;">
+    <div class="loading-logo" style="text-align:center;margin-bottom:6px;">Events <span>Café</span></div>
+    <div style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:22px;">Accès réservé — connecte-toi pour gérer tes événements</div>
+    <div class="config-panel" style="background:var(--bg2);">
+      <div class="cfg-group" style="margin-bottom:12px;">
+        <label class="cfg-label">📧 Email</label>
+        <input class="cfg-input" id="login-email" type="email" autocomplete="username" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="cfg-group" style="margin-bottom:12px;">
+        <label class="cfg-label">🔒 Mot de passe</label>
+        <input class="cfg-input" id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()" style="width:100%;justify-content:center;">Se connecter</button>
+      <div id="login-error" style="font-size:12px;color:#fca5a5;margin-top:10px;text-align:center;display:none;"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6;">
+      Comptes gérés dans Firebase → Authentication.<br>Mot de passe oublié ? <a href="#" onclick="doResetPassword();return false;" style="color:var(--accent2);">Réinitialiser par email</a>
+    </div>
+  </div>
+</div>
+
 <div class="wrapper" id="app" style="display:none">
   <!-- Overlay mobile (DOIT être dans .wrapper pour que la sidebar passe au-dessus) -->
   <div class="mob-overlay" id="mob-overlay" onclick="closeSidebar()"></div>
@@ -617,7 +640,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
           <div style="font-size:12px;color:var(--text3)">Note tes missions &amp; heures pour ta facture</div>
         </div>
 
-        <div class="stats-row" id="plan-summary" style="margin-bottom:16px;grid-template-columns:repeat(2,1fr);max-width:520px;"></div>
+        <div class="stats-row" id="plan-summary" style="margin-bottom:16px;grid-template-columns:repeat(3,1fr);max-width:780px;"></div>
 
         <div class="config-panel">
           <div class="config-title" id="plan-form-title">➕ Ajouter des heures</div>
@@ -628,6 +651,11 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
             <div class="cfg-group"><label class="cfg-label">💶 Taux €/h (optionnel)</label><input class="cfg-input" id="h-rate" type="number" min="0" step="0.5" placeholder="ex: 15"></div>
             <div class="cfg-group" style="grid-column:1/-1"><label class="cfg-label">🛠️ Mission effectuée</label><input class="cfg-input" id="h-mission" list="h-mission-list" placeholder="ex: Livraison + montage du stand"><datalist id="h-mission-list"><option>Livraison</option><option>Montage</option><option>Démontage</option><option>Récupération matériel</option><option>Installation</option><option>Maintenance / dépannage</option><option>Déplacement / route</option><option>Préparation matériel</option></datalist></div>
             <div class="cfg-group" style="grid-column:1/-1"><label class="cfg-label">🎪 Événement lié (optionnel)</label><input class="cfg-input" id="h-event" list="h-event-list" placeholder="ex: Festival de Cannes"><datalist id="h-event-list"></datalist></div>
+            <div class="cfg-group" style="grid-column:1/-1">
+              <label class="cfg-label">🧾 Frais avancés à rembourser (péage, parking, carburant…)</label>
+              <div id="h-expenses-list"></div>
+              <button type="button" class="btn btn-ghost" onclick="addExpenseRow()" style="font-size:12px;padding:6px 12px;margin-top:6px;align-self:flex-start;">＋ Ajouter un frais</button>
+            </div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
             <button class="btn btn-primary" id="h-save-btn" onclick="addOrUpdateHour()">➕ Ajouter</button>
@@ -740,6 +768,15 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
 
       <!-- CONFIG -->
       <div id="tab-config" class="section">
+        <div class="config-panel" id="account-panel" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <div>
+              <div class="config-title">👤 Compte connecté</div>
+              <div class="config-sub" id="account-email">—</div>
+            </div>
+            <button class="btn btn-ghost" onclick="logout()">🚪 Se déconnecter</button>
+          </div>
+        </div>
         <div class="config-panel">
           <div class="config-title">🔥 Connexion Firebase</div>
           <div class="config-sub">Les données sont partagées en temps réel entre toi, ton frère et le formulaire client.</div>
@@ -1245,6 +1282,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="firebase-config.js"></script>
 
@@ -1324,6 +1362,9 @@ let hoursList = JSON.parse(localStorage.getItem('ep_hours')||'[]'), editingHourI
 let planningDefaults = JSON.parse(localStorage.getItem('ep_plan_def')||'{}');
 let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
 let db = null, fbReady = false;
+let auth = null;                                   // Firebase Auth (si activé)
+let authRequired = (window.REQUIRE_AUTH === true); // activé via firebase-config.js
+let currentUser = null, appBooted = false;
 let prevEventsSnapshot = {};
 let isFirstLoad = true;
 let activityLog = JSON.parse(localStorage.getItem('ep_activity')||'[]');
@@ -1348,6 +1389,13 @@ let ejsCfg = JSON.parse(localStorage.getItem('ep_ejs')||'{}');
   if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
     try{firebase.initializeApp(cfg); db=firebase.database(); fbReady=true;}
     catch(e){console.error('Firebase init',e);}
+    // Authentification (optionnelle) : activée si window.REQUIRE_AUTH = true
+    if(authRequired){
+      try{
+        auth = firebase.auth();
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+      }catch(e){ console.warn('Firebase Auth indisponible', e); auth=null; }
+    }
   }
 })();
 
@@ -2084,9 +2132,39 @@ async function persistHourDelete(id){
   if(fbReady) queuedWrite('remove', 'hours/'+id, null);
 }
 function hourAmount(h){ const r=parseFloat(h.rate)||0, hr=parseFloat(h.hours)||0; return r>0?r*hr:0; }
+// Total des frais avancés (à rembourser) d'une saisie
+function hourExpenses(h){ return (h.expenses||[]).reduce((s,e)=>s+(parseFloat(e.amount)||0),0); }
 function fmtMoney(n){ return (n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
 function planFmtDate(d){ if(!d)return'—'; try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}catch(e){return d;} }
 function moisLabel(m){ try{const p=m.split('-'); return new Date(+p[0],+p[1]-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});}catch(e){return m;} }
+
+// ── Frais avancés à rembourser (lignes dynamiques du formulaire) ──
+let currentExpenses = []; // [{label, amount}]
+function renderExpenseRows(){
+  const c=document.getElementById('h-expenses-list'); if(!c) return;
+  if(!currentExpenses.length){
+    c.innerHTML='<div style="font-size:11px;color:var(--text3);padding:2px 0;">Aucun frais avancé. Ajoute un péage, un parking, du carburant payé de ta poche…</div>';
+    return;
+  }
+  c.innerHTML=currentExpenses.map((e,i)=>`
+    <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
+      <input class="cfg-input" style="flex:1" placeholder="ex: Péage A7" value="${esc(e.label||'')}" oninput="updateExpense(${i},'label',this.value)">
+      <div style="position:relative;width:120px;flex-shrink:0;">
+        <input class="cfg-input" style="width:100%;padding-right:22px;" type="number" min="0" step="0.01" placeholder="0.00" value="${e.amount!==''&&e.amount!=null?e.amount:''}" oninput="updateExpense(${i},'amount',this.value)">
+        <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none;">€</span>
+      </div>
+      <button class="btn-xs danger" type="button" onclick="removeExpenseRow(${i})" title="Retirer ce frais">🗑</button>
+    </div>`).join('');
+}
+function addExpenseRow(){ currentExpenses.push({label:'',amount:''}); renderExpenseRows(); }
+function updateExpense(i,key,val){ if(currentExpenses[i]) currentExpenses[i][key]=val; }
+function removeExpenseRow(i){ currentExpenses.splice(i,1); renderExpenseRows(); }
+// Nettoie les frais saisis (retire les lignes vides) pour l'enregistrement
+function collectExpenses(){
+  return currentExpenses
+    .map(e=>({label:(e.label||'').trim(), amount:Math.round((parseFloat(e.amount)||0)*100)/100}))
+    .filter(e=>e.label || e.amount>0);
+}
 
 function addOrUpdateHour(){
   const date=document.getElementById('h-date').value;
@@ -2098,7 +2176,8 @@ function addOrUpdateHour(){
   if(!date){ showToast('Indique la date','error'); return; }
   if(!hours||hours<=0){ showToast('Indique un nombre d\'heures valide','error'); return; }
   if(!mission){ showToast('Indique la mission effectuée','error'); return; }
-  const data={date,hours,worker,mission,event:evName,rate,createdAt:Date.now()};
+  const expenses=collectExpenses();
+  const data={date,hours,worker,mission,event:evName,rate,expenses,createdAt:Date.now()};
   planningDefaults={worker,rate};
   try{localStorage.setItem('ep_plan_def',JSON.stringify(planningDefaults));}catch(e){}
   if(editingHourId){ persistHourUpdate(editingHourId,data); showToast('Heures mises à jour ✓','success'); }
@@ -2114,6 +2193,8 @@ function editHour(id){
   document.getElementById('h-mission').value=h.mission||'';
   document.getElementById('h-event').value=h.event||'';
   document.getElementById('h-rate').value=h.rate||'';
+  currentExpenses=(h.expenses||[]).map(e=>({label:e.label||'',amount:(e.amount!=null?e.amount:'')}));
+  renderExpenseRows();
   document.getElementById('plan-form-title').textContent='✏️ Modifier la saisie';
   document.getElementById('h-save-btn').textContent='💾 Enregistrer';
   document.getElementById('h-cancel-btn').style.display='';
@@ -2125,6 +2206,7 @@ function cancelHourEdit(){
   ['h-hours','h-mission','h-event'].forEach(id=>{const el=document.getElementById(id); if(el)el.value='';});
   const wEl=document.getElementById('h-worker'); if(wEl) wEl.value=planningDefaults.worker||'';
   const rEl=document.getElementById('h-rate'); if(rEl) rEl.value=planningDefaults.rate||'';
+  currentExpenses=[]; renderExpenseRows();
   const t=document.getElementById('plan-form-title'); if(t) t.textContent='➕ Ajouter des heures';
   const b=document.getElementById('h-save-btn'); if(b) b.textContent='➕ Ajouter';
   const c=document.getElementById('h-cancel-btn'); if(c) c.style.display='none';
@@ -2159,21 +2241,28 @@ function renderPlanning(){
   const list=planningFilteredList().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const totalH=list.reduce((s,h)=>s+(parseFloat(h.hours)||0),0);
   const totalAmt=list.reduce((s,h)=>s+hourAmount(h),0);
+  const totalExp=list.reduce((s,h)=>s+hourExpenses(h),0);
   document.getElementById('plan-summary').innerHTML=`
     <div class="stat-card blue"><div class="stat-label">Heures du mois</div><div class="stat-value" style="color:var(--accent2)">${totalH.toLocaleString('fr-FR')}<span style="font-size:13px;color:var(--text3)"> h</span></div><div class="stat-sub">${list.length} saisie(s)</div><div class="stat-icon">⏱️</div></div>
-    <div class="stat-card green"><div class="stat-label">À facturer</div><div class="stat-value" style="color:var(--green2);font-size:22px">${totalAmt>0?fmtMoney(totalAmt):'—'}</div><div class="stat-sub">${monthEl.value?moisLabel(monthEl.value):''}</div><div class="stat-icon">💶</div></div>`;
+    <div class="stat-card green"><div class="stat-label">À facturer</div><div class="stat-value" style="color:var(--green2);font-size:22px">${totalAmt>0?fmtMoney(totalAmt):'—'}</div><div class="stat-sub">${monthEl.value?moisLabel(monthEl.value):''}</div><div class="stat-icon">💶</div></div>
+    <div class="stat-card orange"><div class="stat-label">À rembourser</div><div class="stat-value" style="color:#fdba74;font-size:22px">${totalExp>0?fmtMoney(totalExp):'—'}</div><div class="stat-sub">Frais avancés (péage, parking…)</div><div class="stat-icon">🧾</div></div>`;
   const cont=document.getElementById('plan-list');
   if(!list.length){ cont.innerHTML='<div class="empty"><div class="empty-icon">⏱️</div><div class="empty-text">Aucune heure saisie pour ce mois</div></div>'; return; }
   cont.innerHTML=list.map(h=>{
     const amt=hourAmount(h);
+    const exp=hourExpenses(h);
+    const expChips=(h.expenses||[]).filter(e=>(e.label||'')||(parseFloat(e.amount)||0)>0)
+      .map(e=>`<span style="font-size:10px;padding:2px 8px;border-radius:6px;background:rgba(249,115,22,.12);color:#fdba74;border:1px solid rgba(249,115,22,.25);">🧾 ${esc(e.label||'Frais')}${(parseFloat(e.amount)||0)>0?' · '+fmtMoney(parseFloat(e.amount)||0):''}</span>`).join('');
     return `<div class="plan-entry">
       <div class="pe-main">
         <div class="pe-mission">${h.mission||'—'}${h.worker?` · <span style="color:var(--text3);font-weight:400">${h.worker}</span>`:''}</div>
         <div class="pe-sub">📅 ${planFmtDate(h.date)}${h.event?` · 🎪 ${h.event}`:''}${h.rate?` · ${h.rate}€/h`:''}</div>
+        ${expChips?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">${expChips}</div>`:''}
       </div>
       <div style="text-align:right">
         <div class="pe-hours">${(parseFloat(h.hours)||0).toLocaleString('fr-FR')} h</div>
         ${amt>0?`<div class="pe-amount">${fmtMoney(amt)}</div>`:''}
+        ${exp>0?`<div style="font-size:11px;color:#fdba74;margin-top:2px;white-space:nowrap;">+ ${fmtMoney(exp)} à rembourser</div>`:''}
       </div>
       <div style="display:flex;gap:5px;">
         <button class="btn-xs" onclick="editHour('${h.id}')">✏️</button>
@@ -2189,9 +2278,16 @@ function copyPlanningSummary(){
   if(!list.length){ showToast('Rien à copier pour ce mois','info'); return; }
   const totalH=list.reduce((s,h)=>s+(parseFloat(h.hours)||0),0);
   const totalAmt=list.reduce((s,h)=>s+hourAmount(h),0);
+  const totalExp=list.reduce((s,h)=>s+hourExpenses(h),0);
   let txt=`RÉCAP HEURES — ${moisLabel(month)}${filterWorker?' — '+filterWorker:''}\n\n`;
-  list.forEach(h=>{ txt+=`• ${planFmtDate(h.date)} — ${h.mission}${h.event?' ('+h.event+')':''} : ${(parseFloat(h.hours)||0)} h${hourAmount(h)>0?' = '+fmtMoney(hourAmount(h)):''}\n`; });
+  list.forEach(h=>{
+    txt+=`• ${planFmtDate(h.date)} — ${h.mission}${h.event?' ('+h.event+')':''} : ${(parseFloat(h.hours)||0)} h${hourAmount(h)>0?' = '+fmtMoney(hourAmount(h)):''}\n`;
+    (h.expenses||[]).filter(e=>(e.label||'')||(parseFloat(e.amount)||0)>0).forEach(e=>{
+      txt+=`    🧾 ${e.label||'Frais'} : ${fmtMoney(parseFloat(e.amount)||0)} (à rembourser)\n`;
+    });
+  });
   txt+=`\nTOTAL : ${totalH} h${totalAmt>0?' = '+fmtMoney(totalAmt):''}`;
+  if(totalExp>0) txt+=`\nFRAIS AVANCÉS À REMBOURSER : ${fmtMoney(totalExp)}`;
   if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>showToast('Récap copié ✓','success')).catch(()=>showToast('Copie impossible','error')); }
   else showToast('Copie non supportée sur ce navigateur','error');
 }
@@ -2634,8 +2730,19 @@ function renderAnalytics(){
 // Stocké dans Firebase /catalogue + localStorage 'ep_catalogue'
 // ══════════════════════════════════════════════════════
 
-// Produits par défaut (si aucun catalogue en base)
+// Packs clé en main (alignés sur le formulaire client) — base de notre fonctionnement
+const DEFAULT_PACKS = [
+  {id:'pack_eau',            label:'Pack Eau',                        icon:'💧', color:'#0ea5e9', cat:'pack', stock:20, active:true, desc:'Fontaine à eau + 1 bonbonne + 100 gobelets'},
+  {id:'pack_events_base',    label:'Pack Events de Base',             icon:'📦', color:'#3b82f6', cat:'pack', stock:10, active:true, desc:'Fontaine + bonbonne + 100 gobelets + machine Covim150 (kit 150)'},
+  {id:'pack_events_complet', label:'Pack Events Complet',             icon:'🎪', color:'#f59e0b', cat:'pack', stock:8,  active:true, desc:'Fontaine + 2 bonbonnes + 200 gobelets + Covim150 (kit 150) + frigo table top'},
+  {id:'pack_nespresso_200',  label:'Machine Nespresso + Kit 200',     icon:'☕', color:'#8b5cf6', cat:'pack', stock:6,  active:true, desc:'Nespresso Zenius + 200 capsules + touillettes & sucre'},
+  {id:'pack_covim_150',      label:'Machine Covim/Lavazza + Kit 150', icon:'☕', color:'#7c3aed', cat:'pack', stock:8,  active:true, desc:'Machine Covim ou Lavazza + 150 capsules + consommables'},
+  {id:'pack_gemini_400',     label:'Machine Gemini + Kit 400',        icon:'☕', color:'#a855f7', cat:'pack', stock:4,  active:true, desc:'Nespresso Gemini + kit 400 + consommables'},
+];
+
+// Produits par défaut (si aucun catalogue en base) — les packs en tête
 const DEFAULT_CATALOGUE = [
+  ...DEFAULT_PACKS.map(p=>({...p})),
   {id:'fontaine_eau',  label:'Fontaine à eau',         icon:'💧', color:'#0ea5e9', cat:'eau',     stock:40, active:true},
   {id:'bonbonne',      label:'Bonbonnes',               icon:'🫙', color:'#0369a1', cat:'eau',     stock:80, active:true},
   {id:'gobelet',       label:'Gobelets (lot 50)',        icon:'🥤', color:'#38bdf8', cat:'eau',     stock:60, active:true},
@@ -2655,6 +2762,7 @@ const DEFAULT_CATALOGUE = [
 ];
 
 const CAT_LABELS_BASE = {
+  pack:'📦 Packs clé en main',
   eau:'💧 Eau & Boissons', cafe:'☕ Machines Café', grains:'🌰 Café Grains',
   frigo:'🧊 Réfrigération', mobilier:'🪑 Mobilier', ventil:'🌀 Ventilation', autre:'📦 Autre'
 };
@@ -2665,6 +2773,21 @@ const CAT_LABELS = new Proxy(CAT_LABELS_BASE, {
 
 let catalogue = JSON.parse(localStorage.getItem('ep_catalogue')||'null') || DEFAULT_CATALOGUE.map(p=>({...p}));
 let catEditingId = null;
+
+// Packs supprimés volontairement (pour ne pas les ré-injecter automatiquement)
+let deletedPacks = JSON.parse(localStorage.getItem('ep_deleted_packs')||'[]');
+// Injecte les packs clé en main manquants dans le catalogue (migration douce, non destructive).
+// Respecte les packs que l'utilisateur a explicitement supprimés. Retourne true si le catalogue a changé.
+function mergeDefaultPacks(){
+  const missing = DEFAULT_PACKS.filter(pk => !catalogue.some(p=>p.id===pk.id) && !deletedPacks.includes(pk.id));
+  if(!missing.length) return false;
+  // On place les packs en tête du catalogue (regroupés ensemble pour l'affichage par catégorie)
+  catalogue = [...missing.map(p=>({...p})), ...catalogue];
+  missing.forEach(pk=>{ if(STOCK_DEFAULTS[pk.id]===undefined) STOCK_DEFAULTS[pk.id]=pk.stock||0; });
+  try{ localStorage.setItem('ep_catalogue', JSON.stringify(catalogue)); }catch(e){}
+  try{ localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS)); }catch(e){}
+  return true;
+}
 
 // Synchronise STOCK_META et STOCK_DEFAULTS depuis le catalogue dynamique
 function syncStockMetaFromCatalogue(){
@@ -2695,8 +2818,11 @@ function loadCatalogueFromFirebase(){
     const val = snap.val();
     if(val && Array.isArray(val) && val.length > 0){
       catalogue = val;
+      // Injecte les packs clé en main s'ils manquent (et propage vers Firebase une seule fois)
+      const added = mergeDefaultPacks();
       localStorage.setItem('ep_catalogue', JSON.stringify(catalogue));
       syncStockMetaFromCatalogue();
+      if(added){ queuedWrite('set', 'catalogue', catalogue); }
       renderAll();
       if(document.getElementById('tab-catalogue').classList.contains('active')) renderCatalogue();
     }
@@ -2820,6 +2946,11 @@ function deleteCatProduct(id){
   const p = catalogue.find(x=>x.id===id);
   if(!p) return;
   if(!confirm(`Supprimer "${p.label}" du catalogue ?\n\nAttention : si ce produit est utilisé dans des événements existants, les quantités resteront dans l'historique mais le nom n'apparaîtra plus.`)) return;
+  // Mémorise les packs supprimés volontairement pour ne pas les ré-injecter automatiquement
+  if(DEFAULT_PACKS.some(pk=>pk.id===id) && !deletedPacks.includes(id)){
+    deletedPacks.push(id);
+    try{ localStorage.setItem('ep_deleted_packs', JSON.stringify(deletedPacks)); }catch(e){}
+  }
   catalogue = catalogue.filter(x=>x.id!==id);
   saveCatalogue();
   showToast(`${p.label} supprimé du catalogue`, 'info');
@@ -3849,7 +3980,7 @@ function saveStockConfig(){
 // MODAL
 // ══════════════════════════════════════════════════════
 function buildMatGrid(cid,values={}){
-  const cats={eau:'💧 Eau & Boissons',cafe:'☕ Machines Café',grains:'🌰 Café Grains',frigo:'🧊 Réfrigération',mobilier:'🪑 Mobilier',ventil:'🌀 Ventilation'};
+  const cats={pack:'📦 Packs clé en main',eau:'💧 Eau & Boissons',cafe:'☕ Machines Café',grains:'🌰 Café Grains',frigo:'🧊 Réfrigération',mobilier:'🪑 Mobilier',ventil:'🌀 Ventilation'};
   let html='', lastCat='';
   // N'afficher que les produits actifs dans la modal de création d'événement
   const activeItems = STOCK_META.filter(si => si.active !== false);
@@ -4075,17 +4206,87 @@ function registerServiceWorker(){
 
 // Démarrage robuste : chaque étape est isolée pour qu'une erreur n'empêche jamais
 // la synchronisation Firebase de démarrer (cause du "Connexion..." figé sur mobile).
-function bootApp(){
+function startMainApp(){
+  if(appBooted) return;        // évite un double démarrage (onAuthStateChanged peut se déclencher plusieurs fois)
+  appBooted = true;
+  try{ document.getElementById('login-screen').style.display='none'; }catch(e){}
   try{ document.getElementById('loading-screen').style.display='none'; }catch(e){}
   try{ document.getElementById('app').style.display='flex'; }catch(e){}
   try{ if(ejsCfg.pubkey && typeof emailjs!=='undefined') emailjs.init(ejsCfg.pubkey); }catch(e){console.warn(e);}
   try{ loadEmailConfig(); }catch(e){console.warn('loadEmailConfig:',e);}
+  // Injecte les packs clé en main manquants + synchronise STOCK_META depuis le catalogue (offline inclus)
+  try{ mergeDefaultPacks(); syncStockMetaFromCatalogue(); }catch(e){console.warn('packs seed:',e);}
   try{ renderBadges(); }catch(e){console.warn('renderBadges:',e);}
   try{ updateQueueBadge(); }catch(e){console.warn('updateQueueBadge:',e);}
   try{ cancelHourEdit(); }catch(e){console.warn('cancelHourEdit:',e);}
+  // Affiche le panneau "Compte connecté" si l'authentification est active
+  try{
+    if(authRequired && currentUser){
+      const ap=document.getElementById('account-panel'); if(ap) ap.style.display='';
+      const ae=document.getElementById('account-email'); if(ae) ae.textContent=currentUser.email||'Connecté';
+    }
+  }catch(e){}
   try{ startRealtime(); }catch(e){console.error('startRealtime:',e); setSyncStatus('error'); try{loadLocal();}catch(_){}}
   // Filet de sécurité : retente l'envoi de la file toutes les 20s tant qu'il reste des éléments
   setInterval(()=>{ if(offlineQueue.length && fbReady && fbOnline) flushOfflineQueue(); }, 20000);
+}
+
+function showLoginScreen(){
+  try{ document.getElementById('loading-screen').style.display='none'; }catch(e){}
+  try{ document.getElementById('app').style.display='none'; }catch(e){}
+  const ls=document.getElementById('login-screen'); if(ls) ls.style.display='flex';
+}
+
+function bootApp(){
+  // Authentification activée + disponible : on attend l'état de connexion
+  if(authRequired && fbReady && auth){
+    auth.onAuthStateChanged(function(user){
+      currentUser = (user && !user.isAnonymous) ? user : null;
+      if(currentUser){ startMainApp(); }
+      else if(!appBooted){ showLoginScreen(); }
+    });
+    // Filet de sécurité : si Firebase Auth ne répond pas, on montre quand même l'écran de connexion
+    setTimeout(()=>{ if(!appBooted && !currentUser){ showLoginScreen(); } }, 4000);
+    return;
+  }
+  // Pas d'authentification requise (ou Auth indisponible) : démarrage normal
+  startMainApp();
+}
+
+// ── Connexion / déconnexion ──
+function authErrMsg(e){
+  const c = (e && e.code) || '';
+  if(c.includes('wrong-password')||c.includes('invalid-credential')) return 'Email ou mot de passe incorrect.';
+  if(c.includes('user-not-found')) return 'Aucun compte avec cet email.';
+  if(c.includes('invalid-email')) return 'Email invalide.';
+  if(c.includes('too-many-requests')) return 'Trop de tentatives. Réessaie dans quelques minutes.';
+  if(c.includes('network')) return 'Pas de connexion internet.';
+  return (e && e.message) || 'Connexion impossible.';
+}
+function doLogin(){
+  const errEl=document.getElementById('login-error'); if(errEl) errEl.style.display='none';
+  const email=(document.getElementById('login-email').value||'').trim();
+  const pass=document.getElementById('login-pass').value||'';
+  if(!email||!pass){ if(errEl){errEl.textContent='Email et mot de passe requis.';errEl.style.display='block';} return; }
+  if(!auth){ if(errEl){errEl.textContent='Authentification Firebase indisponible.';errEl.style.display='block';} return; }
+  const btn=document.getElementById('login-btn'); if(btn){btn.disabled=true;btn.textContent='Connexion…';}
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(()=>{ /* onAuthStateChanged démarre l'app */ })
+    .catch(e=>{ if(errEl){errEl.textContent=authErrMsg(e);errEl.style.display='block';} if(btn){btn.disabled=false;btn.textContent='Se connecter';} });
+}
+function doResetPassword(){
+  const email=(document.getElementById('login-email').value||'').trim();
+  const errEl=document.getElementById('login-error');
+  if(!email){ if(errEl){errEl.textContent='Saisis ton email puis clique sur Réinitialiser.';errEl.style.display='block';errEl.style.color='var(--text2)';} return; }
+  if(!auth) return;
+  auth.sendPasswordResetEmail(email)
+    .then(()=>{ if(errEl){errEl.textContent='Email de réinitialisation envoyé ✓';errEl.style.display='block';errEl.style.color='var(--green2)';} })
+    .catch(e=>{ if(errEl){errEl.textContent=authErrMsg(e);errEl.style.display='block';errEl.style.color='#fca5a5';} });
+}
+function logout(){
+  if(!auth){ return; }
+  if(!confirm('Se déconnecter du tableau de bord ?')) return;
+  auth.signOut().then(()=>{ location.reload(); }).catch(()=>{ location.reload(); });
 }
 
 registerServiceWorker();
