@@ -1950,7 +1950,7 @@ function loadEmailConfig(){
 function getEvColor(ev){return EV_COLORS[events.indexOf(ev)%EV_COLORS.length];}
 function getLockedStock(){
   const l={};STOCK_META.forEach(s=>l[s.id]=0);
-  events.forEach(ev=>{if(!isStockLocked(ev.status))return;Object.entries(ev.material||{}).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
+  events.forEach(ev=>{if(!isStockLocked(ev.status))return;const exp=expandMaterial(ev.material);Object.entries(exp).forEach(([k,v])=>{l[k]=(l[k]||0)+(parseInt(v)||0);});});
   return l;
 }
 function formatDate(d){if(!d)return'—';return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
@@ -2093,7 +2093,7 @@ function applyFilters(){
 
 function renderStock(){
   const locked=getLockedStock();
-  document.getElementById('stock-grid').innerHTML=STOCK_META.map(si=>{
+  document.getElementById('stock-grid').innerHTML=STOCK_META.filter(si=>si.cat!=='pack').map(si=>{
     const total=STOCK_DEFAULTS[si.id]||0,avail=total-(locked[si.id]||0),pct=total>0?Math.round(avail/total*100):0;
     const col=pct>50?'var(--green)':pct>20?'var(--orange)':'var(--red)';
     const st=pct>50?'Disponible':pct>20?'Stock limité':'⚠️ Stock critique';
@@ -2109,7 +2109,7 @@ function renderConfig(){
   // Lance le diagnostic de synchronisation automatiquement (léger, en arrière-plan)
   if(fbReady){ setTimeout(()=>{ try{ runSyncDiagnostic(); }catch(e){} }, 300); }
   else { const b=document.getElementById('sync-diag-box'); if(b) b.innerHTML='<div style="font-size:13px;color:var(--text3)">Firebase non connecté — synchronisation indisponible.</div>'; }
-  document.getElementById('stock-config-grid').innerHTML=STOCK_META.map(si=>`<div class="cfg-group"><label class="cfg-label">${si.icon} ${si.label}</label><input class="cfg-input" id="sc-${si.id}" type="number" min="0" value="${STOCK_DEFAULTS[si.id]||0}"></div>`).join('');
+  document.getElementById('stock-config-grid').innerHTML=STOCK_META.filter(si=>si.cat!=='pack').map(si=>`<div class="cfg-group"><label class="cfg-label">${si.icon} ${si.label}</label><input class="cfg-input" id="sc-${si.id}" type="number" min="0" value="${STOCK_DEFAULTS[si.id]||0}"></div>`).join('');
 }
 
 // ══════════════════════════════════════════════════════
@@ -2705,8 +2705,8 @@ function renderAnalytics(){
   document.getElementById('stats-hours-month').innerHTML=monthBars(hMonth,v=>v+' h','var(--accent)')+`<div class="chart-total">Total : ${totalHours.toLocaleString('fr-FR')} h${montantHours>0?' · '+fmtMoney(montantHours):''}</div>`;
   // Matériel le plus loué
   const matTotals={};
-  evs.forEach(e=>Object.entries(e.material||{}).forEach(([k,v])=>{matTotals[k]=(matTotals[k]||0)+(parseInt(v)||0);}));
-  const matItems=STOCK_META.map(si=>({label:si.icon+' '+si.label,value:matTotals[si.id]||0,display:(matTotals[si.id]||0)+'×',color:si.color})).filter(i=>i.value>0).sort((a,b)=>b.value-a.value);
+  evs.forEach(e=>Object.entries(expandMaterial(e.material)).forEach(([k,v])=>{matTotals[k]=(matTotals[k]||0)+(parseInt(v)||0);}));
+  const matItems=STOCK_META.filter(si=>si.cat!=='pack').map(si=>({label:si.icon+' '+si.label,value:matTotals[si.id]||0,display:(matTotals[si.id]||0)+'×',color:si.color})).filter(i=>i.value>0).sort((a,b)=>b.value-a.value);
   document.getElementById('stats-material').innerHTML=barRows(matItems);
   // Répartition par type
   const typeT={};
@@ -2786,11 +2786,75 @@ function mergeDefaultPacks(){
   catalogue = [...missing.map(p=>({...p})), ...catalogue];
   missing.forEach(pk=>{ if(STOCK_DEFAULTS[pk.id]===undefined) STOCK_DEFAULTS[pk.id]=pk.stock||0; });
   try{ localStorage.setItem('ep_catalogue', JSON.stringify(catalogue)); }catch(e){}
-  try{ localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS)); }catch(e){}
   return true;
 }
 
-// Synchronise STOCK_META et STOCK_DEFAULTS depuis le catalogue dynamique
+// ══════════════════════════════════════════════════════
+// COMPOSITION DES PACKS — un pack n'est PAS un article de stock.
+// Choisir un pack décompte ses COMPOSANTS du stock réel.
+// Couvre aussi les identifiants envoyés par le formulaire client
+// (covim150, fontaine, gemini400…) pour que les demandes décomptent le stock.
+// Par défaut, la machine d'un pack Events = Covim.
+// Note : "gobelet" = lot de 50 → 100 gobelets = 2 lots.
+// ══════════════════════════════════════════════════════
+const PACK_COMPONENTS = {
+  // — Packs (dashboard) —
+  pack_eau:            {fontaine_eau:1, bonbonne:1, gobelet:2},
+  pack_events_base:    {fontaine_eau:1, bonbonne:1, gobelet:2, covim:1},
+  pack_events_complet: {fontaine_eau:1, bonbonne:2, gobelet:4, covim:1, frigo_petit:1},
+  pack_nespresso_200:  {nespresso:1},
+  pack_covim_150:      {covim:1},
+  pack_gemini_400:     {nespresso_g200:1},
+  // — Identifiants venant du formulaire client —
+  covim150:            {covim:1},
+  lavazza150:          {lavazza:1},
+  gemini400:           {nespresso_g200:1},
+  zenius200:           {nespresso:1},
+  fontaine:            {fontaine_eau:1, bonbonne:1, gobelet:2},
+  fontaine_sup:        {fontaine_eau:1, bonbonne:1, gobelet:2},
+  chaise:              {chaise_pliante:1},
+  table:               {table_pliante:1},
+  gobelets_sup:        {gobelet:2},
+  bonbonne_sup:        {bonbonne:1}
+};
+// Composants d'un identifiant composite (pack/alias formulaire), ou null si c'est un article simple
+function packComponents(id){
+  if(PACK_COMPONENTS[id]) return PACK_COMPONENTS[id];
+  const p = catalogue.find(x=>x.id===id);
+  if(p && p.components && typeof p.components==='object' && Object.keys(p.components).length) return p.components;
+  return null;
+}
+// Vrai si l'identifiant est un pack (catégorie "pack") — donc non décompté tel quel dans le stock
+function isPackItem(id){
+  if(PACK_COMPONENTS[id]) return true;
+  const p = catalogue.find(x=>x.id===id);
+  return !!(p && p.cat==='pack');
+}
+// Convertit un material {id:qty} en quantités de composants réels du stock
+// (les packs sont éclatés en leurs composants, les articles simples sont conservés)
+function expandMaterial(material){
+  const out = {};
+  Object.entries(material||{}).forEach(([id, qty])=>{
+    const q = parseInt(qty)||0; if(q<=0) return;
+    const comp = packComponents(id);
+    if(comp){
+      Object.entries(comp).forEach(([cid, cq])=>{ out[cid] = (out[cid]||0) + (cq*q); });
+    } else {
+      out[id] = (out[id]||0) + q;
+    }
+  });
+  return out;
+}
+
+// Texte lisible de la composition d'un pack (pour info-bulle catalogue)
+function packCompositionText(id){
+  const comp = packComponents(id);
+  if(!comp) return 'Composition non définie';
+  return Object.entries(comp).map(([cid,q])=>{
+    const meta = STOCK_META.find(s=>s.id===cid) || catalogue.find(c=>c.id===cid);
+    return q+'× '+(meta?meta.label:cid);
+  }).join(', ');
+}
 function syncStockMetaFromCatalogue(){
   // Reconstruire STOCK_META depuis le catalogue (tous produits, actifs ou non — pour conserver l'historique)
   STOCK_META.length = 0;
@@ -2888,12 +2952,12 @@ function renderCatalogue(){
         <td class="cat-desc-cell">${p.desc||'—'}</td>
         <td><span class="cat-pill">${CAT_LABELS[p.cat||'autre']||p.cat||'—'}</span></td>
         <td class="cat-stock-cell">
-          <div style="display:flex;align-items:center;gap:6px;">
+          ${p.cat==='pack' ? `<span style="font-size:11px;color:var(--text3);" title="${esc(packCompositionText(p.id))}">⚙️ décompté en composants</span>` : `<div style="display:flex;align-items:center;gap:6px;">
             <span>${STOCK_DEFAULTS[p.id]||0}</span>
             <input type="number" min="0" value="${STOCK_DEFAULTS[p.id]||0}" 
               style="width:60px;padding:3px 6px;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text1);font-size:12px;font-family:var(--font-body);"
               onchange="quickUpdateStock('${p.id}',this.value)" onclick="this.select()">
-          </div>
+          </div>`}
         </td>
         <td>
           <span style="font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;${isHidden
