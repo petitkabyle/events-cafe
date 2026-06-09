@@ -2754,7 +2754,8 @@ const DEFAULT_CATALOGUE = [
   {id:'lavazza',       label:'Machine Lavazza',          icon:'☕', color:'#6d28d9', cat:'cafe',    stock:8,  active:true},
   {id:'machine_grains',label:'Machine Café Grains',     icon:'⚙️', color:'#92400e', cat:'grains',  stock:4,  active:true},
   {id:'cafe_grains',   label:'Café Grains (kg)',         icon:'🌰', color:'#a16207', cat:'grains',  stock:20, active:true},
-  {id:'cafe_pods',     label:'Café Pods (boîte 50)',     icon:'📦', color:'#f59e0b', cat:'cafe',    stock:100,active:true},
+  {id:'cafe_pods',     label:'Café Pods Covim/Lavazza (boîte 50)', icon:'📦', color:'#f59e0b', cat:'cafe',    stock:100,active:true},
+  {id:'cafe_caps_nespresso', label:'Capsules Nespresso (boîte 50)', icon:'📦', color:'#8b5cf6', cat:'cafe', stock:100, active:true},
   {id:'frigo_petit',   label:'Frigo 50L',                icon:'🧊', color:'#14b8a6', cat:'frigo',   stock:15, active:true},
   {id:'frigo_grand',   label:'Frigo 200L',               icon:'🧊', color:'#0d9488', cat:'frigo',   stock:8,  active:true},
   {id:'table_pliante', label:'Tables pliantes',          icon:'🪑', color:'#64748b', cat:'mobilier',stock:30, active:true},
@@ -2789,6 +2790,31 @@ function mergeDefaultPacks(){
   return true;
 }
 
+// Articles de stock ajoutés après coup (migration douce pour les bases existantes)
+const DEFAULT_EXTRA_ITEMS = [
+  {id:'cafe_caps_nespresso', label:'Capsules Nespresso (boîte 50)', icon:'📦', color:'#8b5cf6', cat:'cafe', stock:100, active:true},
+];
+// Injecte les nouveaux articles manquants + clarifie l'ancien libellé "Café Pods".
+// Respecte les articles supprimés volontairement. Retourne true si le catalogue a changé.
+function mergeDefaultItems(){
+  let changed = false;
+  // 1) Ajout des articles manquants
+  const missing = DEFAULT_EXTRA_ITEMS.filter(it => !catalogue.some(p=>p.id===it.id) && !deletedPacks.includes(it.id));
+  if(missing.length){
+    catalogue = [...catalogue, ...missing.map(p=>({...p}))];
+    missing.forEach(it=>{ if(STOCK_DEFAULTS[it.id]===undefined) STOCK_DEFAULTS[it.id]=it.stock||0; });
+    changed = true;
+  }
+  // 2) Clarifie le libellé des pods Covim/Lavazza (seulement si encore au libellé d'origine)
+  const pods = catalogue.find(p=>p.id==='cafe_pods');
+  if(pods && pods.label==='Café Pods (boîte 50)'){ pods.label='Café Pods Covim/Lavazza (boîte 50)'; changed = true; }
+  if(changed){
+    try{ localStorage.setItem('ep_catalogue', JSON.stringify(catalogue)); }catch(e){}
+    try{ localStorage.setItem('ep_stock', JSON.stringify(STOCK_DEFAULTS)); }catch(e){}
+  }
+  return changed;
+}
+
 // ══════════════════════════════════════════════════════
 // COMPOSITION DES PACKS — un pack n'est PAS un article de stock.
 // Choisir un pack décompte ses COMPOSANTS du stock réel.
@@ -2809,14 +2835,14 @@ const PACK_COMPONENTS = {
   // Events Complet : eau (2 bonbonnes) + 200 gobelets + frigo + Covim avec Kit 150
   pack_events_complet: {fontaine_eau:1, bonbonne:2, frigo_petit:1, covim:1, cafe_pods:3, gobelet:7},
   // Machine seule + son kit café
-  pack_nespresso_200:  {nespresso:1, cafe_pods:4, gobelet:4},          // Kit 200
-  pack_covim_150:      {covim:1, cafe_pods:3, gobelet:3},              // Kit 150
-  pack_gemini_400:     {nespresso_g200:1, cafe_grains:4, gobelet:8},   // Kit 400 (café grains)
+  pack_nespresso_200:  {nespresso:1, cafe_caps_nespresso:4, gobelet:4},   // Kit 200 (capsules Nespresso)
+  pack_covim_150:      {covim:1, cafe_pods:3, gobelet:3},                 // Kit 150 (pods Covim/Lavazza)
+  pack_gemini_400:     {nespresso_g200:1, cafe_grains:4, gobelet:8},      // Kit 400 (café grains)
   // — Identifiants venant du formulaire client —
-  covim150:            {covim:1, cafe_pods:3, gobelet:3},              // Kit 150
-  lavazza150:          {lavazza:1, cafe_pods:3, gobelet:3},            // Kit 150
-  gemini400:           {nespresso_g200:1, cafe_grains:4, gobelet:8},   // Kit 400
-  zenius200:           {nespresso:1, cafe_pods:4, gobelet:4},          // Kit 200
+  covim150:            {covim:1, cafe_pods:3, gobelet:3},                 // Kit 150 (pods Covim/Lavazza)
+  lavazza150:          {lavazza:1, cafe_pods:3, gobelet:3},               // Kit 150 (pods Covim/Lavazza)
+  gemini400:           {nespresso_g200:1, cafe_grains:4, gobelet:8},      // Kit 400
+  zenius200:           {nespresso:1, cafe_caps_nespresso:4, gobelet:4},   // Kit 200 (capsules Nespresso)
   fontaine:            {fontaine_eau:1, bonbonne:1, gobelet:2},
   fontaine_sup:        {fontaine_eau:1, bonbonne:1, gobelet:2},
   chaise:              {chaise_pliante:1},
@@ -2890,11 +2916,12 @@ function loadCatalogueFromFirebase(){
     const val = snap.val();
     if(val && Array.isArray(val) && val.length > 0){
       catalogue = val;
-      // Injecte les packs clé en main s'ils manquent (et propage vers Firebase une seule fois)
+      // Injecte les packs clé en main + nouveaux articles s'ils manquent (et propage vers Firebase une seule fois)
       const added = mergeDefaultPacks();
+      const added2 = mergeDefaultItems();
       localStorage.setItem('ep_catalogue', JSON.stringify(catalogue));
       syncStockMetaFromCatalogue();
-      if(added){ queuedWrite('set', 'catalogue', catalogue); }
+      if(added || added2){ queuedWrite('set', 'catalogue', catalogue); }
       renderAll();
       if(document.getElementById('tab-catalogue').classList.contains('active')) renderCatalogue();
     }
@@ -3018,8 +3045,8 @@ function deleteCatProduct(id){
   const p = catalogue.find(x=>x.id===id);
   if(!p) return;
   if(!confirm(`Supprimer "${p.label}" du catalogue ?\n\nAttention : si ce produit est utilisé dans des événements existants, les quantités resteront dans l'historique mais le nom n'apparaîtra plus.`)) return;
-  // Mémorise les packs supprimés volontairement pour ne pas les ré-injecter automatiquement
-  if(DEFAULT_PACKS.some(pk=>pk.id===id) && !deletedPacks.includes(id)){
+  // Mémorise les packs/articles par défaut supprimés volontairement pour ne pas les ré-injecter automatiquement
+  if((DEFAULT_PACKS.some(pk=>pk.id===id) || DEFAULT_EXTRA_ITEMS.some(it=>it.id===id)) && !deletedPacks.includes(id)){
     deletedPacks.push(id);
     try{ localStorage.setItem('ep_deleted_packs', JSON.stringify(deletedPacks)); }catch(e){}
   }
@@ -4287,7 +4314,7 @@ function startMainApp(){
   try{ if(ejsCfg.pubkey && typeof emailjs!=='undefined') emailjs.init(ejsCfg.pubkey); }catch(e){console.warn(e);}
   try{ loadEmailConfig(); }catch(e){console.warn('loadEmailConfig:',e);}
   // Injecte les packs clé en main manquants + synchronise STOCK_META depuis le catalogue (offline inclus)
-  try{ mergeDefaultPacks(); syncStockMetaFromCatalogue(); }catch(e){console.warn('packs seed:',e);}
+  try{ mergeDefaultPacks(); mergeDefaultItems(); syncStockMetaFromCatalogue(); }catch(e){console.warn('packs seed:',e);}
   try{ renderBadges(); }catch(e){console.warn('renderBadges:',e);}
   try{ updateQueueBadge(); }catch(e){console.warn('updateQueueBadge:',e);}
   try{ cancelHourEdit(); }catch(e){console.warn('cancelHourEdit:',e);}
