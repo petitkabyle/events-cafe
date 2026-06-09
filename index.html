@@ -2795,21 +2795,28 @@ function mergeDefaultPacks(){
 // Couvre aussi les identifiants envoyés par le formulaire client
 // (covim150, fontaine, gemini400…) pour que les demandes décomptent le stock.
 // Par défaut, la machine d'un pack Events = Covim.
-// Note : "gobelet" = lot de 50 → 100 gobelets = 2 lots.
+// Unités stock : "gobelet" = lot de 50 (100 gobelets = 2 lots) ;
+//   "cafe_pods" = boîte de 50 capsules ; "cafe_grains" = kg.
+// Kits café : Kit 150 = 3 boîtes capsules + 3 lots gobelets ;
+//   Kit 200 = 4 boîtes capsules + 4 lots gobelets ;
+//   Kit 400 = 4 kg café grains + 8 lots gobelets.
 // ══════════════════════════════════════════════════════
 const PACK_COMPONENTS = {
   // — Packs (dashboard) —
   pack_eau:            {fontaine_eau:1, bonbonne:1, gobelet:2},
-  pack_events_base:    {fontaine_eau:1, bonbonne:1, gobelet:2, covim:1},
-  pack_events_complet: {fontaine_eau:1, bonbonne:2, gobelet:4, covim:1, frigo_petit:1},
-  pack_nespresso_200:  {nespresso:1},
-  pack_covim_150:      {covim:1},
-  pack_gemini_400:     {nespresso_g200:1},
+  // Events Base : eau + 100 gobelets + Covim avec Kit 150 (150 capsules + 150 gobelets)
+  pack_events_base:    {fontaine_eau:1, bonbonne:1, covim:1, cafe_pods:3, gobelet:5},
+  // Events Complet : eau (2 bonbonnes) + 200 gobelets + frigo + Covim avec Kit 150
+  pack_events_complet: {fontaine_eau:1, bonbonne:2, frigo_petit:1, covim:1, cafe_pods:3, gobelet:7},
+  // Machine seule + son kit café
+  pack_nespresso_200:  {nespresso:1, cafe_pods:4, gobelet:4},          // Kit 200
+  pack_covim_150:      {covim:1, cafe_pods:3, gobelet:3},              // Kit 150
+  pack_gemini_400:     {nespresso_g200:1, cafe_grains:4, gobelet:8},   // Kit 400 (café grains)
   // — Identifiants venant du formulaire client —
-  covim150:            {covim:1},
-  lavazza150:          {lavazza:1},
-  gemini400:           {nespresso_g200:1},
-  zenius200:           {nespresso:1},
+  covim150:            {covim:1, cafe_pods:3, gobelet:3},              // Kit 150
+  lavazza150:          {lavazza:1, cafe_pods:3, gobelet:3},            // Kit 150
+  gemini400:           {nespresso_g200:1, cafe_grains:4, gobelet:8},   // Kit 400
+  zenius200:           {nespresso:1, cafe_pods:4, gobelet:4},          // Kit 200
   fontaine:            {fontaine_eau:1, bonbonne:1, gobelet:2},
   fontaine_sup:        {fontaine_eau:1, bonbonne:1, gobelet:2},
   chaise:              {chaise_pliante:1},
