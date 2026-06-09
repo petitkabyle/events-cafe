@@ -42,3 +42,28 @@ window.EMAILJS_CONFIG = {
   email2:   "",                          // 2e adresse (ton frère) — à configurer plus tard
   name2:    ""                           // prénom associé
 };
+
+
+// ============================================================
+//  🔐 SÉCURITÉ — Authentification (recommandé)
+// ============================================================
+//  Par défaut, l'app fonctionne SANS connexion (REQUIRE_AUTH = false).
+//  Pour sécuriser ta base de données (et faire disparaître l'alerte
+//  Firebase "règles non sécurisées"), passe cette valeur à TRUE
+//  APRÈS avoir suivi ces 3 étapes (voir aussi GUIDE_SECURITE.md) :
+//
+//   1) Console Firebase → Authentication → "Commencer"
+//        • Active "E-mail/Mot de passe"
+//        • Active aussi "Anonyme" (pour le formulaire client)
+//        • Onglet "Users" → Ajoute un compte pour toi et ton frère
+//          (note bien chaque UID affiché)
+//   2) Console Firebase → Realtime Database → Règles
+//        • Colle le contenu de firebase-rules.json
+//        • Remplace UID_1 / UID_2 par VOS deux UID, puis "Publier"
+//   3) Reviens ici et mets :  window.REQUIRE_AUTH = true;
+//        • Recharge le tableau de bord → un écran de connexion apparaît.
+//
+//  ⚠️ Tant que tu n'as pas créé les comptes + publié les règles,
+//     laisse REQUIRE_AUTH = false (sinon tu ne pourras pas te connecter).
+// ============================================================
+window.REQUIRE_AUTH = false;
