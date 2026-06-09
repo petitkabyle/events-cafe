@@ -1957,7 +1957,7 @@ function getLockedStock(){
     if(!reserved && !consumed) return;           // au stade devis : rien n'est déduit
     const exp = expandMaterial(ev.material);
     Object.entries(exp).forEach(([k,v])=>{
-      const take = CONSUMABLE_IDS.includes(k) ? consumed : reserved;
+      const take = isConsumableId(k) ? consumed : reserved;
       if(take) l[k]=(l[k]||0)+(parseInt(v)||0);
     });
   });
@@ -2809,7 +2809,13 @@ const DEFAULT_EXTRA_ITEMS = [
 function mergeDefaultItems(){
   let changed = false;
   // 1) Ajout des articles manquants
-  const missing = DEFAULT_EXTRA_ITEMS.filter(it => !catalogue.some(p=>p.id===it.id) && !deletedPacks.includes(it.id));
+  const missing = DEFAULT_EXTRA_ITEMS.filter(it => {
+    if(catalogue.some(p=>p.id===it.id)) return false;
+    if(deletedPacks.includes(it.id)) return false;
+    // Évite un doublon : si un article "capsules Nespresso" existe déjà (créé manuellement), on n'ajoute pas l'officiel
+    if(it.id==='cafe_caps_nespresso' && hasManualNespressoCapsule()) return false;
+    return true;
+  });
   if(missing.length){
     catalogue = [...catalogue, ...missing.map(p=>({...p}))];
     missing.forEach(it=>{ if(STOCK_DEFAULTS[it.id]===undefined) STOCK_DEFAULTS[it.id]=it.stock||0; });
@@ -2864,6 +2870,34 @@ const PACK_COMPONENTS = {
 // reviennent pas dans le stock (contrairement au matériel durable : machines,
 // fontaines, frigos, mobilier… qui sont rendus une fois l'événement clôturé).
 const CONSUMABLE_IDS = ['cafe_pods', 'cafe_caps_nespresso', 'gobelet', 'bonbonne', 'cafe_grains'];
+
+// Détecte un éventuel article "capsules Nespresso" créé manuellement (≠ machines Nespresso)
+function _normLbl(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function hasManualNespressoCapsule(){
+  const machineIds=['nespresso','nespresso_g200','nespresso_g220'];
+  return catalogue.some(p=>{
+    if(p.id==='cafe_caps_nespresso' || machineIds.includes(p.id)) return false;
+    const l=_normLbl(p.label);
+    return l.includes('nespresso') && (l.includes('capsule') || l.includes('caps'));
+  });
+}
+// Identifiant réel de l'article "capsules Nespresso" présent dans le catalogue.
+// Préfère l'article officiel ; sinon retombe sur celui créé manuellement.
+// Ainsi, peu importe lequel des deux on garde, les packs Nespresso suivent.
+function findNespressoCapsuleId(){
+  if(catalogue.some(p=>p.id==='cafe_caps_nespresso')) return 'cafe_caps_nespresso';
+  const machineIds=['nespresso','nespresso_g200','nespresso_g220'];
+  const found=catalogue.find(p=>{
+    if(machineIds.includes(p.id)) return false;
+    const l=_normLbl(p.label);
+    return l.includes('nespresso') && (l.includes('capsule') || l.includes('caps'));
+  });
+  return found ? found.id : 'cafe_caps_nespresso';
+}
+// Remappe un identifiant de composant vers l'article de stock réellement présent
+function remapStockId(id){ return id==='cafe_caps_nespresso' ? findNespressoCapsuleId() : id; }
+// Consommable ? (gère aussi l'article capsules Nespresso quel que soit son identifiant)
+function isConsumableId(id){ return CONSUMABLE_IDS.includes(id) || id===findNespressoCapsuleId(); }
 // Composants d'un identifiant composite (pack/alias formulaire), ou null si c'est un article simple
 function packComponents(id){
   if(PACK_COMPONENTS[id]) return PACK_COMPONENTS[id];
@@ -2885,9 +2919,9 @@ function expandMaterial(material){
     const q = parseInt(qty)||0; if(q<=0) return;
     const comp = packComponents(id);
     if(comp){
-      Object.entries(comp).forEach(([cid, cq])=>{ out[cid] = (out[cid]||0) + (cq*q); });
+      Object.entries(comp).forEach(([cid, cq])=>{ const rid=remapStockId(cid); out[rid] = (out[rid]||0) + (cq*q); });
     } else {
-      out[id] = (out[id]||0) + q;
+      out[remapStockId(id)] = (out[remapStockId(id)]||0) + q;
     }
   });
   return out;
@@ -2898,8 +2932,9 @@ function packCompositionText(id){
   const comp = packComponents(id);
   if(!comp) return 'Composition non définie';
   return Object.entries(comp).map(([cid,q])=>{
-    const meta = STOCK_META.find(s=>s.id===cid) || catalogue.find(c=>c.id===cid);
-    return q+'× '+(meta?meta.label:cid);
+    const rid = remapStockId(cid);
+    const meta = STOCK_META.find(s=>s.id===rid) || catalogue.find(c=>c.id===rid);
+    return q+'× '+(meta?meta.label:rid);
   }).join(', ');
 }
 function syncStockMetaFromCatalogue(){
