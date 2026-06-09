@@ -1,7 +1,5 @@
 {
   "rules": {
-    "//": "EVENTS CAFE - Regles Realtime Database securisees. Remplace UID_1 et UID_2 par les UID de tes 2 comptes (Console Firebase > Authentication > Users). Colle ce contenu dans Realtime Database > Regles puis Publier.",
-
     ".read": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
     ".write": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
 
