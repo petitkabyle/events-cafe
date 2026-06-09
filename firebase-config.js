@@ -66,4 +66,4 @@ window.EMAILJS_CONFIG = {
 //  ⚠️ Tant que tu n'as pas créé les comptes + publié les règles,
 //     laisse REQUIRE_AUTH = false (sinon tu ne pourras pas te connecter).
 // ============================================================
-window.REQUIRE_AUTH = false;
+window.REQUIRE_AUTH = true;
