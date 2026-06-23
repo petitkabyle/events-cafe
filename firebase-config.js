@@ -40,7 +40,7 @@ window.EMAILJS_CONFIG = {
   // 👉 Modèle DÉDIÉ AU CLIENT (accusé de réception propre, sans en-tête "dashboard").
   //    Crée un 2e modèle sur EmailJS (voir la recette ci-dessous) puis colle son ID ici.
   //    Tant qu'il vaut "" ou "COLLE_...", AUCUN email n'est envoyé au client.
-  templateClient: "",                   // ex: "template_client123"
+  templateClient: "template_r00icig",   // modèle dédié à l'accusé client (propre)
   email1:   "soane.mansouri@gmail.com", // 1re adresse de réception (toi)
   name1:    "Soane Mansouri",           // prénom associé
   email2:   "",                          // 2e adresse (ton frère) — à configurer plus tard

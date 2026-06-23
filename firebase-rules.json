@@ -2,7 +2,6 @@
   "rules": {
     ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
     ".write": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
-
     "events": {
       ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
       "$eventId": {
@@ -10,7 +9,6 @@
         ".validate": "newData.hasChildren(['client','status'])"
       }
     },
-
     "reservations": {
       ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
       "$reservationId": {
@@ -18,7 +16,6 @@
         ".validate": "newData.hasChildren(['company','date'])"
       }
     },
-
     "slots": {
       ".read": "auth != null",
       "$date": {
