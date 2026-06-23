@@ -77,18 +77,30 @@ body::before{content:'';position:fixed;inset:0;background:
 .sel option,.sel optgroup{background:var(--bg2);}
 .txt{resize:vertical;min-height:64px;line-height:1.5;}
 
-/* ITEMS (réappro) */
+/* CATEGORIES */
+.cat-title{font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:8px;}
+.cat-title:first-of-type{margin-top:4px;}
+.cat-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+/* ITEMS */
 .items{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .item{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .2s;}
 .item.sel{border-color:var(--gold);background:rgba(59,158,255,.07);}
 .item-info{min-width:0;display:flex;align-items:center;gap:9px;}
 .item-ico{font-size:20px;flex-shrink:0;}
 .item-name{font-size:13px;font-weight:600;color:var(--text1);line-height:1.25;}
+.item-tag{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;padding:2px 7px;border-radius:20px;margin-left:6px;white-space:nowrap;}
 .qty{display:flex;align-items:center;gap:9px;flex-shrink:0;}
 .qty-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#06101F;}
 .qty-val{min-width:22px;text-align:center;font-weight:700;font-size:16px;font-family:var(--font-head);}
 .qty-val.on{color:var(--gold2);}
+
+/* CAFÉ ROW */
+.cafe-row{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:all .2s;}
+.cafe-row.sel{border-color:var(--gold);background:rgba(59,158,255,.07);}
+.cafe-row .item-info{flex:1;min-width:140px;}
+.cafe-row select{min-width:160px;flex:1;}
 
 /* DAY CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;}
@@ -98,14 +110,19 @@ body::before{content:'';position:fixed;inset:0;background:
 .chip small{display:block;font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
 .chip.sel small{color:var(--accent2);}
 
-/* SLOT GRID */
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
-.slot{border:1px solid var(--border2);background:var(--bg3);border-radius:12px;padding:13px 10px;cursor:pointer;text-align:center;transition:all .15s;}
+/* SLOT GRID (pas de 30 min) */
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;}
+.slot{border:1px solid var(--border2);background:var(--bg3);border-radius:11px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s;}
 .slot:hover{border-color:var(--border3);}
-.slot.sel{border-color:var(--gold);background:rgba(59,158,255,.12);box-shadow:0 0 0 3px rgba(59,158,255,.10);}
-.slot-t{font-size:15px;font-weight:700;font-family:var(--font-head);color:var(--text1);}
-.slot-d{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.slot.sel{border-color:var(--gold);background:rgba(59,158,255,.14);box-shadow:0 0 0 3px rgba(59,158,255,.10);}
+.slot.taken{opacity:.42;cursor:not-allowed;border-style:dashed;background:var(--bg2);}
+.slot.taken:hover{border-color:var(--border2);}
+.slot-t{font-size:14px;font-weight:700;font-family:var(--font-head);color:var(--text1);}
+.slot-d{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
 .slot.sel .slot-d{color:var(--accent2);}
+.slot-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text3);margin:12px 0 4px;}
+.slot-legend i{font-style:normal;}
+.slot-hint{font-size:12px;color:var(--text3);margin-bottom:10px;}
 
 /* URGENT TOGGLE */
 .urgent{display:flex;align-items:flex-start;gap:11px;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:13px;padding:13px 15px;cursor:pointer;transition:all .2s;}
@@ -160,7 +177,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .row{grid-template-columns:1fr;}
   .items{grid-template-columns:1fr;}
   .inp,.sel,.txt{font-size:16px;}
-  .slots{grid-template-columns:1fr 1fr;}
+  .slots{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));}
 }
 </style>
 </head>
@@ -178,7 +195,7 @@ body::before{content:'';position:fixed;inset:0;background:
     </div>
   </div>
   <h1 class="hero-title">Réservez votre<br><em>créneau de livraison</em></h1>
-  <p class="hero-sub">Besoin d'un réapprovisionnement sur votre stand (eau, café, gobelets…) ? Choisissez votre créneau en 30 secondes — on s'occupe du reste. Pas besoin d'appeler.</p>
+  <p class="hero-sub">Besoin d'un réapprovisionnement sur votre stand (café, eau, machines…) ? Choisissez un créneau libre en 30 secondes — on s'occupe du reste. Pas besoin d'appeler.</p>
 </div>
 
 <!-- PHONE BANNER -->
@@ -186,7 +203,7 @@ body::before{content:'';position:fixed;inset:0;background:
   <div class="phone-inner">
     <span class="pico">📞</span>
     <span>Une <b>urgence</b> ou une demande particulière ? Notre équipe reste joignable directement par téléphone :
-      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
+      <a href="tel:+33761465720">+33 7 61 46 57 20</a>
     </span>
   </div>
 </div>
@@ -242,7 +259,7 @@ body::before{content:'';position:fixed;inset:0;background:
       <div class="row single" id="r-othercity-wrap" style="display:none;">
         <div class="grp">
           <label class="lbl">Ville (si autre lieu) <span class="req">*</span></label>
-          <input class="inp" id="r-othercity" type="text" placeholder="ex: Vallauris">
+          <input class="inp" id="r-othercity" type="text" placeholder="ex: Vallauris" oninput="updateSummary()">
         </div>
       </div>
       <div class="row single">
@@ -262,12 +279,21 @@ body::before{content:'';position:fixed;inset:0;background:
       <div class="card-sub">Réapprovisionnement</div>
     </div>
     <div class="card-body">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Indiquez les quantités à recharger sur votre stand.</div>
-      <div class="items" id="items-container"></div>
-      <div class="row single" style="margin-top:14px;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Indiquez ce qu'il faut recharger / remplacer sur votre stand.</div>
+
+      <div class="cat-title">☕ Café</div>
+      <div id="cafe-container"></div>
+
+      <div class="cat-title">💧 Eau</div>
+      <div class="items" id="water-container"></div>
+
+      <div class="cat-title">⚙️ Machine à café</div>
+      <div class="items" id="machine-container"></div>
+
+      <div class="row single" style="margin-top:16px;">
         <div class="grp">
           <label class="lbl">Autre besoin / précision</label>
-          <textarea class="txt" id="r-other" placeholder="ex: 1 machine à café en panne à remplacer, besoin de sucre supplémentaire..."></textarea>
+          <textarea class="txt" id="r-other" placeholder="ex: machine en panne à remplacer, sucre / gobelets en plus, lait..."></textarea>
         </div>
       </div>
     </div>
@@ -278,7 +304,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <div class="card-head">
       <div class="card-num">4</div>
       <div class="card-title">Quand vous livrer ?</div>
-      <div class="card-sub">Choisissez votre créneau</div>
+      <div class="card-sub">Créneaux d'1 heure</div>
     </div>
     <div class="card-body">
       <label class="lbl" style="display:block;margin-bottom:9px;">Jour souhaité <span class="req">*</span></label>
@@ -290,7 +316,12 @@ body::before{content:'';position:fixed;inset:0;background:
         </div>
       </div>
 
-      <label class="lbl" style="display:block;margin-bottom:9px;">Créneau horaire <span class="req">*</span></label>
+      <label class="lbl" style="display:block;margin-bottom:4px;">Créneau horaire <span class="req">*</span></label>
+      <div class="slot-hint" id="slot-hint">Choisissez d'abord un jour pour voir les horaires disponibles (de 9h à minuit).</div>
+      <div class="slot-legend" style="display:none" id="slot-legend">
+        <span><i style="color:var(--gold2)">●</i> Libre</span>
+        <span><i style="color:var(--text3)">◌</i> Déjà réservé</span>
+      </div>
       <div class="slots" id="slots-container"></div>
 
       <label class="urgent" id="urgent-box" onclick="toggleUrgent(event)">
@@ -321,7 +352,7 @@ body::before{content:'';position:fixed;inset:0;background:
   <h2 class="success-title">Créneau <em>réservé !</em></h2>
   <p class="success-sub">Votre demande de réapprovisionnement a bien été transmise à notre équipe. Nous arrivons sur le créneau choisi.</p>
   <div class="success-card" id="success-details"></div>
-  <p class="success-phone">Un imprévu ? Appelez-nous directement : <a href="tel:+33600000000">+33 6 00 00 00 00</a></p>
+  <p class="success-phone">Un imprévu ? Appelez-nous directement : <a href="tel:+33761465720">+33 7 61 46 57 20</a></p>
   <button class="reset-btn" onclick="resetForm()">↩ Faire une autre demande</button>
 </div>
 
@@ -339,10 +370,14 @@ body::before{content:'';position:fixed;inset:0;background:
 // RÉSERVATION DE CRÉNEAU — EauService by Events Café
 // Outil client léger : réservation d'un créneau de livraison /
 // réapprovisionnement pendant les salons (Côte d'Azur).
-// Écrit dans le nœud Firebase "reservations" + email équipe + accusé client.
+// • Écrit dans le nœud Firebase "reservations" (+ email équipe + accusé client)
+// • Créneaux toutes les 30 min de 9h à minuit, CONNECTÉS : un créneau déjà
+//   pris (nœud public "slots/{date}/{heure}") s'affiche comme indisponible.
 // ============================================================
 
-// ---------- Lieux Côte d'Azur (avec coordonnées GPS pour la carte du dashboard) ----------
+const pad = n => String(n).padStart(2,'0');
+
+// ---------- Lieux Côte d'Azur (coordonnées GPS pour la carte du dashboard) ----------
 const VENUES = [
   { group:'Cannes', items:[
     { id:'cannes_palais', name:'Palais des Festivals et des Congrès — Cannes', city:'Cannes', lat:43.5505, lng:7.0174 },
@@ -377,34 +412,32 @@ const VENUES = [
 const VENUE_MAP = {};
 VENUES.forEach(g=>g.items.forEach(v=>VENUE_MAP[v.id]=v));
 
-// ---------- Articles de réapprovisionnement ----------
-// (les "id" reprennent ceux du dashboard quand ils existent, pour l'affichage du matériel)
-const ITEMS = [
-  { id:'bonbonne',  icon:'💧', name:'Bonbonne d\'eau (18,9 L)' },
-  { id:'gobelet',   icon:'🥤', name:'Gobelets (lot de 100)' },
-  { id:'cafe_pods', icon:'☕', name:'Capsules / dosettes café' },
-  { id:'the',       icon:'🍵', name:'Sachets de thé' },
-  { id:'lait',      icon:'🥛', name:'Lait / dosettes lait' },
-  { id:'sucre',     icon:'🥄', name:'Sucre & touillettes' },
-];
-const ITEM_MAP = {};
-ITEMS.forEach(i=>ITEM_MAP[i.id]=i);
+// ---------- Café : nombre de capsules (50 → illimité) ----------
+const CAFE_OPTIONS = ['50','100','150','200','250','300','400','500','illimite'];
 
-// ---------- Créneaux horaires ----------
-const SLOTS = [
-  { id:'08-10', label:'08:00 – 10:00', d:'Matin' },
-  { id:'10-12', label:'10:00 – 12:00', d:'Matin' },
-  { id:'12-14', label:'12:00 – 14:00', d:'Midi' },
-  { id:'14-16', label:'14:00 – 16:00', d:'Après-midi' },
-  { id:'16-18', label:'16:00 – 18:00', d:'Après-midi' },
-  { id:'18-20', label:'18:00 – 20:00', d:'Soir' },
+// ---------- Eau ----------
+const WATER = [
+  { id:'bonbonne',     icon:'🫙', name:"Bonbonnes d'eau", tag:'Le + demandé' },
+  { id:'fontaine_eau', icon:'💧', name:'Fontaine à eau' },
+];
+// ---------- Machines à café (ids alignés sur le stock du dashboard) ----------
+const MACHINES = [
+  { id:'nespresso',      icon:'☕', name:'Nespresso Zenius' },
+  { id:'nespresso_g220', icon:'☕', name:'Nespresso Gemini' },
+  { id:'covim',          icon:'☕', name:'Machine Covim' },
+  { id:'lavazza',        icon:'☕', name:'Machine Lavazza' },
+  { id:'machine_grains', icon:'⚙️', name:'Machine à grains' },
+  { id:'machine_bar',    icon:'🍸', name:'Machine à bar' },
 ];
 
 // ---------- État ----------
-const qty = {};            // { itemId: qty }
+const qty = {};            // { itemId: qty } (eau + machines)
+let cafeCapsules = '';     // '' | '50'..'500' | 'illimite'
 let selVenue = '';
 let selDate = '';          // YYYY-MM-DD
-let selSlot = '';
+let selSlot = '';          // id créneau 'HHMM'
+let takenSlots = {};       // { 'HHMM': true } pour la date sélectionnée
+let slotsRefHandle = null; // référence Firebase écoutée
 
 // ============================================================
 // Construction de l'interface
@@ -426,20 +459,30 @@ function onVenueChange(){
   updateSummary();
 }
 
-function buildItems(){
-  const cont = document.getElementById('items-container');
-  cont.innerHTML = ITEMS.map(it=>{
-    const q = qty[it.id]||0;
-    return `<div class="item${q>0?' sel':''}" id="it-${it.id}">
-      <div class="item-info"><span class="item-ico">${it.icon}</span><span class="item-name">${it.name}</span></div>
-      <div class="qty">
-        <button class="qty-btn" onclick="adjQty('${it.id}',-1)">−</button>
-        <span class="qty-val${q>0?' on':''}" id="q-${it.id}">${q}</span>
-        <button class="qty-btn" onclick="adjQty('${it.id}',1)">+</button>
-      </div>
-    </div>`;
-  }).join('');
+function buildCafe(){
+  const cont = document.getElementById('cafe-container');
+  const opts = ['<option value="">— Pas de café —</option>']
+    .concat(CAFE_OPTIONS.map(v=>`<option value="${v}"${cafeCapsules===v?' selected':''}>${v==='illimite'?'Illimité (à volonté)':v+' capsules'}</option>`));
+  cont.innerHTML = `<div class="cafe-row${cafeCapsules?' sel':''}">
+    <div class="item-info"><span class="item-ico">☕</span><span class="item-name">Capsules / dosettes café</span></div>
+    <select class="sel" onchange="setCafe(this.value)">${opts.join('')}</select>
+  </div>`;
 }
+function setCafe(v){ cafeCapsules = v; buildCafe(); updateSummary(); }
+
+function stepperCardHtml(it){
+  const q = qty[it.id]||0;
+  return `<div class="item${q>0?' sel':''}" id="it-${it.id}">
+    <div class="item-info"><span class="item-ico">${it.icon}</span><span class="item-name">${it.name}${it.tag?`<span class="item-tag">${it.tag}</span>`:''}</span></div>
+    <div class="qty">
+      <button class="qty-btn" onclick="adjQty('${it.id}',-1)">−</button>
+      <span class="qty-val${q>0?' on':''}" id="q-${it.id}">${q}</span>
+      <button class="qty-btn" onclick="adjQty('${it.id}',1)">+</button>
+    </div>
+  </div>`;
+}
+function buildWater(){ document.getElementById('water-container').innerHTML = WATER.map(stepperCardHtml).join(''); }
+function buildMachines(){ document.getElementById('machine-container').innerHTML = MACHINES.map(stepperCardHtml).join(''); }
 function adjQty(id,d){
   const v = Math.max(0,(qty[id]||0)+d);
   if(v===0) delete qty[id]; else qty[id]=v;
@@ -449,67 +492,107 @@ function adjQty(id,d){
   updateSummary();
 }
 
+// ---------- Jours ----------
 function isoOffset(days){
   const d = new Date(); d.setDate(d.getDate()+days);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 }
+function todayLocal(){ return isoOffset(0); }
+function dayShort(iso){ try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }catch(e){ return ''; } }
 function buildDayChips(){
-  const today = isoOffset(0);
-  document.getElementById('r-date').min = today;
+  document.getElementById('r-date').min = todayLocal();
   const days = [
     { iso:isoOffset(0), t:'Aujourd\'hui' },
     { iso:isoOffset(1), t:'Demain' },
-    { iso:isoOffset(2), t:dayName(isoOffset(2)) },
+    { iso:isoOffset(2), t:(()=>{ try{ return new Date(isoOffset(2)+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long'}); }catch(e){ return isoOffset(2); } })() },
   ];
-  const cont = document.getElementById('day-chips');
-  cont.innerHTML = days.map(d=>`<div class="chip${selDate===d.iso?' sel':''}" data-iso="${d.iso}" onclick="pickDay('${d.iso}')">${d.t}<small>${dayShort(d.iso)}</small></div>`).join('');
+  document.getElementById('day-chips').innerHTML = days.map(d=>`<div class="chip${selDate===d.iso?' sel':''}" data-iso="${d.iso}" onclick="pickDay('${d.iso}')">${d.t}<small>${dayShort(d.iso)}</small></div>`).join('');
 }
-function dayName(iso){ try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long'}); }catch(e){ return iso; } }
-function dayShort(iso){ try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }catch(e){ return ''; } }
-function pickDay(iso){
-  selDate = iso;
-  document.getElementById('r-date').value = iso;
-  buildDayChips();
-  updateSummary();
-}
-function onDatePick(v){
-  if(!v) return;
-  selDate = v;
-  buildDayChips(); // met à jour la sélection des pastilles (aucune si date hors des 3 jours)
-  document.querySelectorAll('#day-chips .chip').forEach(c=>c.classList.toggle('sel', c.dataset.iso===v));
-  updateSummary();
-}
+function pickDay(iso){ selDate=iso; selSlot=''; document.getElementById('r-date').value=iso; buildDayChips(); watchSlots(iso); updateSummary(); }
+function onDatePick(v){ if(!v) return; selDate=v; selSlot=''; buildDayChips(); document.querySelectorAll('#day-chips .chip').forEach(c=>c.classList.toggle('sel', c.dataset.iso===v)); watchSlots(v); updateSummary(); }
 
+// ---------- Créneaux (30 min, 9h → minuit) ----------
+function buildSlotTimes(){
+  const arr = [];
+  for(let h=9; h<=23; h++){ arr.push(pad(h)+'00'); } // créneaux d'1 heure
+  arr.push('0000'); // minuit
+  return arr;
+}
+const SLOT_TIMES = buildSlotTimes();
+function slotLabelFromId(id){ return id.slice(0,2)+':'+id.slice(2); }
+// Créneau déjà passé (uniquement pour aujourd'hui) -> on le masque complètement
+function slotIsPast(id){
+  if(selDate!==todayLocal()) return false;
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const cmp = (id==='0000') ? 24*60 : (parseInt(id.slice(0,2))*60 + parseInt(id.slice(2)));
+  return cmp <= nowMin;
+}
+function slotUnavailable(id){ return !!takenSlots[id] || slotIsPast(id); }
 function buildSlots(){
   const cont = document.getElementById('slots-container');
-  cont.innerHTML = SLOTS.map(s=>`<div class="slot${selSlot===s.id?' sel':''}" onclick="pickSlot('${s.id}')">
-      <div class="slot-t">${s.label}</div><div class="slot-d">${s.d}</div></div>`).join('');
+  const hint = document.getElementById('slot-hint');
+  const legend = document.getElementById('slot-legend');
+  if(!selDate){
+    cont.innerHTML = ''; hint.style.display = ''; hint.textContent = 'Choisissez d\'abord un jour pour voir les horaires disponibles (de 9h à minuit).'; legend.style.display = 'none'; return;
+  }
+  // on n'affiche que les créneaux non passés (les heures passées disparaissent aujourd'hui)
+  const avail = SLOT_TIMES.filter(id=>!slotIsPast(id));
+  if(!avail.length){
+    hint.style.display = ''; hint.textContent = 'Plus de créneau disponible aujourd\'hui — choisissez « Demain » ou une autre date.';
+    legend.style.display = 'none'; cont.innerHTML = ''; return;
+  }
+  hint.style.display = 'none'; legend.style.display = '';
+  // si le créneau choisi est devenu indisponible, on le libère
+  if(selSlot && slotUnavailable(selSlot)){ selSlot=''; }
+  cont.innerHTML = avail.map(id=>{
+    if(takenSlots[id]){
+      return `<div class="slot taken" title="Déjà réservé"><div class="slot-t">${slotLabelFromId(id)}</div><div class="slot-d">Réservé</div></div>`;
+    }
+    const sel = (selSlot===id);
+    return `<div class="slot${sel?' sel':''}" onclick="pickSlot('${id}')"><div class="slot-t">${slotLabelFromId(id)}</div><div class="slot-d">${sel?'Choisi':'Libre'}</div></div>`;
+  }).join('');
 }
-function pickSlot(id){ selSlot = id; buildSlots(); updateSummary(); }
+function pickSlot(id){ if(slotUnavailable(id)) return; selSlot=id; buildSlots(); updateSummary(); }
+
+// Écoute en direct les créneaux pris pour une date donnée
+function watchSlots(date){
+  takenSlots = {};
+  if(slotsRefHandle){ try{ slotsRefHandle.off(); }catch(e){} slotsRefHandle=null; }
+  if(!fbReady || !date){ buildSlots(); return; }
+  slotsRefHandle = db.ref('slots/'+date);
+  slotsRefHandle.on('value', snap=>{
+    const v = snap.val() || {};
+    const prevSel = selSlot;
+    takenSlots = {};
+    Object.keys(v).forEach(k=>{ if(v[k]) takenSlots[k]=true; });
+    if(prevSel && takenSlots[prevSel]){ showToast('Le créneau choisi vient d\'être réservé, choisissez-en un autre','error'); }
+    buildSlots(); updateSummary();
+  }, err=>{ console.warn('Lecture des créneaux indisponible (on affiche tout comme libre)', err); buildSlots(); });
+}
 
 function toggleUrgent(e){
-  // évite le double toggle quand on clique directement sur la case
   if(e && e.target && e.target.id==='r-urgent'){ syncUrgent(); return; }
-  const cb = document.getElementById('r-urgent');
-  cb.checked = !cb.checked;
-  syncUrgent();
+  const cb = document.getElementById('r-urgent'); cb.checked = !cb.checked; syncUrgent();
 }
-function syncUrgent(){
-  document.getElementById('urgent-box').classList.toggle('on', document.getElementById('r-urgent').checked);
-  updateSummary();
-}
+function syncUrgent(){ document.getElementById('urgent-box').classList.toggle('on', document.getElementById('r-urgent').checked); updateSummary(); }
 
-// ---------- Récapitulatif ----------
+// ---------- Sélection / récap ----------
 function selectedItems(){
-  return ITEMS.filter(it=>(qty[it.id]||0)>0).map(it=>({ id:it.id, label:it.name, qty:qty[it.id] }));
+  const out = [];
+  if(cafeCapsules){
+    out.push({ id:'cafe_pods', label:'Café', detail: cafeCapsules==='illimite'?'illimité':cafeCapsules+' capsules', qty: cafeCapsules==='illimite'?0:Math.max(1,Math.round(Number(cafeCapsules)/50)) });
+  }
+  [...WATER, ...MACHINES].forEach(it=>{ const q=qty[it.id]||0; if(q>0) out.push({ id:it.id, label:it.name, qty:q }); });
+  return out;
 }
 function updateSummary(){
   const chips = [];
   if(selVenue){ const v=VENUE_MAP[selVenue]; chips.push('📍 '+(v?v.city:(document.getElementById('r-othercity').value||'Autre lieu'))); }
   if(selDate){ chips.push('📅 '+dayShort(selDate)); }
-  if(selSlot){ const s=SLOTS.find(x=>x.id===selSlot); chips.push('🕐 '+(s?s.label:'')); }
-  selectedItems().forEach(i=>chips.push(`${i.qty}× ${i.label}`));
-  if(document.getElementById('r-urgent') && document.getElementById('r-urgent').checked) chips.push('🚨 Urgent');
+  if(selSlot){ chips.push('🕐 '+slotLabelFromId(selSlot)); }
+  selectedItems().forEach(i=>chips.push(i.detail?('☕ '+i.detail):(i.qty+'× '+i.label)));
+  if(document.getElementById('r-urgent').checked) chips.push('🚨 Urgent');
   const box = document.getElementById('summary'), wrap = document.getElementById('summary-chips');
   if(chips.length){ box.classList.add('on'); wrap.innerHTML = chips.map(c=>`<span class="summary-chip">${c}</span>`).join(''); }
   else box.classList.remove('on');
@@ -558,9 +641,8 @@ async function ensureEmailCfg(){
   return emailCfg;
 }
 
-function slotLabel(id){ const s=SLOTS.find(x=>x.id===id); return s?s.label:'—'; }
 function fmtFull(iso){ if(!iso) return '—'; try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }catch(e){ return iso; } }
-function itemsText(items){ return items.length ? items.map(i=>`   • ${i.qty}× ${i.label}`).join('\n') : '   • (aucun article précisé)'; }
+function itemsText(items){ return items.length ? items.map(i=>'   • '+(i.detail?(i.label+' : '+i.detail):(i.qty+'× '+i.label))).join('\n') : '   • (aucun article précisé)'; }
 
 async function sendTeamEmail(res){
   await ensureEmailCfg();
@@ -581,13 +663,13 @@ Stand / accès : ${res.stand||'—'}
 Carte : ${mapLink}
 
 CRÉNEAU SOUHAITÉ
-${fmtFull(res.date)} — ${slotLabel(res.slot)}
+${fmtFull(res.date)} — ${res.slotLabel}
 
 BESOIN (réapprovisionnement)
 ${itemsText(res.items)}
 ${res.other?('\nAutre : '+res.other):''}
 
-➡️ Ouvre le dashboard → onglet « Réappro » : la demande s'affiche sur la carte et dans la liste du jour.`;
+➡️ Ouvre le dashboard → onglet « Réappro » : la demande s'affiche sur la carte et dans le planning du jour.`;
   const recipients = [
     { email: emailCfg.email1, name: emailCfg.name1 },
     { email: emailCfg.email2, name: emailCfg.name2 }
@@ -616,7 +698,7 @@ async function sendClientAck(res){
 ✅ Nous avons bien reçu votre demande de réapprovisionnement (réf. ${res.ref}).
 
 VOTRE CRÉNEAU
-${fmtFull(res.date)} — ${slotLabel(res.slot)}
+${fmtFull(res.date)} — ${res.slotLabel}
 Lieu : ${res.venueName||'—'}${res.stand?(' · '+res.stand):''}
 
 CE QUE NOUS VOUS APPORTONS
@@ -624,7 +706,7 @@ ${itemsText(res.items)}
 ${res.other?('\nAutre : '+res.other):''}
 
 Notre équipe passera sur le créneau choisi. En cas d'imprévu, nous vous appelons.
-Pour toute urgence, joignez-nous directement au +33 6 00 00 00 00.
+Pour toute urgence, joignez-nous directement au +33 7 61 46 57 20.
 
 À très vite,
 L'équipe EauService by Events Café`;
@@ -656,7 +738,8 @@ async function submitReservation(){
     if(v){ city=v.city; venueName=v.name; lat=v.lat; lng=v.lng; }
   }
   if(!selDate){ showToast('Merci de choisir un jour','error'); return; }
-  if(!selSlot){ showToast('Merci de choisir un créneau horaire','error'); return; }
+  if(!selSlot){ showToast('Merci de choisir un créneau horaire libre','error'); return; }
+  if(slotUnavailable(selSlot)){ showToast('Ce créneau n\'est plus disponible, choisissez-en un autre','error'); buildSlots(); return; }
 
   const items = selectedItems();
   const other = document.getElementById('r-other').value.trim();
@@ -672,7 +755,7 @@ async function submitReservation(){
     email: document.getElementById('r-email').value.trim(),
     venueId: selVenue, venueName, city, lat, lng,
     stand: document.getElementById('r-stand').value.trim(),
-    date: selDate, slot: selSlot, slotLabel: slotLabel(selSlot),
+    date: selDate, slot: selSlot, slotLabel: slotLabelFromId(selSlot),
     items, other,
     urgent: !!document.getElementById('r-urgent').checked,
     status: 'nouvelle',
@@ -686,21 +769,29 @@ async function submitReservation(){
   try{
     if(fbReady){
       await ensureAnonAuth();
-      const r = db.ref('reservations').push();
-      res.id = r.key;
-      await r.set(res);
+      const resRef = db.ref('reservations').push();
+      res.id = resRef.key;
+      // Réserve le créneau de façon ATOMIQUE (évite la double réservation)
+      const slotPath = 'slots/'+res.date+'/'+res.slot;
+      const claim = await db.ref(slotPath).transaction(cur => (cur===null ? true : undefined));
+      if(!claim.committed){
+        btn.style.pointerEvents=''; btn.style.opacity='';
+        showToast('Ce créneau vient d\'être réservé, choisissez-en un autre','error');
+        watchSlots(res.date);
+        return;
+      }
+      try{ await resRef.set(res); }
+      catch(e){ try{ await db.ref(slotPath).remove(); }catch(_){} throw e; }
     } else {
       const pending = JSON.parse(localStorage.getItem('ec_reservations')||'[]');
       res.id = 'res_'+createdAt; pending.push(res);
       localStorage.setItem('ec_reservations', JSON.stringify(pending));
     }
-    // Emails (indépendants de Firebase : l'équipe est notifiée même si l'écriture est bloquée)
     sendTeamEmail(res);
     sendClientAck(res);
     showSuccess(res);
   }catch(e){
     console.error(e);
-    // L'écriture Firebase a échoué (ex: règles) : on notifie quand même par email
     try{ sendTeamEmail(res); sendClientAck(res); showSuccess(res); }
     catch(_){ showToast('Erreur lors de l\'envoi, réessayez ou appelez-nous','error'); }
   }
@@ -711,7 +802,7 @@ function showSuccess(res){
   document.getElementById('form-wrap').style.display='none';
   document.getElementById('success-screen').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
-  const itemsTxt = res.items.length ? res.items.map(i=>`${i.qty}× ${i.label}`).join(', ') : (res.other||'—');
+  const itemsTxt = res.items.length ? res.items.map(i=>i.detail?(i.label+' ('+i.detail+')'):(i.qty+'× '+i.label)).join(', ') : (res.other||'—');
   document.getElementById('success-details').innerHTML = `
     <div class="success-row"><span class="success-row-label">Référence</span><span class="success-row-val">${res.ref}</span></div>
     <div class="success-row"><span class="success-row-label">Lieu</span><span class="success-row-val" style="max-width:280px">${res.venueName}${res.stand?'<br>'+res.stand:''}</span></div>
@@ -729,8 +820,10 @@ function resetForm(){
   document.getElementById('urgent-box').classList.remove('on');
   document.getElementById('r-othercity-wrap').style.display='none';
   Object.keys(qty).forEach(k=>delete qty[k]);
-  selVenue=''; selDate=''; selSlot='';
-  buildItems(); buildDayChips(); buildSlots(); updateSummary();
+  cafeCapsules=''; selVenue=''; selDate=''; selSlot='';
+  if(slotsRefHandle){ try{ slotsRefHandle.off(); }catch(e){} slotsRefHandle=null; }
+  takenSlots={};
+  buildCafe(); buildWater(); buildMachines(); buildDayChips(); buildSlots(); updateSummary();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -742,11 +835,16 @@ function showToast(msg,type='info'){
 
 // INIT
 buildVenues();
-buildItems();
+buildCafe();
+buildWater();
+buildMachines();
 buildDayChips();
 buildSlots();
 loadEmailCfg();
+ensureAnonAuth();
 updateSummary();
+// Rafraîchit les créneaux chaque minute : à 12h, les créneaux d'avant 12h disparaissent tout seuls
+setInterval(()=>{ if(selDate===todayLocal()) buildSlots(); }, 60000);
 </script>
 </body>
 </html>

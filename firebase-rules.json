@@ -1,21 +1,31 @@
 {
   "rules": {
-    ".read": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
-    ".write": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
+    ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
+    ".write": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
 
     "events": {
-      ".read": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
+      ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
       "$eventId": {
-        ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
+        ".write": "(auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')) || (auth != null && !data.exists() && newData.exists())",
         ".validate": "newData.hasChildren(['client','status'])"
       }
     },
 
     "reservations": {
-      ".read": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
+      ".read": "auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')",
       "$reservationId": {
-        ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
+        ".write": "(auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')) || (auth != null && !data.exists() && newData.exists())",
         ".validate": "newData.hasChildren(['company','date'])"
+      }
+    },
+
+    "slots": {
+      ".read": "auth != null",
+      "$date": {
+        "$time": {
+          ".write": "(auth != null && (auth.uid === '37NcsKyQ9ZgroweOXg6Vmz7MJjB2' || auth.uid === 'CYAUaFthZzP7aXaRJrKtotijOnP2')) || (auth != null && !data.exists() && newData.exists())",
+          ".validate": "newData.isBoolean() || newData.isString()"
+        }
       }
     }
   }
