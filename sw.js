@@ -3,11 +3,12 @@
    But : rendre l'app installable et utilisable hors-ligne (coquille),
    SANS jamais interférer avec Firebase (temps réel) ni EmailJS.
    ============================================================ */
-const CACHE = 'events-cafe-v14';
+const CACHE = 'events-cafe-v15';
 const APP_SHELL = [
   './',
   './index.html',
   './formulaire.html',
+  './reservation.html',
   './firebase-config.js',
   './manifest.webmanifest',
   './icon.svg'

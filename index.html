@@ -506,7 +506,30 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
 @media(max-width:360px){
   .stats-row{grid-template-columns:1fr;}
 }
+
+/* ===== ONGLET RÉAPPRO / CRÉNEAUX ===== */
+#reapproMap{height:340px;width:100%;border-radius:14px;border:1px solid var(--border2);margin-bottom:14px;background:var(--bg2);z-index:0;}
+.leaflet-popup-content{font-family:var(--font-body);font-size:13px;line-height:1.5;}
+.reappro-map-fallback{height:120px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;text-align:center;padding:16px;border:1px dashed var(--border2);border-radius:14px;margin-bottom:14px;}
+.res-summary{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:11px 16px;margin-bottom:14px;}
+.res-summary b{color:var(--text1);}
+.res-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--dc,#60A5FA);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+.res-card.urgent{border-color:rgba(248,113,113,.4);box-shadow:0 0 0 1px rgba(248,113,113,.18);}
+.res-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.res-title{font-family:var(--font-head);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.res-time{font-size:12px;color:var(--accent2);font-weight:600;margin-top:2px;}
+.res-meta{font-size:12px;color:var(--text2);margin-top:7px;display:flex;flex-direction:column;gap:3px;}
+.res-meta a{color:var(--accent2);text-decoration:none;}
+.res-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid;white-space:nowrap;}
+.res-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+.res-chip{font-size:11px;padding:3px 9px;border-radius:7px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);}
+.res-urgent-tag{font-size:10px;font-weight:700;color:#fca5a5;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);padding:3px 8px;border-radius:7px;}
+.res-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:11px;}
+.res-actions select{font-size:11px;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font-body);cursor:pointer;}
+@media(max-width:640px){#reapproMap{height:260px;}}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 </head>
 <body>
 
@@ -553,6 +576,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
     <div class="nav-item active" data-tab="calendar" onclick="showTab('calendar')"><span class="nav-icon">📅</span><span>Calendrier</span><span class="nav-badge" id="nav-badge-cal">0</span></div>
     <div class="nav-item" data-tab="events" onclick="showTab('events')"><span class="nav-icon">🗂️</span><span>Événements</span></div>
     <div class="nav-item" data-tab="delivery" onclick="showTab('delivery')"><span class="nav-icon">🚚</span><span>Livraisons</span><span class="nav-badge" id="nav-badge-delivery" style="display:none">0</span></div>
+    <div class="nav-item" data-tab="reappro" onclick="showTab('reappro')"><span class="nav-icon">📍</span><span>Réappro / Créneaux</span><span class="nav-badge" id="nav-badge-reappro" style="display:none">0</span></div>
     <div class="nav-item" data-tab="stock" onclick="showTab('stock')"><span class="nav-icon">📦</span><span>Stock</span><span class="nav-badge warn" id="nav-badge-stock" style="display:none">!</span></div>
     <div class="nav-item nav-more" id="more-nav-btn-desktop" onclick="openMore()"><span class="nav-icon">☰</span><span>PLUS</span><span class="nav-badge red" id="nav-badge-more" style="display:none">0</span></div>
     <div class="sidebar-bottom">
@@ -575,6 +599,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
           <div class="notif-red-dot" id="notif-red-dot"></div>
         </div>
         <button class="btn btn-ghost" onclick="copyFormLink()">🔗 <span class="btn-label">Formulaire</span></button>
+        <button class="btn btn-ghost" onclick="copyReservationLink()">📍 <span class="btn-label">Réservation</span></button>
         <button class="btn btn-gold" onclick="openAddModal()">＋ <span class="btn-label">Nouvel événement</span></button>
       </div>
     </div>
@@ -767,6 +792,9 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
       <!-- LIVRAISONS & BONS -->
       <div id="tab-delivery" class="section"></div>
 
+      <!-- RÉAPPRO / CRÉNEAUX (réservations clients) -->
+      <div id="tab-reappro" class="section"></div>
+
       <!-- CONFIG -->
       <div id="tab-config" class="section">
         <div class="config-panel" id="account-panel" style="display:none;">
@@ -869,6 +897,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
   <div class="more-sheet-grip"></div>
   <div class="more-sheet-title">Menu — toutes les sections</div>
   <div class="more-grid">
+    <button class="more-item" onclick="showTab('reappro');closeMore()"><span class="mi-ico">📍</span><span>Réappro / Créneaux</span><span class="mi-badge" id="more-badge-reappro" style="display:none">0</span></button>
     <button class="more-item" onclick="showTab('clients');closeMore()"><span class="mi-ico">👥</span><span>Clients &amp; Tarifs</span></button>
     <button class="more-item" onclick="showTab('catalogue');closeMore()"><span class="mi-ico">🛠️</span><span>Catalogue produits</span></button>
     <button class="more-item" onclick="showTab('planning');closeMore()"><span class="mi-ico">⏱️</span><span>Planning / Heures</span></button>
@@ -4449,6 +4478,293 @@ function logout(){
 
 registerServiceWorker();
 setTimeout(bootApp, 800);
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     RÉAPPRO / CRÉNEAUX — réservations clients (reservation.html)
+     Nœud Firebase "reservations". Carte Côte d'Azur (Leaflet),
+     planning du jour, assignation livreur, conversion en livraison.
+     ══════════════════════════════════════════════════════ -->
+<script>
+let reservations = JSON.parse(localStorage.getItem('ec_dash_reservations')||'[]');
+let reservSeen = {};
+let reservLoaded = false;
+let reservDate = (typeof todayISO==='function') ? todayISO() : new Date().toISOString().slice(0,10);
+let reservMap = null, reservMarkers = [];
+
+const RES_STATUS = {
+  nouvelle:  {label:'À planifier', color:'#60A5FA', icon:'🆕'},
+  planifiee: {label:'Planifiée',   color:'#FB923C', icon:'🗓️'},
+  livree:    {label:'Livrée',      color:'#22C55E', icon:'✅'},
+  annulee:   {label:'Annulée',     color:'#5C6478', icon:'🚫'},
+};
+
+// ── Helpers dates / créneaux ──
+function resFmtDay(d){ if(!d)return'—'; try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}catch(e){return d;} }
+function resShiftDay(delta){ const d=new Date(reservDate+'T12:00:00'); d.setDate(d.getDate()+delta); reservDate=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); renderReappro(); }
+function resGoToday(){ reservDate=todayISO(); renderReappro(); }
+function resPickDate(v){ if(v){ reservDate=v; renderReappro(); } }
+function slotStartTime(slot){ const a=(slot||'').split('-')[0]; return a?(a.padStart(2,'0')+':00'):''; }
+function sortRes(a,b){
+  if(!!b.urgent!==!!a.urgent) return b.urgent?1:-1;
+  return (a.slot||'zz').localeCompare(b.slot||'zz') || ((a.createdAt||0)-(b.createdAt||0));
+}
+function resMarkerColor(r){
+  if(r.status==='livree') return '#22C55E';
+  if(r.status==='annulee') return '#5C6478';
+  if(r.urgent) return '#EF4444';
+  if(r.status==='planifiee') return (r.driverId && typeof driverColor==='function') ? driverColor(r.driverId) : '#FB923C';
+  return '#60A5FA';
+}
+
+// ── Persistance ──
+function saveResLocal(){ try{ localStorage.setItem('ec_dash_reservations', JSON.stringify(reservations)); }catch(e){} }
+function saveResPatch(id, patch){
+  const r = reservations.find(x=>String(x.id)===String(id));
+  if(r) Object.assign(r, patch);
+  saveResLocal();
+  if(fbReady) queuedWrite('update', 'reservations/'+id, patch);
+}
+function assignResDriver(id, driverId){ saveResPatch(id, {driverId}); renderReappro(); }
+function setResStatus(id, status){ saveResPatch(id, {status}); renderReappro(); showToast('Statut mis à jour ✓','success'); }
+function deleteReservation(id){
+  const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
+  if(!confirm('Supprimer cette réservation ?')) return;
+  reservations = reservations.filter(x=>String(x.id)!==String(id));
+  saveResLocal();
+  if(fbReady) queuedWrite('remove', 'reservations/'+id, null);
+  renderReappro();
+  showToast('Réservation supprimée','info');
+}
+
+// ── Conversion réservation → livraison (réutilise le système de Livraisons) ──
+function convertReservationToDelivery(id){
+  const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
+  const material = {}; const extra = [];
+  (r.items||[]).forEach(it=>{
+    if(STOCK_META.find(s=>s.id===it.id)) material[it.id] = it.qty;
+    else extra.push(`${it.qty}× ${it.label}`);
+  });
+  let note = 'Réappro client'+(r.ref?(' '+r.ref):'');
+  if(extra.length) note += ' · '+extra.join(', ');
+  if(r.other) note += ' · '+r.other;
+  if(r.urgent) note = '🚨 URGENT · '+note;
+  const d = {
+    id:'dlv_'+Date.now()+'_'+Math.floor(Math.random()*1000),
+    eventId:'', reservationId:r.id,
+    date:r.date, time:slotStartTime(r.slot),
+    type:'livraison',
+    title:(r.company||r.city||'Réappro')+(r.stand?(' — '+r.stand):''),
+    driverId:r.driverId||(drivers[0]?drivers[0].id:''),
+    address:(r.venueName||r.city||'')+(r.stand?(' · '+r.stand):''),
+    contact:r.contact||r.company||'',
+    phone:r.phone||'',
+    material, note, done:false
+  };
+  deliveries.push(d);
+  saveDeliveries();
+  saveResPatch(r.id, {status:'planifiee', driverId:d.driverId});
+  showToast('Livraison créée ✓ (onglet Livraisons)','success');
+  showTab('delivery');
+}
+
+function copyReservationLink(){
+  const link=(location.origin+location.pathname).replace(/[^\/]*$/,'')+'reservation.html';
+  if(navigator.clipboard) navigator.clipboard.writeText(link).then(()=>showToast('Lien de réservation copié ✓','success')).catch(()=>showToast(link,'info'));
+  else showToast(link,'info');
+}
+
+// ── Firebase : écoute du nœud reservations ──
+function loadReservationsFromFirebase(){
+  if(!fbReady) return;
+  db.ref('reservations').on('value', snap=>{
+    const arr = fbToArray(snap.val()).map(r=>({...r}));
+    if(reservLoaded){
+      arr.forEach(r=>{
+        if(r.id && !reservSeen[r.id]){
+          const m = `${r.company||r.city||'Client'} · ${resFmtDay(r.date)} ${r.slotLabel||''}`.trim();
+          try{ pushNotif(r.urgent?'🚨':'📍', r.urgent?'Réservation URGENTE':'Nouvelle réservation créneau', m, 'form'); }catch(e){}
+        }
+      });
+    }
+    arr.forEach(r=>{ if(r.id) reservSeen[r.id]=true; });
+    reservLoaded = true;
+    reservations = arr;
+    saveResLocal();
+    updateReservBadge();
+    const tab=document.getElementById('tab-reappro');
+    if(tab && tab.classList.contains('active')) renderReappro();
+  }, err=>{ console.error('reservations read bloqué:', err); if(typeof flagSyncBlocked==='function') flagSyncBlocked('reservations'); });
+}
+
+function updateReservBadge(){
+  const today = todayISO();
+  const n = reservations.filter(r=>r.date===today && r.status!=='livree' && r.status!=='annulee').length;
+  ['nav-badge-reappro','more-badge-reappro'].forEach(id=>{
+    const b=document.getElementById(id);
+    if(b){ if(n>0){ b.style.display='inline'; b.textContent=n; } else { b.style.display='none'; } }
+  });
+}
+
+// ── Carte (Leaflet + OpenStreetMap) ──
+function initReservMap(list){
+  const mapEl = document.getElementById('reapproMap');
+  if(!mapEl) return;
+  if(typeof L==='undefined'){
+    mapEl.innerHTML = '<div class="reappro-map-fallback">🗺️ La carte se charge… (elle apparaît dès qu\'une connexion internet est disponible)</div>';
+    return;
+  }
+  if(reservMap){ try{ reservMap.remove(); }catch(e){} reservMap=null; reservMarkers=[]; }
+  reservMap = L.map('reapproMap', {scrollWheelZoom:false}).setView([43.65, 7.15], 9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(reservMap);
+  const pts=[];
+  (list||[]).forEach(r=>{
+    if(typeof r.lat!=='number' || typeof r.lng!=='number') return;
+    const col = resMarkerColor(r);
+    const m = L.circleMarker([r.lat, r.lng], {radius:9, color:'#fff', weight:2, fillColor:col, fillOpacity:.92}).addTo(reservMap);
+    const mapsUrl = `https://www.google.com/maps?q=${r.lat},${r.lng}`;
+    m.bindPopup(
+      `<b>${esc(r.company||r.city||'Client')}</b>${r.urgent?' 🚨':''}<br>${esc(r.venueName||'')}`+
+      `<br>${resFmtDay(r.date)} · ${esc(r.slotLabel||slotStartTime(r.slot))}`+
+      (r.phone?`<br>📞 ${esc(r.phone)}`:'')+
+      `<br><a href="${mapsUrl}" target="_blank">Itinéraire ↗</a>`
+    );
+    reservMarkers.push(m); pts.push([r.lat, r.lng]);
+  });
+  setTimeout(()=>{
+    if(!reservMap) return;
+    try{
+      reservMap.invalidateSize();
+      if(pts.length===1) reservMap.setView(pts[0], 12);
+      else if(pts.length>1) reservMap.fitBounds(pts, {padding:[40,40], maxZoom:12});
+    }catch(e){}
+  }, 180);
+}
+
+// ── Options des selects ──
+function resDriverOptions(selId){
+  return '<option value="">— Livreur —</option>' + drivers.map(d=>`<option value="${d.id}"${selId===d.id?' selected':''}>${esc(d.name)}</option>`).join('');
+}
+function resStatusOptions(selStatus){
+  return Object.keys(RES_STATUS).map(k=>`<option value="${k}"${selStatus===k?' selected':''}>${RES_STATUS[k].icon} ${RES_STATUS[k].label}</option>`).join('');
+}
+
+// ── Carte d'une réservation ──
+function renderResCard(r){
+  const st = RES_STATUS[r.status] || RES_STATUS.nouvelle;
+  const dc = (r.status==='planifiee' && r.driverId) ? driverColor(r.driverId) : st.color;
+  const items = (r.items||[]).map(i=>`<span class="res-chip">${i.qty}× ${esc(i.label)}</span>`).join('');
+  const mapLink = (typeof r.lat==='number') ? `<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">🗺️ Itinéraire</a>` : '';
+  return `<div class="res-card${r.urgent?' urgent':''}" style="--dc:${dc}">
+    <div class="res-top">
+      <div>
+        <div class="res-title">${esc(r.company||r.city||'Client')}${r.urgent?'<span class="res-urgent-tag">🚨 URGENT</span>':''}</div>
+        <div class="res-time">🕐 ${esc(r.slotLabel||slotStartTime(r.slot)||'créneau à définir')}${r.ref?(' · '+esc(r.ref)):''}</div>
+      </div>
+      <span class="res-badge" style="color:${st.color};border-color:${st.color}55;background:${st.color}1a">${st.icon} ${st.label}</span>
+    </div>
+    <div class="res-meta">
+      <span>📍 ${esc(r.venueName||r.city||'—')}${r.stand?(' · '+esc(r.stand)):''}</span>
+      ${r.contact?`<span>👤 ${esc(r.contact)}</span>`:''}
+      ${r.phone?`<span>📞 <a href="tel:${esc(r.phone)}">${esc(r.phone)}</a></span>`:''}
+      ${mapLink?`<span>${mapLink}</span>`:''}
+    </div>
+    ${items?`<div class="res-chips">${items}</div>`:''}
+    ${r.other?`<div class="ev-notes" style="margin-top:8px">💬 ${esc(r.other)}</div>`:''}
+    <div class="res-actions">
+      <select onchange="assignResDriver('${r.id}',this.value)">${resDriverOptions(r.driverId)}</select>
+      <select onchange="setResStatus('${r.id}',this.value)">${resStatusOptions(r.status||'nouvelle')}</select>
+      <button class="btn-xs success" onclick="convertReservationToDelivery('${r.id}')">🚚 Créer la livraison</button>
+      <button class="btn-xs danger" onclick="deleteReservation('${r.id}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+// ── Rendu de l'onglet ──
+function renderReappro(){
+  const el = document.getElementById('tab-reappro'); if(!el) return;
+  const day = reservDate;
+  const dayList = reservations.filter(r=>r.date===day).sort(sortRes);
+  const total = reservations.length;
+  const urg = dayList.filter(r=>r.urgent && r.status!=='livree' && r.status!=='annulee').length;
+  const pending = dayList.filter(r=>(r.status||'nouvelle')==='nouvelle').length;
+  const mapList = dayList.length ? dayList : reservations.filter(r=>r.status!=='annulee');
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-family:var(--font-head);font-size:16px;font-weight:600">📍 Réservations de créneaux — Réappro</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Les demandes clients arrivent ici en direct. Assigne un livreur, planifie, ou crée la livraison en 1 clic.</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="copyReservationLink()">🔗 Lien client</button>
+        <button class="btn btn-ghost" onclick="openDriverManager()">👷 Livreurs</button>
+      </div>
+    </div>
+    <div class="cal-header" style="margin-bottom:12px;">
+      <div class="cal-title" style="font-size:16px;text-transform:capitalize;">${resFmtDay(day)}</div>
+      <div class="cal-nav">
+        <input class="cal-btn" type="date" value="${day}" onchange="resPickDate(this.value)" style="padding:5px 10px;">
+        <button class="cal-btn" onclick="resShiftDay(-1)">← Préc.</button>
+        <button class="cal-btn" onclick="resGoToday()">Auj.</button>
+        <button class="cal-btn" onclick="resShiftDay(1)">Suiv. →</button>
+      </div>
+    </div>`;
+
+  html += `<div id="reapproMap"></div>`;
+
+  html += `<div class="res-summary">
+      <span>📋 <b>${dayList.length}</b> ce jour</span>
+      <span>🆕 <b>${pending}</b> à planifier</span>
+      <span>🚨 <b>${urg}</b> urgente${urg>1?'s':''}</span>
+      <span style="margin-left:auto;color:var(--text3)">${total} demande${total>1?'s':''} au total</span>
+    </div>`;
+
+  if(!dayList.length){
+    html += `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune réservation ce jour.<br>La carte montre toutes les demandes à venir. Partage le « Lien client » pour recevoir des créneaux.</div></div>`;
+    const upcoming = reservations
+      .filter(r=>(r.status||'nouvelle')==='nouvelle' && r.date>=todayISO())
+      .sort((a,b)=>(a.date||'').localeCompare(b.date||'') || sortRes(a,b));
+    if(upcoming.length){
+      html += `<div class="ev-list-header"><div class="ev-list-title">🆕 Prochaines demandes à planifier</div></div>`;
+      html += upcoming.slice(0,20).map(renderResCard).join('');
+    }
+  } else {
+    html += dayList.map(renderResCard).join('');
+  }
+
+  el.innerHTML = html;
+  initReservMap(mapList);
+  updateReservBadge();
+}
+
+// ── Branchements : étend startRealtime (écoute) et showTab (rendu) sans toucher au reste ──
+(function(){
+  const _origStartRealtime = window.startRealtime;
+  window.startRealtime = function(){
+    if(_origStartRealtime) _origStartRealtime.apply(this, arguments);
+    try{ loadReservationsFromFirebase(); }catch(e){ console.error('reservations init:', e); }
+  };
+  const _origShowTab = window.showTab;
+  window.showTab = function(n, el){
+    if(_origShowTab) _origShowTab.call(this, n, el);
+    if(n==='reappro'){
+      const pt=document.getElementById('page-title'); if(pt) pt.textContent='📍 Réappro / Créneaux';
+      const mb=document.getElementById('more-nav-btn'); if(mb) mb.classList.add('active');
+      const mbd=document.getElementById('more-nav-btn-desktop'); if(mbd) mbd.classList.add('active');
+      const sr=document.getElementById('stats-row'); if(sr) sr.style.display='none';
+      try{ renderReappro(); }catch(e){ console.error('renderReappro:', e); }
+    }
+  };
+  try{ updateReservBadge(); }catch(e){}
+})();
+
+// Si Leaflet finit de charger après l'ouverture de l'onglet, on redessine la carte
+window.addEventListener('load', function(){
+  if(typeof L==='undefined') return;
+  const tab=document.getElementById('tab-reappro');
+  if(tab && tab.classList.contains('active')){ try{ renderReappro(); }catch(e){} }
+});
 </script>
 </body>
 </html>
