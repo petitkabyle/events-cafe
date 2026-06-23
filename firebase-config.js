@@ -36,12 +36,28 @@ apiKey: "AIzaSyD2PH3pKwKAhGYdk5tFMOf1KcDPQeihTAw",
 window.EMAILJS_CONFIG = {
   pubkey:   "FkbFqxL3Y14WCz_MB",        // EmailJS Public Key
   service:  "service_5ljac5p",          // Service ID
-  template: "template_9c71r47",         // Template ID
+  template: "template_9c71r47",         // Template ID — NOTIFICATION ÉQUIPE (la demande du client)
+  // 👉 Modèle DÉDIÉ AU CLIENT (accusé de réception propre, sans en-tête "dashboard").
+  //    Crée un 2e modèle sur EmailJS (voir la recette ci-dessous) puis colle son ID ici.
+  //    Tant qu'il vaut "" ou "COLLE_...", AUCUN email n'est envoyé au client.
+  templateClient: "",                   // ex: "template_client123"
   email1:   "soane.mansouri@gmail.com", // 1re adresse de réception (toi)
   name1:    "Soane Mansouri",           // prénom associé
   email2:   "",                          // 2e adresse (ton frère) — à configurer plus tard
   name2:    ""                           // prénom associé
 };
+// ────────────────────────────────────────────────────────────
+//  📝 RECETTE DU 2e MODÈLE EMAILJS (accusé client) — 2 minutes
+//  EmailJS → Email Templates → "Create New Template" :
+//   • To Email   : {{to_email}}
+//   • To Name    : {{to_name}}
+//   • Subject    : {{subject}}
+//   • Reply To   : soane.mansouri@gmail.com   (pour que le client puisse répondre)
+//   • Content    : mettre UNIQUEMENT  {{message}}   (rien d'autre, pas d'en-tête)
+//  Enregistre, copie l'ID du modèle (template_xxxxx) et colle-le dans
+//  "templateClient" ci-dessus. C'est tout : le client recevra alors son propre
+//  accusé propre, et toi tu ne reçois que la demande (modèle "template").
+// ────────────────────────────────────────────────────────────
 
 
 // ============================================================

@@ -235,7 +235,7 @@ body::before{content:'';position:fixed;inset:0;background:
           <input class="inp" id="r-phone" type="tel" placeholder="+33 6 ..." oninput="updateSummary()">
         </div>
         <div class="grp">
-          <label class="lbl">Email (facultatif)</label>
+          <label class="lbl">Email (pour recevoir votre confirmation)</label>
           <input class="inp" id="r-email" type="email" placeholder="vous@societe.com">
         </div>
       </div>
@@ -420,10 +420,9 @@ let selSlot = '';          // id créneau 'HHMM'
 let takenSlots = {};       // { 'HHMM': true } pour la date sélectionnée
 let slotsRefHandle = null; // référence Firebase écoutée
 
-// Accusé de réception au client : désactivé (le modèle d'email partagé n'est pas
-// adapté aux clients). On notifie uniquement l'équipe. Repasser à true seulement
-// avec un modèle EmailJS dédié aux clients.
-const SEND_CLIENT_ACK = false;
+// Accusé de réception au client : envoyé via un modèle EmailJS DÉDIÉ au client
+// (champ "templateClient" dans firebase-config.js). Sans ce modèle dédié, rien
+// n'est envoyé au client (on n'utilise jamais le modèle équipe pour le client).
 
 // ============================================================
 // Construction de l'interface
@@ -660,8 +659,15 @@ ${res.other?('\nAutre : '+res.other):''}
 
 async function sendClientAck(res){
   await ensureEmailCfg();
-  if(typeof emailjs==='undefined' || !emailCfg.pubkey || !emailCfg.service || !emailCfg.template) return;
+  if(typeof emailjs==='undefined' || !emailCfg.pubkey || !emailCfg.service) return;
   if(!res.email) return;
+  // Modèle DÉDIÉ au client (différent de la notif équipe). Sans lui, on n'envoie rien
+  // (pour éviter d'utiliser le modèle équipe qui contient l'en-tête "dashboard").
+  const clientTemplate = emailCfg.templateClient;
+  if(!clientTemplate || String(clientTemplate).includes('COLLE')){ console.warn('Pas de modèle client dédié (templateClient) : accusé non envoyé'); return; }
+  // Ne pas s'auto-envoyer l'accusé si le client a saisi une adresse de l'équipe
+  const adminEmails = [emailCfg.email1, emailCfg.email2].filter(Boolean).map(e=>String(e).toLowerCase());
+  if(adminEmails.includes(String(res.email).toLowerCase())){ console.warn('Email client = email équipe : accusé non envoyé'); return; }
   const message =
 `Bonjour ${res.contact || res.company || ''},
 
@@ -682,12 +688,12 @@ Pour toute urgence, joignez-nous directement au +33 7 61 46 57 20.
 L'équipe EauService by Events Café`;
   try{
     emailjs.init(emailCfg.pubkey);
-    await emailjs.send(emailCfg.service, emailCfg.template, {
+    await emailjs.send(emailCfg.service, clientTemplate, {
       to_email: res.email, to_name: res.contact||res.company||'Client',
       subject: 'Confirmation de votre créneau — EauService by Events Café',
       message, time: new Date().toLocaleString('fr-FR')
     });
-    showToast('Confirmation envoyée ✓','success');
+    showToast('Confirmation envoyée au client ✓','success');
   }catch(e){ console.error('Erreur envoi accusé client :', e); }
 }
 
@@ -764,11 +770,11 @@ async function submitReservation(){
       localStorage.setItem('ec_reservations', JSON.stringify(pending));
     }
     sendTeamEmail(res);
-    if(SEND_CLIENT_ACK) sendClientAck(res);
+    sendClientAck(res);
     showSuccess(res);
   }catch(e){
     console.error(e);
-    try{ sendTeamEmail(res); if(SEND_CLIENT_ACK) sendClientAck(res); showSuccess(res); }
+    try{ sendTeamEmail(res); sendClientAck(res); showSuccess(res); }
     catch(_){ showToast('Erreur lors de l\'envoi, réessayez ou appelez-nous','error'); }
   }
   btn.style.pointerEvents=''; btn.style.opacity='';
@@ -785,7 +791,7 @@ function showSuccess(res){
     <div class="success-row"><span class="success-row-label">Créneau</span><span class="success-row-val">${fmtFull(res.date)}<br>${res.slotLabel}</span></div>
     <div class="success-row"><span class="success-row-label">Réappro</span><span class="success-row-val" style="max-width:280px">${itemsTxt}</span></div>
     ${res.urgent?'<div class="success-row"><span class="success-row-label">Priorité</span><span class="success-row-val" style="color:#fca5a5">🚨 Urgent</span></div>':''}
-    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">Nous passons sur le créneau choisi</span></div>`;
+    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">${res.email?('Confirmation envoyée à '+res.email):'Nous passons sur le créneau choisi'}</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display='block';

@@ -49,6 +49,12 @@ d'Azur) / quoi / quand**.
 > 📞 Pense aussi à remplacer le numéro `+33 6 00 00 00 00` dans `reservation.html`
 > (3 endroits) par ton vrai numéro.
 
+> 📧 **Accusé de réception client (email propre)** : le client reçoit son propre
+> accusé via un **modèle EmailJS dédié**. Crée un 2ᵉ modèle sur EmailJS (To = `{{to_email}}`,
+> Subject = `{{subject}}`, Contenu = uniquement `{{message}}`) puis colle son ID dans
+> `templateClient` (fichier `firebase-config.js`, recette complète en commentaire). Ainsi
+> **le client reçoit uniquement son accusé** et **toi uniquement la demande**.
+
 ## Comment ça marche
 
 1. Un client remplit `formulaire.html` → sa demande arrive **automatiquement** dans
