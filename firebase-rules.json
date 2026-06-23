@@ -9,6 +9,14 @@
         ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
         ".validate": "newData.hasChildren(['client','status'])"
       }
+    },
+
+    "reservations": {
+      ".read": "auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')",
+      "$reservationId": {
+        ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
+        ".validate": "newData.hasChildren(['company','date'])"
+      }
     }
   }
 }

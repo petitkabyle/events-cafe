@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Réserver mon créneau de livraison — EauService by Events Café</title>
+<meta name="theme-color" content="#060D1A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="EauService">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#060D1A; --bg1:#0A1424; --bg2:#0F1D34; --bg3:#142844; --bg4:#1B3358;
+  --border:rgba(255,255,255,0.06); --border2:rgba(96,165,250,0.16); --border3:rgba(96,165,250,0.28);
+  --text1:#EAF1FB; --text2:#9DB4D4; --text3:#5B7299;
+  --gold:#3B9EFF; --gold2:#60A5FA; --gold3:#BAE6FD;
+  --coffee:#1E6FD9; --accent:#38BDF8; --accent2:#7DD3FC;
+  --green:#22C55E; --green2:#34D399; --red:#F87171; --orange:#FB923C;
+  --font-head:'Outfit',sans-serif; --font-body:'Outfit',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg0);color:var(--text1);min-height:100vh;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(900px 500px at 50% -120px, rgba(59,158,255,.10), transparent 70%),
+  radial-gradient(700px 500px at 110% 10%, rgba(30,111,217,.08), transparent 70%);
+  pointer-events:none;z-index:0;}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:54px 28px 34px;text-align:center;z-index:1;}
+.hero-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:620px;height:300px;background:radial-gradient(ellipse,rgba(59,158,255,.18) 0%,transparent 70%);pointer-events:none;}
+.hero-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,255,.55),transparent);}
+.hero-brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:16px;}
+.bean{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1E6FD9,#0F2042);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45),inset 0 0 0 2px rgba(96,165,250,.4);}
+.bean::after{content:'';position:absolute;width:3px;height:28px;background:var(--gold3);border-radius:3px;transform:rotate(18deg);opacity:.9;}
+.brand-name{font-family:var(--font-head);font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.brand-name span{color:var(--gold);}
+.brand-slogan{font-family:var(--font-head);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);margin-top:3px;}
+.hero-title{font-family:var(--font-head);font-size:clamp(27px,5vw,42px);font-weight:800;line-height:1.12;margin-bottom:12px;letter-spacing:-1px;}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:15px;color:var(--text2);max-width:520px;margin:0 auto;font-weight:300;}
+
+/* PHONE BANNER */
+.phone-banner{max-width:760px;margin:0 auto 22px;padding:0 20px;position:relative;z-index:1;}
+.phone-inner{display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(34,197,94,.10),var(--bg2));border:1px solid rgba(34,197,94,.28);border-radius:14px;padding:12px 16px;font-size:13px;color:var(--text2);}
+.phone-inner .pico{font-size:22px;flex-shrink:0;}
+.phone-inner b{color:var(--green2);}
+.phone-inner a{color:var(--gold2);font-weight:700;text-decoration:none;white-space:nowrap;}
+
+/* WRAP */
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 90px;position:relative;z-index:1;}
+
+/* SECTION CARD */
+.card{margin-bottom:18px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+.card:focus-within{border-color:var(--border3);box-shadow:0 8px 30px rgba(0,0,0,.25);}
+.card-head{padding:16px 20px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(59,158,255,.05),transparent);}
+.card-num{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-title{font-family:var(--font-head);font-size:16px;font-weight:600;}
+.card-sub{font-size:11px;color:var(--text3);margin-left:auto;text-align:right;}
+.card-body{padding:18px 20px;}
+
+/* FORM ELEMENTS */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.row.single{grid-template-columns:1fr;}
+.row:last-child{margin-bottom:0;}
+.grp{display:flex;flex-direction:column;gap:5px;}
+.lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;}
+.lbl .req{color:var(--gold);margin-left:2px;}
+.inp,.sel,.txt{background:var(--bg3);border:1px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text1);font-family:var(--font-body);font-size:15px;transition:all .2s;width:100%;}
+.inp::placeholder{color:var(--text3);}
+.inp:focus,.sel:focus,.txt:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(59,158,255,.14);}
+.sel{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237DD3FC' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.sel option,.sel optgroup{background:var(--bg2);}
+.txt{resize:vertical;min-height:64px;line-height:1.5;}
+
+/* ITEMS (réappro) */
+.items{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.item{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .2s;}
+.item.sel{border-color:var(--gold);background:rgba(59,158,255,.07);}
+.item-info{min-width:0;display:flex;align-items:center;gap:9px;}
+.item-ico{font-size:20px;flex-shrink:0;}
+.item-name{font-size:13px;font-weight:600;color:var(--text1);line-height:1.25;}
+.qty{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.qty-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border2);background:var(--bg4);cursor:pointer;color:var(--text1);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#06101F;}
+.qty-val{min-width:22px;text-align:center;font-weight:700;font-size:16px;font-family:var(--font-head);}
+.qty-val.on{color:var(--gold2);}
+
+/* DAY CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;}
+.chip{border:1px solid var(--border2);background:var(--bg3);border-radius:11px;padding:10px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text2);transition:all .15s;text-align:center;}
+.chip:hover{border-color:var(--border3);color:var(--text1);}
+.chip.sel{border-color:var(--gold);background:rgba(59,158,255,.12);color:var(--gold3);box-shadow:0 0 0 3px rgba(59,158,255,.10);}
+.chip small{display:block;font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.chip.sel small{color:var(--accent2);}
+
+/* SLOT GRID */
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.slot{border:1px solid var(--border2);background:var(--bg3);border-radius:12px;padding:13px 10px;cursor:pointer;text-align:center;transition:all .15s;}
+.slot:hover{border-color:var(--border3);}
+.slot.sel{border-color:var(--gold);background:rgba(59,158,255,.12);box-shadow:0 0 0 3px rgba(59,158,255,.10);}
+.slot-t{font-size:15px;font-weight:700;font-family:var(--font-head);color:var(--text1);}
+.slot-d{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:2px;}
+.slot.sel .slot-d{color:var(--accent2);}
+
+/* URGENT TOGGLE */
+.urgent{display:flex;align-items:flex-start;gap:11px;margin-top:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:13px;padding:13px 15px;cursor:pointer;transition:all .2s;}
+.urgent.on{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);}
+.urgent input{margin-top:3px;width:18px;height:18px;accent-color:var(--red);flex-shrink:0;cursor:pointer;}
+.urgent-txt{font-size:13px;color:var(--text2);line-height:1.45;}
+.urgent-txt b{color:#fca5a5;}
+
+/* SUMMARY */
+.summary{background:linear-gradient(180deg,rgba(59,158,255,.06),var(--bg3));border:1px solid var(--border2);border-radius:14px;padding:15px;margin-top:16px;display:none;}
+.summary.on{display:block;}
+.summary-t{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px;font-weight:600;}
+.summary-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.summary-chip{font-size:12px;padding:5px 12px;border-radius:8px;background:rgba(59,158,255,.14);color:var(--gold2);border:1px solid rgba(59,158,255,.26);font-weight:500;}
+
+/* SUBMIT */
+.submit-area{text-align:center;padding:6px 0;}
+.submit-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#60A5FA,#1E6FD9);color:#06101F;font-family:var(--font-head);font-size:17px;font-weight:700;padding:17px 46px;border-radius:14px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.3px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(59,158,255,.34);}
+.submit-btn .arrow{font-size:21px;transition:transform .2s;}
+.submit-btn:hover .arrow{transform:translateX(4px);}
+.submit-note{font-size:12px;color:var(--text3);margin-top:12px;max-width:440px;margin-left:auto;margin-right:auto;}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:70px 30px;position:relative;z-index:1;}
+.success.show{display:block;}
+.success-icon{font-size:62px;margin-bottom:20px;animation:pop .4s ease;}
+@keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.success-title{font-family:var(--font-head);font-size:30px;font-weight:800;margin-bottom:10px;}
+.success-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.success-sub{font-size:15px;color:var(--text2);margin-bottom:26px;max-width:460px;margin-left:auto;margin-right:auto;}
+.success-card{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:20px 22px;max-width:520px;margin:0 auto 20px;text-align:left;}
+.success-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.success-row:last-child{border:none;}
+.success-row-label{color:var(--text3);white-space:nowrap;}
+.success-row-val{color:var(--text1);font-weight:500;text-align:right;}
+.success-phone{font-size:13px;color:var(--text2);margin-bottom:22px;}
+.success-phone a{color:var(--gold2);font-weight:700;text-decoration:none;}
+.reset-btn{display:inline-flex;align-items:center;gap:6px;padding:11px 26px;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;color:var(--text2);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .2s;}
+.reset-btn:hover{background:var(--bg4);color:var(--text1);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);padding:12px 20px;border-radius:11px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all .3s;pointer-events:none;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.success{background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.34);color:var(--green2);}
+.toast.error{background:rgba(248,113,113,.16);border:1px solid rgba(248,113,113,.36);color:#fca5a5;}
+.toast.info{background:rgba(59,158,255,.16);border:1px solid rgba(59,158,255,.3);color:var(--gold2);}
+
+@media(max-width:640px){
+  .hero{padding:42px 18px 26px;}
+  .wrap{padding:0 14px 70px;}
+  .row{grid-template-columns:1fr;}
+  .items{grid-template-columns:1fr;}
+  .inp,.sel,.txt{font-size:16px;}
+  .slots{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-line"></div>
+  <div class="hero-brand">
+    <div class="bean" aria-hidden="true"></div>
+    <div style="text-align:left">
+      <div class="brand-name">Eau<span>Service</span></div>
+      <div class="brand-slogan">by Events Café</div>
+    </div>
+  </div>
+  <h1 class="hero-title">Réservez votre<br><em>créneau de livraison</em></h1>
+  <p class="hero-sub">Besoin d'un réapprovisionnement sur votre stand (eau, café, gobelets…) ? Choisissez votre créneau en 30 secondes — on s'occupe du reste. Pas besoin d'appeler.</p>
+</div>
+
+<!-- PHONE BANNER -->
+<div class="phone-banner">
+  <div class="phone-inner">
+    <span class="pico">📞</span>
+    <span>Une <b>urgence</b> ou une demande particulière ? Notre équipe reste joignable directement par téléphone :
+      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
+    </span>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="wrap" id="form-wrap">
+
+  <!-- 1 — QUI -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">1</div>
+      <div class="card-title">Qui êtes-vous ?</div>
+      <div class="card-sub">Pour vous recontacter</div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="grp">
+          <label class="lbl">Société / Stand</label>
+          <input class="inp" id="r-company" type="text" placeholder="ex: Groupe Publicis">
+        </div>
+        <div class="grp">
+          <label class="lbl">Votre nom</label>
+          <input class="inp" id="r-contact" type="text" placeholder="ex: Marie Dupont">
+        </div>
+      </div>
+      <div class="row">
+        <div class="grp">
+          <label class="lbl">Téléphone <span class="req">*</span></label>
+          <input class="inp" id="r-phone" type="tel" placeholder="+33 6 ..." oninput="updateSummary()">
+        </div>
+        <div class="grp">
+          <label class="lbl">Email (pour la confirmation)</label>
+          <input class="inp" id="r-email" type="email" placeholder="vous@societe.com">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 — OÙ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">2</div>
+      <div class="card-title">Où êtes-vous ?</div>
+      <div class="card-sub">Côte d'Azur</div>
+    </div>
+    <div class="card-body">
+      <div class="row single">
+        <div class="grp">
+          <label class="lbl">Lieu / Salon <span class="req">*</span></label>
+          <select class="sel" id="r-venue" onchange="onVenueChange()"></select>
+        </div>
+      </div>
+      <div class="row single" id="r-othercity-wrap" style="display:none;">
+        <div class="grp">
+          <label class="lbl">Ville (si autre lieu) <span class="req">*</span></label>
+          <input class="inp" id="r-othercity" type="text" placeholder="ex: Vallauris">
+        </div>
+      </div>
+      <div class="row single">
+        <div class="grp">
+          <label class="lbl">N° de stand / précisions d'accès</label>
+          <input class="inp" id="r-stand" type="text" placeholder="ex: Stand B12 – Hall 3, entrée logistique, demander Marie">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 — QUOI -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">3</div>
+      <div class="card-title">De quoi avez-vous besoin ?</div>
+      <div class="card-sub">Réapprovisionnement</div>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Indiquez les quantités à recharger sur votre stand.</div>
+      <div class="items" id="items-container"></div>
+      <div class="row single" style="margin-top:14px;">
+        <div class="grp">
+          <label class="lbl">Autre besoin / précision</label>
+          <textarea class="txt" id="r-other" placeholder="ex: 1 machine à café en panne à remplacer, besoin de sucre supplémentaire..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 — QUAND -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">4</div>
+      <div class="card-title">Quand vous livrer ?</div>
+      <div class="card-sub">Choisissez votre créneau</div>
+    </div>
+    <div class="card-body">
+      <label class="lbl" style="display:block;margin-bottom:9px;">Jour souhaité <span class="req">*</span></label>
+      <div class="chips" id="day-chips"></div>
+      <div class="row single" style="margin-bottom:18px;">
+        <div class="grp">
+          <label class="lbl">…ou choisir une autre date</label>
+          <input class="inp" id="r-date" type="date" onchange="onDatePick(this.value)">
+        </div>
+      </div>
+
+      <label class="lbl" style="display:block;margin-bottom:9px;">Créneau horaire <span class="req">*</span></label>
+      <div class="slots" id="slots-container"></div>
+
+      <label class="urgent" id="urgent-box" onclick="toggleUrgent(event)">
+        <input type="checkbox" id="r-urgent">
+        <span class="urgent-txt"><b>C'est urgent</b> (rupture en cours / besoin au plus vite). Nous traiterons votre demande en priorité et vous rappellerons si besoin.</span>
+      </label>
+
+      <div class="summary" id="summary">
+        <div class="summary-t">Récapitulatif de votre demande</div>
+        <div class="summary-chips" id="summary-chips"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <button class="submit-btn" onclick="submitReservation()">
+      <span>Réserver mon créneau</span> <span class="arrow">→</span>
+    </button>
+    <div class="submit-note">Votre demande arrive instantanément à notre équipe. Vous recevrez une confirmation et nous passons à l'heure choisie.</div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success" id="success-screen">
+  <div class="success-icon">✅</div>
+  <h2 class="success-title">Créneau <em>réservé !</em></h2>
+  <p class="success-sub">Votre demande de réapprovisionnement a bien été transmise à notre équipe. Nous arrivons sur le créneau choisi.</p>
+  <div class="success-card" id="success-details"></div>
+  <p class="success-phone">Un imprévu ? Appelez-nous directement : <a href="tel:+33600000000">+33 6 00 00 00 00</a></p>
+  <button class="reset-btn" onclick="resetForm()">↩ Faire une autre demande</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase (compat) + EmailJS + config -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+// ============================================================
+// RÉSERVATION DE CRÉNEAU — EauService by Events Café
+// Outil client léger : réservation d'un créneau de livraison /
+// réapprovisionnement pendant les salons (Côte d'Azur).
+// Écrit dans le nœud Firebase "reservations" + email équipe + accusé client.
+// ============================================================
+
+// ---------- Lieux Côte d'Azur (avec coordonnées GPS pour la carte du dashboard) ----------
+const VENUES = [
+  { group:'Cannes', items:[
+    { id:'cannes_palais', name:'Palais des Festivals et des Congrès — Cannes', city:'Cannes', lat:43.5505, lng:7.0174 },
+    { id:'cannes_centre', name:'Cannes — Croisette / Centre', city:'Cannes', lat:43.5513, lng:7.0174 },
+    { id:'mandelieu',     name:'Mandelieu-la-Napoule', city:'Mandelieu-la-Napoule', lat:43.5462, lng:6.9387 },
+  ]},
+  { group:'Nice', items:[
+    { id:'nice_acropolis', name:'Palais des Expositions / Acropolis — Nice', city:'Nice', lat:43.7034, lng:7.2839 },
+    { id:'nice_allianz',   name:'Allianz Riviera — Nice', city:'Nice', lat:43.7050, lng:7.1925 },
+    { id:'nice_centre',    name:'Nice — Centre / Promenade', city:'Nice', lat:43.7102, lng:7.2620 },
+    { id:'nice_aeroport',  name:'Aéroport Nice Côte d\'Azur', city:'Nice', lat:43.6584, lng:7.2159 },
+  ]},
+  { group:'Monaco & Est', items:[
+    { id:'monaco_grimaldi', name:'Grimaldi Forum — Monaco', city:'Monaco', lat:43.7447, lng:7.4310 },
+    { id:'monaco_centre',   name:'Monaco — Centre', city:'Monaco', lat:43.7384, lng:7.4246 },
+    { id:'beaulieu',        name:'Beaulieu-sur-Mer / Cap-Ferrat', city:'Beaulieu-sur-Mer', lat:43.7065, lng:7.3320 },
+    { id:'menton',          name:'Menton', city:'Menton', lat:43.7765, lng:7.5044 },
+  ]},
+  { group:'Antibes & Ouest', items:[
+    { id:'antibes',  name:'Antibes / Juan-les-Pins', city:'Antibes', lat:43.5808, lng:7.1239 },
+    { id:'sophia',   name:'Sophia Antipolis — Valbonne', city:'Valbonne', lat:43.6157, lng:7.0489 },
+    { id:'cagnes',   name:'Cagnes-sur-Mer', city:'Cagnes-sur-Mer', lat:43.6645, lng:7.1490 },
+    { id:'grasse',   name:'Grasse', city:'Grasse', lat:43.6585, lng:6.9225 },
+  ]},
+  { group:'Var (Est)', items:[
+    { id:'saintraphael', name:'Saint-Raphaël', city:'Saint-Raphaël', lat:43.4250, lng:6.7686 },
+    { id:'frejus',       name:'Fréjus', city:'Fréjus', lat:43.4332, lng:6.7370 },
+    { id:'saintemaxime', name:'Sainte-Maxime', city:'Sainte-Maxime', lat:43.3090, lng:6.6380 },
+    { id:'sainttropez',  name:'Saint-Tropez', city:'Saint-Tropez', lat:43.2727, lng:6.6407 },
+  ]},
+];
+const VENUE_MAP = {};
+VENUES.forEach(g=>g.items.forEach(v=>VENUE_MAP[v.id]=v));
+
+// ---------- Articles de réapprovisionnement ----------
+// (les "id" reprennent ceux du dashboard quand ils existent, pour l'affichage du matériel)
+const ITEMS = [
+  { id:'bonbonne',  icon:'💧', name:'Bonbonne d\'eau (18,9 L)' },
+  { id:'gobelet',   icon:'🥤', name:'Gobelets (lot de 100)' },
+  { id:'cafe_pods', icon:'☕', name:'Capsules / dosettes café' },
+  { id:'the',       icon:'🍵', name:'Sachets de thé' },
+  { id:'lait',      icon:'🥛', name:'Lait / dosettes lait' },
+  { id:'sucre',     icon:'🥄', name:'Sucre & touillettes' },
+];
+const ITEM_MAP = {};
+ITEMS.forEach(i=>ITEM_MAP[i.id]=i);
+
+// ---------- Créneaux horaires ----------
+const SLOTS = [
+  { id:'08-10', label:'08:00 – 10:00', d:'Matin' },
+  { id:'10-12', label:'10:00 – 12:00', d:'Matin' },
+  { id:'12-14', label:'12:00 – 14:00', d:'Midi' },
+  { id:'14-16', label:'14:00 – 16:00', d:'Après-midi' },
+  { id:'16-18', label:'16:00 – 18:00', d:'Après-midi' },
+  { id:'18-20', label:'18:00 – 20:00', d:'Soir' },
+];
+
+// ---------- État ----------
+const qty = {};            // { itemId: qty }
+let selVenue = '';
+let selDate = '';          // YYYY-MM-DD
+let selSlot = '';
+
+// ============================================================
+// Construction de l'interface
+// ============================================================
+function buildVenues(){
+  const sel = document.getElementById('r-venue');
+  let html = '<option value="">— Sélectionnez votre lieu —</option>';
+  VENUES.forEach(g=>{
+    html += `<optgroup label="${g.group}">`;
+    g.items.forEach(v=>{ html += `<option value="${v.id}">${v.name}</option>`; });
+    html += `</optgroup>`;
+  });
+  html += `<optgroup label="Autre"><option value="autre">Autre lieu (à préciser)</option></optgroup>`;
+  sel.innerHTML = html;
+}
+function onVenueChange(){
+  selVenue = document.getElementById('r-venue').value;
+  document.getElementById('r-othercity-wrap').style.display = (selVenue==='autre') ? '' : 'none';
+  updateSummary();
+}
+
+function buildItems(){
+  const cont = document.getElementById('items-container');
+  cont.innerHTML = ITEMS.map(it=>{
+    const q = qty[it.id]||0;
+    return `<div class="item${q>0?' sel':''}" id="it-${it.id}">
+      <div class="item-info"><span class="item-ico">${it.icon}</span><span class="item-name">${it.name}</span></div>
+      <div class="qty">
+        <button class="qty-btn" onclick="adjQty('${it.id}',-1)">−</button>
+        <span class="qty-val${q>0?' on':''}" id="q-${it.id}">${q}</span>
+        <button class="qty-btn" onclick="adjQty('${it.id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function adjQty(id,d){
+  const v = Math.max(0,(qty[id]||0)+d);
+  if(v===0) delete qty[id]; else qty[id]=v;
+  const el = document.getElementById('q-'+id);
+  el.textContent = v; el.className = 'qty-val'+(v>0?' on':'');
+  document.getElementById('it-'+id).classList.toggle('sel', v>0);
+  updateSummary();
+}
+
+function isoOffset(days){
+  const d = new Date(); d.setDate(d.getDate()+days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function buildDayChips(){
+  const today = isoOffset(0);
+  document.getElementById('r-date').min = today;
+  const days = [
+    { iso:isoOffset(0), t:'Aujourd\'hui' },
+    { iso:isoOffset(1), t:'Demain' },
+    { iso:isoOffset(2), t:dayName(isoOffset(2)) },
+  ];
+  const cont = document.getElementById('day-chips');
+  cont.innerHTML = days.map(d=>`<div class="chip${selDate===d.iso?' sel':''}" data-iso="${d.iso}" onclick="pickDay('${d.iso}')">${d.t}<small>${dayShort(d.iso)}</small></div>`).join('');
+}
+function dayName(iso){ try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long'}); }catch(e){ return iso; } }
+function dayShort(iso){ try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }catch(e){ return ''; } }
+function pickDay(iso){
+  selDate = iso;
+  document.getElementById('r-date').value = iso;
+  buildDayChips();
+  updateSummary();
+}
+function onDatePick(v){
+  if(!v) return;
+  selDate = v;
+  buildDayChips(); // met à jour la sélection des pastilles (aucune si date hors des 3 jours)
+  document.querySelectorAll('#day-chips .chip').forEach(c=>c.classList.toggle('sel', c.dataset.iso===v));
+  updateSummary();
+}
+
+function buildSlots(){
+  const cont = document.getElementById('slots-container');
+  cont.innerHTML = SLOTS.map(s=>`<div class="slot${selSlot===s.id?' sel':''}" onclick="pickSlot('${s.id}')">
+      <div class="slot-t">${s.label}</div><div class="slot-d">${s.d}</div></div>`).join('');
+}
+function pickSlot(id){ selSlot = id; buildSlots(); updateSummary(); }
+
+function toggleUrgent(e){
+  // évite le double toggle quand on clique directement sur la case
+  if(e && e.target && e.target.id==='r-urgent'){ syncUrgent(); return; }
+  const cb = document.getElementById('r-urgent');
+  cb.checked = !cb.checked;
+  syncUrgent();
+}
+function syncUrgent(){
+  document.getElementById('urgent-box').classList.toggle('on', document.getElementById('r-urgent').checked);
+  updateSummary();
+}
+
+// ---------- Récapitulatif ----------
+function selectedItems(){
+  return ITEMS.filter(it=>(qty[it.id]||0)>0).map(it=>({ id:it.id, label:it.name, qty:qty[it.id] }));
+}
+function updateSummary(){
+  const chips = [];
+  if(selVenue){ const v=VENUE_MAP[selVenue]; chips.push('📍 '+(v?v.city:(document.getElementById('r-othercity').value||'Autre lieu'))); }
+  if(selDate){ chips.push('📅 '+dayShort(selDate)); }
+  if(selSlot){ const s=SLOTS.find(x=>x.id===selSlot); chips.push('🕐 '+(s?s.label:'')); }
+  selectedItems().forEach(i=>chips.push(`${i.qty}× ${i.label}`));
+  if(document.getElementById('r-urgent') && document.getElementById('r-urgent').checked) chips.push('🚨 Urgent');
+  const box = document.getElementById('summary'), wrap = document.getElementById('summary-chips');
+  if(chips.length){ box.classList.add('on'); wrap.innerHTML = chips.map(c=>`<span class="summary-chip">${c}</span>`).join(''); }
+  else box.classList.remove('on');
+}
+
+// ============================================================
+// Firebase + EmailJS
+// ============================================================
+let db=null, fbReady=false, fbAuth=null;
+const authRequired = (window.REQUIRE_AUTH === true);
+(function initFirebase(){
+  const cfg = window.FIREBASE_CONFIG;
+  if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
+    try{ firebase.initializeApp(cfg); db = firebase.database(); fbReady = true; }
+    catch(e){ console.error('Firebase init error', e); }
+    if(authRequired){ try{ fbAuth = firebase.auth(); }catch(e){ console.warn('Auth indisponible', e); fbAuth=null; } }
+  }
+})();
+async function ensureAnonAuth(){
+  if(!authRequired || !fbAuth) return;
+  try{ if(!fbAuth.currentUser){ await fbAuth.signInAnonymously(); } }
+  catch(e){ console.warn('Connexion anonyme impossible (Anonymous Auth désactivé ?)', e); }
+}
+
+let emailCfg = {};
+function fileEmailCfg(){
+  const c = window.EMAILJS_CONFIG;
+  if(c && c.pubkey && !String(c.pubkey).includes('COLLE') && c.service && c.template) return c;
+  return null;
+}
+function loadEmailCfg(){
+  const f = fileEmailCfg();
+  if(f){ emailCfg = f; if(typeof emailjs!=='undefined'){ try{emailjs.init(f.pubkey);}catch(e){} } return; }
+  if(!fbReady) return;
+  db.ref('config/emailjs').once('value').then(snap=>{
+    const v = snap.val();
+    if(v){ emailCfg = v; if(v.pubkey && typeof emailjs!=='undefined'){ try{emailjs.init(v.pubkey);}catch(e){} } }
+  }).catch(()=>{});
+}
+async function ensureEmailCfg(){
+  const f = fileEmailCfg();
+  if(f){ emailCfg = f; return emailCfg; }
+  if(emailCfg && emailCfg.pubkey) return emailCfg;
+  if(!fbReady) return emailCfg;
+  try{ const snap = await db.ref('config/emailjs').once('value'); const v = snap.val(); if(v) emailCfg = v; }catch(e){}
+  return emailCfg;
+}
+
+function slotLabel(id){ const s=SLOTS.find(x=>x.id===id); return s?s.label:'—'; }
+function fmtFull(iso){ if(!iso) return '—'; try{ return new Date(iso+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); }catch(e){ return iso; } }
+function itemsText(items){ return items.length ? items.map(i=>`   • ${i.qty}× ${i.label}`).join('\n') : '   • (aucun article précisé)'; }
+
+async function sendTeamEmail(res){
+  await ensureEmailCfg();
+  if(typeof emailjs==='undefined' || !emailCfg.pubkey || !emailCfg.service || !emailCfg.template){ console.warn('EmailJS : config absente'); return; }
+  const mapLink = (res.lat&&res.lng) ? `https://www.google.com/maps?q=${res.lat},${res.lng}` : '(localisation à préciser)';
+  const message =
+`Nouvelle réservation de créneau de LIVRAISON / RÉAPPRO.${res.urgent?'\n\n🚨🚨 DEMANDE URGENTE 🚨🚨':''}
+
+QUI
+Société / Stand : ${res.company||'—'}
+Contact : ${res.contact||'—'}
+Tél : ${res.phone||'—'}${res.email?' · Email : '+res.email:''}
+
+OÙ
+Lieu : ${res.venueName||'—'}
+Ville : ${res.city||'—'}
+Stand / accès : ${res.stand||'—'}
+Carte : ${mapLink}
+
+CRÉNEAU SOUHAITÉ
+${fmtFull(res.date)} — ${slotLabel(res.slot)}
+
+BESOIN (réapprovisionnement)
+${itemsText(res.items)}
+${res.other?('\nAutre : '+res.other):''}
+
+➡️ Ouvre le dashboard → onglet « Réappro » : la demande s'affiche sur la carte et dans la liste du jour.`;
+  const recipients = [
+    { email: emailCfg.email1, name: emailCfg.name1 },
+    { email: emailCfg.email2, name: emailCfg.name2 }
+  ].filter(r => r.email);
+  if(!recipients.length){ console.warn('EmailJS : aucune adresse de réception'); return; }
+  try{
+    emailjs.init(emailCfg.pubkey);
+    for(const r of recipients){
+      await emailjs.send(emailCfg.service, emailCfg.template, {
+        to_email: r.email, to_name: r.name||'Équipe',
+        subject: (res.urgent?'[URGENT] ':'')+'[EauService] Nouveau créneau — '+(res.company||res.city||'client'),
+        message, time: new Date().toLocaleString('fr-FR')
+      });
+    }
+    showToast('Équipe notifiée ✓','success');
+  }catch(e){ console.error('Erreur envoi email équipe :', e); }
+}
+
+async function sendClientAck(res){
+  await ensureEmailCfg();
+  if(typeof emailjs==='undefined' || !emailCfg.pubkey || !emailCfg.service || !emailCfg.template) return;
+  if(!res.email) return;
+  const message =
+`Bonjour ${res.contact || res.company || ''},
+
+✅ Nous avons bien reçu votre demande de réapprovisionnement (réf. ${res.ref}).
+
+VOTRE CRÉNEAU
+${fmtFull(res.date)} — ${slotLabel(res.slot)}
+Lieu : ${res.venueName||'—'}${res.stand?(' · '+res.stand):''}
+
+CE QUE NOUS VOUS APPORTONS
+${itemsText(res.items)}
+${res.other?('\nAutre : '+res.other):''}
+
+Notre équipe passera sur le créneau choisi. En cas d'imprévu, nous vous appelons.
+Pour toute urgence, joignez-nous directement au +33 6 00 00 00 00.
+
+À très vite,
+L'équipe EauService by Events Café`;
+  try{
+    emailjs.init(emailCfg.pubkey);
+    await emailjs.send(emailCfg.service, emailCfg.template, {
+      to_email: res.email, to_name: res.contact||res.company||'Client',
+      subject: 'Confirmation de votre créneau — EauService by Events Café',
+      message, time: new Date().toLocaleString('fr-FR')
+    });
+    showToast('Confirmation envoyée ✓','success');
+  }catch(e){ console.error('Erreur envoi accusé client :', e); }
+}
+
+// ============================================================
+// Soumission
+// ============================================================
+async function submitReservation(){
+  const phone = document.getElementById('r-phone').value.trim();
+  if(!phone){ showToast('Merci d\'indiquer un téléphone pour vous recontacter','error'); return; }
+  if(!selVenue){ showToast('Merci de sélectionner votre lieu','error'); return; }
+  let city='', venueName='', lat=null, lng=null;
+  if(selVenue==='autre'){
+    city = document.getElementById('r-othercity').value.trim();
+    if(!city){ showToast('Merci de préciser la ville','error'); return; }
+    venueName = 'Autre lieu — '+city;
+  } else {
+    const v = VENUE_MAP[selVenue];
+    if(v){ city=v.city; venueName=v.name; lat=v.lat; lng=v.lng; }
+  }
+  if(!selDate){ showToast('Merci de choisir un jour','error'); return; }
+  if(!selSlot){ showToast('Merci de choisir un créneau horaire','error'); return; }
+
+  const items = selectedItems();
+  const other = document.getElementById('r-other').value.trim();
+  if(!items.length && !other){ showToast('Indiquez au moins un article ou une précision','error'); return; }
+
+  const createdAt = Date.now();
+  const ref = 'RES-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(createdAt).slice(-4);
+  const res = {
+    ref,
+    company: document.getElementById('r-company').value.trim() || (document.getElementById('r-contact').value.trim() || 'Client'),
+    contact: document.getElementById('r-contact').value.trim(),
+    phone,
+    email: document.getElementById('r-email').value.trim(),
+    venueId: selVenue, venueName, city, lat, lng,
+    stand: document.getElementById('r-stand').value.trim(),
+    date: selDate, slot: selSlot, slotLabel: slotLabel(selSlot),
+    items, other,
+    urgent: !!document.getElementById('r-urgent').checked,
+    status: 'nouvelle',
+    driverId: '',
+    origin: 'reservation',
+    createdAt
+  };
+
+  const btn = document.querySelector('.submit-btn');
+  btn.style.pointerEvents='none'; btn.style.opacity='.7';
+  try{
+    if(fbReady){
+      await ensureAnonAuth();
+      const r = db.ref('reservations').push();
+      res.id = r.key;
+      await r.set(res);
+    } else {
+      const pending = JSON.parse(localStorage.getItem('ec_reservations')||'[]');
+      res.id = 'res_'+createdAt; pending.push(res);
+      localStorage.setItem('ec_reservations', JSON.stringify(pending));
+    }
+    // Emails (indépendants de Firebase : l'équipe est notifiée même si l'écriture est bloquée)
+    sendTeamEmail(res);
+    sendClientAck(res);
+    showSuccess(res);
+  }catch(e){
+    console.error(e);
+    // L'écriture Firebase a échoué (ex: règles) : on notifie quand même par email
+    try{ sendTeamEmail(res); sendClientAck(res); showSuccess(res); }
+    catch(_){ showToast('Erreur lors de l\'envoi, réessayez ou appelez-nous','error'); }
+  }
+  btn.style.pointerEvents=''; btn.style.opacity='';
+}
+
+function showSuccess(res){
+  document.getElementById('form-wrap').style.display='none';
+  document.getElementById('success-screen').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+  const itemsTxt = res.items.length ? res.items.map(i=>`${i.qty}× ${i.label}`).join(', ') : (res.other||'—');
+  document.getElementById('success-details').innerHTML = `
+    <div class="success-row"><span class="success-row-label">Référence</span><span class="success-row-val">${res.ref}</span></div>
+    <div class="success-row"><span class="success-row-label">Lieu</span><span class="success-row-val" style="max-width:280px">${res.venueName}${res.stand?'<br>'+res.stand:''}</span></div>
+    <div class="success-row"><span class="success-row-label">Créneau</span><span class="success-row-val">${fmtFull(res.date)}<br>${res.slotLabel}</span></div>
+    <div class="success-row"><span class="success-row-label">Réappro</span><span class="success-row-val" style="max-width:280px">${itemsTxt}</span></div>
+    ${res.urgent?'<div class="success-row"><span class="success-row-label">Priorité</span><span class="success-row-val" style="color:#fca5a5">🚨 Urgent</span></div>':''}
+    <div class="success-row"><span class="success-row-label">Confirmation</span><span class="success-row-val" style="max-width:280px">${res.email?('envoyée à '+res.email):'par téléphone'}</span></div>`;
+}
+function resetForm(){
+  document.getElementById('form-wrap').style.display='block';
+  document.getElementById('success-screen').classList.remove('show');
+  ['r-company','r-contact','r-phone','r-email','r-stand','r-other','r-othercity','r-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('r-venue').value='';
+  document.getElementById('r-urgent').checked=false;
+  document.getElementById('urgent-box').classList.remove('on');
+  document.getElementById('r-othercity-wrap').style.display='none';
+  Object.keys(qty).forEach(k=>delete qty[k]);
+  selVenue=''; selDate=''; selSlot='';
+  buildItems(); buildDayChips(); buildSlots(); updateSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showToast(msg,type='info'){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// INIT
+buildVenues();
+buildItems();
+buildDayChips();
+buildSlots();
+loadEmailCfg();
+updateSummary();
+</script>
+</body>
+</html>

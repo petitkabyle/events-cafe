@@ -8,10 +8,36 @@ ton frère et le formulaire grâce à **Firebase** (gratuit, temps réel).
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | Le tableau de bord (toi + ton frère) : calendrier, événements, stock |
-| `formulaire.html` | Le formulaire de demande à partager aux clients |
+| `index.html` | Le tableau de bord (toi + ton frère) : calendrier, événements, stock, **livraisons** et **réappro/créneaux (carte Côte d'Azur)** |
+| `formulaire.html` | Le formulaire de demande (devis) à partager aux clients |
+| `reservation.html` | **NOUVEAU** — outil léger pour que les clients réservent un **créneau de livraison / réapprovisionnement** pendant les salons |
 | `firebase-config.js` | Tes clés Firebase (à remplir **une seule fois**) |
+| `firebase-rules.json` | Les règles de sécurité de la base (à publier dans Firebase) |
 | `GUIDE_INSTALLATION.md` | **Commence ici** : le pas-à-pas complet |
+
+## 🆕 Réservation de créneaux (réappro pendant les salons)
+
+`reservation.html` est un 3ᵉ outil **indépendant et ultra-simple** à envoyer aux clients
+sur place (QR code, SMS, email). En 30 secondes le client indique **qui / où (lieu Côte
+d'Azur) / quoi (eau, café, gobelets…) / quand (créneau horaire)**, avec une option
+« urgent ».
+
+- La demande arrive **en direct** dans le tableau de bord → onglet **« Réappro / Créneaux »**
+  (📍 dans le menu), avec une **carte de la Côte d'Azur**, le planning du jour et la liste.
+- Tu **assignes un livreur**, changes le statut, ou **crées la livraison en 1 clic**
+  (elle bascule dans l'onglet « Livraisons » avec son bon PDF).
+- L'équipe est **notifiée par email** à chaque demande, et le client reçoit une **confirmation**.
+- Le message rappelle que vous restez **joignables par téléphone** pour les urgences.
+
+> ⚠️ **Important — à faire une seule fois** : pour que les clients puissent envoyer une
+> réservation, republie les règles de sécurité. Console Firebase → Realtime Database →
+> **Règles** → colle le contenu de `firebase-rules.json` (en remplaçant `UID_1`/`UID_2`
+> par vos deux UID comme pour l'installation) → **Publier**. Le bloc `reservations` a été
+> ajouté à ce fichier. Sans cette étape, l'équipe est quand même prévenue par email, mais
+> la demande ne s'affichera pas sur la carte du tableau de bord.
+>
+> 📞 Pense aussi à remplacer le numéro `+33 6 00 00 00 00` dans `reservation.html`
+> (3 endroits) par ton vrai numéro.
 
 ## Comment ça marche
 
