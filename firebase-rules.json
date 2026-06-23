@@ -17,6 +17,16 @@
         ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
         ".validate": "newData.hasChildren(['company','date'])"
       }
+    },
+
+    "slots": {
+      ".read": "auth != null",
+      "$date": {
+        "$time": {
+          ".write": "(auth != null && (auth.uid === 'UID_1' || auth.uid === 'UID_2')) || (auth != null && !data.exists() && newData.exists())",
+          ".validate": "newData.isBoolean() || newData.isString()"
+        }
+      }
     }
   }
 }

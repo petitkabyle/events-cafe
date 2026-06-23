@@ -4504,7 +4504,16 @@ function resFmtDay(d){ if(!d)return'—'; try{return new Date(d+'T12:00:00').toL
 function resShiftDay(delta){ const d=new Date(reservDate+'T12:00:00'); d.setDate(d.getDate()+delta); reservDate=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); renderReappro(); }
 function resGoToday(){ reservDate=todayISO(); renderReappro(); }
 function resPickDate(v){ if(v){ reservDate=v; renderReappro(); } }
-function slotStartTime(slot){ const a=(slot||'').split('-')[0]; return a?(a.padStart(2,'0')+':00'):''; }
+function slotStartTime(slot){
+  if(!slot) return '';
+  if(/^\d{4}$/.test(slot)) return slot.slice(0,2)+':'+slot.slice(2); // nouveau format HHMM (ex: 0930 -> 09:30)
+  const a=(slot||'').split('-')[0]; return a?(a.padStart(2,'0')+':00'):'';  // ancien format (ex: 08-10)
+}
+// Libère le créneau réservé (nœud public slots/{date}/{heure}) pour qu'il redevienne disponible
+function freeReservSlot(r){
+  if(!r || !r.date || !r.slot) return;
+  if(/^\d{4}$/.test(r.slot) && fbReady){ queuedWrite('remove', 'slots/'+r.date+'/'+r.slot, null); }
+}
 function sortRes(a,b){
   if(!!b.urgent!==!!a.urgent) return b.urgent?1:-1;
   return (a.slot||'zz').localeCompare(b.slot||'zz') || ((a.createdAt||0)-(b.createdAt||0));
@@ -4526,10 +4535,18 @@ function saveResPatch(id, patch){
   if(fbReady) queuedWrite('update', 'reservations/'+id, patch);
 }
 function assignResDriver(id, driverId){ saveResPatch(id, {driverId}); renderReappro(); }
-function setResStatus(id, status){ saveResPatch(id, {status}); renderReappro(); showToast('Statut mis à jour ✓','success'); }
+function setResStatus(id, status){
+  const r = reservations.find(x=>String(x.id)===String(id));
+  saveResPatch(id, {status});
+  // Une livraison effectuée (ou annulée) libère le créneau -> le planning se "réinitialise"
+  if((status==='livree' || status==='annulee') && r) freeReservSlot(r);
+  renderReappro();
+  showToast('Statut mis à jour ✓','success');
+}
 function deleteReservation(id){
   const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
   if(!confirm('Supprimer cette réservation ?')) return;
+  freeReservSlot(r);
   reservations = reservations.filter(x=>String(x.id)!==String(id));
   saveResLocal();
   if(fbReady) queuedWrite('remove', 'reservations/'+id, null);
@@ -4542,8 +4559,11 @@ function convertReservationToDelivery(id){
   const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
   const material = {}; const extra = [];
   (r.items||[]).forEach(it=>{
-    if(STOCK_META.find(s=>s.id===it.id)) material[it.id] = it.qty;
-    else extra.push(`${it.qty}× ${it.label}`);
+    const q = parseInt(it.qty)||0;
+    const known = STOCK_META.find(s=>s.id===it.id);
+    if(known && q>0) material[it.id] = q;
+    if(it.detail) extra.push(it.label+' : '+it.detail);          // café (ex: "Café : 150 capsules")
+    else if(!known) extra.push((q||'')+'× '+it.label);            // ex: machine à bar
   });
   let note = 'Réappro client'+(r.ref?(' '+r.ref):'');
   if(extra.length) note += ' · '+extra.join(', ');
@@ -4653,7 +4673,7 @@ function resStatusOptions(selStatus){
 function renderResCard(r){
   const st = RES_STATUS[r.status] || RES_STATUS.nouvelle;
   const dc = (r.status==='planifiee' && r.driverId) ? driverColor(r.driverId) : st.color;
-  const items = (r.items||[]).map(i=>`<span class="res-chip">${i.qty}× ${esc(i.label)}</span>`).join('');
+  const items = (r.items||[]).map(i=>`<span class="res-chip">${i.detail?('☕ '+esc(i.label)+' · '+esc(i.detail)):(i.qty+'× '+esc(i.label))}</span>`).join('');
   const mapLink = (typeof r.lat==='number') ? `<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">🗺️ Itinéraire</a>` : '';
   return `<div class="res-card${r.urgent?' urgent':''}" style="--dc:${dc}">
     <div class="res-top">

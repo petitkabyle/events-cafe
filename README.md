@@ -19,9 +19,16 @@ ton frère et le formulaire grâce à **Firebase** (gratuit, temps réel).
 
 `reservation.html` est un 3ᵉ outil **indépendant et ultra-simple** à envoyer aux clients
 sur place (QR code, SMS, email). En 30 secondes le client indique **qui / où (lieu Côte
-d'Azur) / quoi (eau, café, gobelets…) / quand (créneau horaire)**, avec une option
-« urgent ».
+d'Azur) / quoi / quand**.
 
+- **Produits de réappro** : café (nombre de capsules de **50 à illimité**), **bonbonnes
+  d'eau**, **fontaine à eau**, et **machine à café** (Nespresso Zenius, Nespresso Gemini,
+  Covim, Lavazza, machine à grains, machine à bar) — plus un champ « autre besoin ».
+- **Créneaux horaires connectés** : pas de 30 min de **9h à minuit**. Un créneau **déjà
+  réservé s'affiche « Réservé »** et ne peut pas être repris (deux clients ne peuvent pas
+  prendre la même heure). Le planning est **par jour** : chaque jour repart à neuf, et un
+  créneau **se libère** dès que la livraison est marquée **Livrée** (ou annulée) dans le
+  tableau de bord.
 - La demande arrive **en direct** dans le tableau de bord → onglet **« Réappro / Créneaux »**
   (📍 dans le menu), avec une **carte de la Côte d'Azur**, le planning du jour et la liste.
 - Tu **assignes un livreur**, changes le statut, ou **crées la livraison en 1 clic**
@@ -30,11 +37,14 @@ d'Azur) / quoi (eau, café, gobelets…) / quand (créneau horaire)**, avec une 
 - Le message rappelle que vous restez **joignables par téléphone** pour les urgences.
 
 > ⚠️ **Important — à faire une seule fois** : pour que les clients puissent envoyer une
-> réservation, republie les règles de sécurité. Console Firebase → Realtime Database →
-> **Règles** → colle le contenu de `firebase-rules.json` (en remplaçant `UID_1`/`UID_2`
-> par vos deux UID comme pour l'installation) → **Publier**. Le bloc `reservations` a été
-> ajouté à ce fichier. Sans cette étape, l'équipe est quand même prévenue par email, mais
-> la demande ne s'affichera pas sur la carte du tableau de bord.
+> réservation **et voir les créneaux disponibles**, republie les règles de sécurité.
+> Console Firebase → Realtime Database → **Règles** → colle le contenu de
+> `firebase-rules.json` (en remplaçant `UID_1`/`UID_2` par vos deux UID comme pour
+> l'installation) → **Publier**. Les blocs `reservations` et `slots` ont été ajoutés à ce
+> fichier. Pense aussi à activer **Authentification anonyme** (Console Firebase →
+> Authentication → Sign-in method → Anonyme), sans quoi l'affichage des créneaux pris ne
+> fonctionnera pas. Sans ces étapes, l'équipe est quand même prévenue par email, mais la
+> demande ne s'affiche pas sur la carte.
 >
 > 📞 Pense aussi à remplacer le numéro `+33 6 00 00 00 00` dans `reservation.html`
 > (3 endroits) par ton vrai numéro.
