@@ -4494,11 +4494,10 @@ let reservDate = (typeof todayISO==='function') ? todayISO() : new Date().toISOS
 let reservMap = null, reservMarkers = [];
 
 const RES_STATUS = {
-  nouvelle:  {label:'À planifier', color:'#60A5FA', icon:'🆕'},
-  planifiee: {label:'Planifiée',   color:'#FB923C', icon:'🗓️'},
-  livree:    {label:'Livrée',      color:'#22C55E', icon:'✅'},
-  annulee:   {label:'Annulée',     color:'#5C6478', icon:'🚫'},
+  planifiee: {label:'Planifié', color:'#FB923C', icon:'🗓️'},
+  livree:    {label:'Livré',    color:'#22C55E', icon:'✅'},
 };
+function normResStatus(s){ return s==='livree' ? 'livree' : 'planifiee'; }
 
 // ── Helpers dates / créneaux ──
 function resFmtDay(d){ if(!d)return'—'; try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}catch(e){return d;} }
@@ -4538,9 +4537,17 @@ function saveResPatch(id, patch){
 function assignResDriver(id, driverId){ saveResPatch(id, {driverId}); renderReappro(); }
 function setResStatus(id, status){
   const r = reservations.find(x=>String(x.id)===String(id));
+  if(!r) return;
   saveResPatch(id, {status});
-  // Une livraison effectuée (ou annulée) libère le créneau -> le planning se "réinitialise"
-  if((status==='livree' || status==='annulee') && r) freeReservSlot(r);
+  if(status==='livree'){
+    // Livré : on libère le créneau ET on enregistre un événement "livré"
+    // -> il apparaît dans l'onglet Événements et décompte le stock (comme d'habitude)
+    freeReservSlot(r);
+    if(!r.eventId){ const evId = createEventFromReservation(r); saveResPatch(id, {eventId: evId}); }
+  } else if(status==='planifiee'){
+    // Retour en "Planifié" : on retire l'événement livré (le stock est restauré)
+    if(r.eventId){ removeEventFromReservation(r); saveResPatch(id, {eventId: ''}); }
+  }
   renderReappro();
   showToast('Statut mis à jour ✓','success');
 }
@@ -4548,6 +4555,7 @@ function deleteReservation(id){
   const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
   if(!confirm('Supprimer cette réservation ?')) return;
   freeReservSlot(r);
+  if(r.eventId) removeEventFromReservation(r);
   reservations = reservations.filter(x=>String(x.id)!==String(id));
   saveResLocal();
   if(fbReady) queuedWrite('remove', 'reservations/'+id, null);
@@ -4555,38 +4563,51 @@ function deleteReservation(id){
   showToast('Réservation supprimée','info');
 }
 
-// ── Conversion réservation → livraison (réutilise le système de Livraisons) ──
-function convertReservationToDelivery(id){
-  const r = reservations.find(x=>String(x.id)===String(id)); if(!r) return;
+// ── Réservation LIVRÉE -> événement (onglet Événements + décompte du stock) ──
+function reservationMaterial(r){
   const material = {}; const extra = [];
   (r.items||[]).forEach(it=>{
     const q = parseInt(it.qty)||0;
     const known = STOCK_META.find(s=>s.id===it.id);
     if(known && q>0) material[it.id] = q;
-    if(it.detail) extra.push(it.label+' : '+it.detail);          // café (ex: "Café : 150 capsules")
-    else if(!known) extra.push((q||'')+'× '+it.label);            // ex: machine à bar
+    if(it.detail) extra.push(it.label+' : '+it.detail);   // café (ex: "Café : 150 capsules")
+    else if(!known && q>0) extra.push(q+'× '+it.label);   // ex: machine à bar
   });
-  let note = 'Réappro client'+(r.ref?(' '+r.ref):'');
-  if(extra.length) note += ' · '+extra.join(', ');
-  if(r.other) note += ' · '+r.other;
-  if(r.urgent) note = '🚨 URGENT · '+note;
-  const d = {
-    id:'dlv_'+Date.now()+'_'+Math.floor(Math.random()*1000),
-    eventId:'', reservationId:r.id,
-    date:r.date, time:slotStartTime(r.slot),
-    type:'livraison',
-    title:(r.company||r.city||'Réappro')+(r.stand?(' — '+r.stand):''),
-    driverId:r.driverId||(drivers[0]?drivers[0].id:''),
-    address:(r.venueName||r.city||'')+(r.stand?(' · '+r.stand):''),
-    contact:r.contact||r.company||'',
-    phone:r.phone||'',
-    material, note, done:false
+  return { material, extra };
+}
+function createEventFromReservation(r){
+  const { material, extra } = reservationMaterial(r);
+  let notes = 'Réappro client'+(r.ref?(' '+r.ref):'');
+  if(extra.length) notes += ' · '+extra.join(', ');
+  if(r.other) notes += ' · '+r.other;
+  if(r.urgent) notes = '🚨 URGENT · '+notes;
+  const ev = {
+    client: r.contact ? (r.company+' ('+r.contact+')') : (r.company||'Client'),
+    clientCompany: r.company||'', clientName: r.contact||'',
+    salon: 'Réappro'+(r.city?(' — '+r.city):''),
+    stand: r.stand||'',
+    type: 'Réapprovisionnement',
+    lieu: r.city||'',
+    deliveryAddress: r.venueName||'',
+    onSitePhone: r.phone||'',
+    start: r.date, end: r.date,
+    status: 'livré',
+    contact: r.phone||'',
+    origin: 'reservation', reservationId: r.id,
+    createdAt: Date.now(),
+    material, itemLabels: {}, notes
   };
-  deliveries.push(d);
-  saveDeliveries();
-  saveResPatch(r.id, {status:'planifiee', driverId:d.driverId});
-  showToast('Livraison créée ✓ (onglet Livraisons)','success');
-  showTab('delivery');
+  const id = (fbReady && db.ref('events').push().key) || ('loc_'+Date.now()+'_'+Math.floor(Math.random()*100000));
+  const rec = { id, ...ev };
+  events.push(rec); saveLocal(); renderAll();
+  if(fbReady) queuedWrite('set', 'events/'+id, rec);
+  return id;
+}
+function removeEventFromReservation(r){
+  if(!r.eventId) return;
+  events = events.filter(e=>e.id!==r.eventId);
+  saveLocal(); renderAll();
+  if(fbReady) queuedWrite('remove', 'events/'+r.eventId, null);
 }
 
 function copyReservationLink(){
@@ -4599,7 +4620,7 @@ function copyReservationLink(){
 function loadReservationsFromFirebase(){
   if(!fbReady) return;
   db.ref('reservations').on('value', snap=>{
-    const arr = fbToArray(snap.val()).map(r=>({...r}));
+    const arr = fbToArray(snap.val()).map(r=>({...r, status: normResStatus(r.status)}));
     if(reservLoaded){
       arr.forEach(r=>{
         if(r.id && !reservSeen[r.id]){
@@ -4620,7 +4641,7 @@ function loadReservationsFromFirebase(){
 
 function updateReservBadge(){
   const today = todayISO();
-  const n = reservations.filter(r=>r.date===today && r.status!=='livree' && r.status!=='annulee').length;
+  const n = reservations.filter(r=>r.date===today && r.status!=='livree').length;
   ['nav-badge-reappro','more-badge-reappro'].forEach(id=>{
     const b=document.getElementById(id);
     if(b){ if(n>0){ b.style.display='inline'; b.textContent=n; } else { b.style.display='none'; } }
@@ -4726,8 +4747,7 @@ function renderResCard(r){
     ${r.other?`<div class="ev-notes" style="margin-top:8px">💬 ${esc(r.other)}</div>`:''}
     <div class="res-actions">
       <select onchange="assignResDriver('${r.id}',this.value)">${resDriverOptions(r.driverId)}</select>
-      <select onchange="setResStatus('${r.id}',this.value)">${resStatusOptions(r.status||'nouvelle')}</select>
-      <button class="btn-xs success" onclick="convertReservationToDelivery('${r.id}')">🚚 Créer la livraison</button>
+      <select onchange="setResStatus('${r.id}',this.value)">${resStatusOptions(r.status||'planifiee')}</select>
       <button class="btn-xs danger" onclick="deleteReservation('${r.id}')">🗑</button>
     </div>
   </div>`;
@@ -4739,15 +4759,16 @@ function renderReappro(){
   const day = reservDate;
   const dayList = reservations.filter(r=>r.date===day).sort(sortRes);
   const total = reservations.length;
-  const urg = dayList.filter(r=>r.urgent && r.status!=='livree' && r.status!=='annulee').length;
-  const pending = dayList.filter(r=>(r.status||'nouvelle')==='nouvelle').length;
-  const mapList = dayList.length ? dayList : reservations.filter(r=>r.status!=='annulee');
+  const urg = dayList.filter(r=>r.urgent && r.status!=='livree').length;
+  const planif = dayList.filter(r=>r.status!=='livree').length;
+  const done = dayList.filter(r=>r.status==='livree').length;
+  const mapList = dayList.length ? dayList : reservations.slice();
 
   let html = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div>
         <div style="font-family:var(--font-head);font-size:16px;font-weight:600">📍 Réservations de créneaux — Réappro</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Les demandes clients arrivent ici en direct. Assigne un livreur, planifie, ou crée la livraison en 1 clic.</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Les demandes clients arrivent ici en direct. Assigne un livreur, puis passe en « Livré » une fois fait (ça décompte le stock et l'ajoute aux événements).</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-ghost" onclick="copyReservationLink()">🔗 Lien client</button>
@@ -4768,7 +4789,8 @@ function renderReappro(){
 
   html += `<div class="res-summary">
       <span>📋 <b>${dayList.length}</b> ce jour</span>
-      <span>🆕 <b>${pending}</b> à planifier</span>
+      <span>🗓️ <b>${planif}</b> planifié${planif>1?'s':''}</span>
+      <span>✅ <b>${done}</b> livré${done>1?'s':''}</span>
       <span>🚨 <b>${urg}</b> urgente${urg>1?'s':''}</span>
       <span style="margin-left:auto;color:var(--text3)">${total} demande${total>1?'s':''} au total</span>
     </div>`;
@@ -4782,12 +4804,12 @@ function renderReappro(){
   }
 
   if(!dayList.length){
-    html += `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune réservation ce jour.<br>La carte montre toutes les demandes à venir. Partage le « Lien client » pour recevoir des créneaux.</div></div>`;
+    html += `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune réservation ce jour.<br>La carte montre toutes les demandes. Partage le « Lien client » pour recevoir des créneaux.</div></div>`;
     const upcoming = reservations
-      .filter(r=>(r.status||'nouvelle')==='nouvelle' && r.date>=todayISO())
+      .filter(r=>r.status!=='livree' && r.date>=todayISO())
       .sort((a,b)=>(a.date||'').localeCompare(b.date||'') || sortRes(a,b));
     if(upcoming.length){
-      html += `<div class="ev-list-header"><div class="ev-list-title">🆕 Prochaines demandes à planifier</div></div>`;
+      html += `<div class="ev-list-header"><div class="ev-list-title">🗓️ Prochaines réservations planifiées</div></div>`;
       html += upcoming.slice(0,20).map(renderResCard).join('');
     }
   } else {
