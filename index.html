@@ -526,6 +526,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
 .res-urgent-tag{font-size:10px;font-weight:700;color:#fca5a5;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);padding:3px 8px;border-radius:7px;}
 .res-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:11px;}
 .res-actions select{font-size:11px;padding:6px 9px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--font-body);cursor:pointer;}
+.res-city-pin{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;font-family:var(--font-head);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45);}
 @media(max-width:640px){#reapproMap{height:260px;}}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -4627,6 +4628,35 @@ function updateReservBadge(){
 }
 
 // ── Carte (Leaflet + OpenStreetMap) ──
+// ── Carte (Leaflet + OpenStreetMap) — un point par VILLE avec le nombre de demandes ──
+const RES_CITY_COORDS = {
+  'cannes':[43.5513,7.0174],'nice':[43.7102,7.2620],'monaco':[43.7384,7.4246],
+  'antibes':[43.5808,7.1239],'juan-les-pins':[43.5680,7.1090],'cagnes-sur-mer':[43.6645,7.1490],
+  'grasse':[43.6585,6.9225],'valbonne':[43.6157,7.0489],'sophia-antipolis':[43.6157,7.0489],
+  'mandelieu-la-napoule':[43.5462,6.9387],'mandelieu':[43.5462,6.9387],'menton':[43.7765,7.5044],
+  'beaulieu-sur-mer':[43.7065,7.3320],'saint-laurent-du-var':[43.6680,7.1780],'villeneuve-loubet':[43.6580,7.1220],
+  'vallauris':[43.5805,7.0540],'mougins':[43.6000,7.0070],'le-cannet':[43.5769,7.0190],
+  'frejus':[43.4332,6.7370],'saint-raphael':[43.4250,6.7686],'sainte-maxime':[43.3090,6.6380],
+  'saint-tropez':[43.2727,6.6407],'draguignan':[43.5380,6.4660],'toulon':[43.1242,5.9280],'hyeres':[43.1199,6.1290]
+};
+function resCityKey(c){ return (c||'').toString().trim().toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
+function resCityCoords(city, members){
+  const withGeo = (members||[]).filter(r=>typeof r.lat==='number' && typeof r.lng==='number');
+  if(withGeo.length){
+    return [ withGeo.reduce((s,r)=>s+r.lat,0)/withGeo.length, withGeo.reduce((s,r)=>s+r.lng,0)/withGeo.length ];
+  }
+  const k = resCityKey(city);
+  return RES_CITY_COORDS[k] || null;
+}
+function groupReservByCity(list){
+  const map = {};
+  (list||[]).forEach(r=>{
+    const key = resCityKey(r.city) || resCityKey(r.venueName) || 'autre';
+    if(!map[key]) map[key] = { city: r.city || r.venueName || '—', items: [] };
+    map[key].items.push(r);
+  });
+  return map;
+}
 function initReservMap(list){
   const mapEl = document.getElementById('reapproMap');
   if(!mapEl) return;
@@ -4637,25 +4667,28 @@ function initReservMap(list){
   if(reservMap){ try{ reservMap.remove(); }catch(e){} reservMap=null; reservMarkers=[]; }
   reservMap = L.map('reapproMap', {scrollWheelZoom:false}).setView([43.65, 7.15], 9);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(reservMap);
+  const groups = groupReservByCity(list);
   const pts=[];
-  (list||[]).forEach(r=>{
-    if(typeof r.lat!=='number' || typeof r.lng!=='number') return;
-    const col = resMarkerColor(r);
-    const m = L.circleMarker([r.lat, r.lng], {radius:9, color:'#fff', weight:2, fillColor:col, fillOpacity:.92}).addTo(reservMap);
-    const mapsUrl = `https://www.google.com/maps?q=${r.lat},${r.lng}`;
-    m.bindPopup(
-      `<b>${esc(r.company||r.city||'Client')}</b>${r.urgent?' 🚨':''}<br>${esc(r.venueName||'')}`+
-      `<br>${resFmtDay(r.date)} · ${esc(r.slotLabel||slotStartTime(r.slot))}`+
-      (r.phone?`<br>📞 ${esc(r.phone)}`:'')+
-      `<br><a href="${mapsUrl}" target="_blank">Itinéraire ↗</a>`
-    );
-    reservMarkers.push(m); pts.push([r.lat, r.lng]);
+  Object.keys(groups).forEach(key=>{
+    const g = groups[key];
+    const coords = resCityCoords(g.city, g.items);
+    if(!coords) return;
+    const n = g.items.length;
+    const anyUrgent = g.items.some(r=>r.urgent && r.status!=='livree' && r.status!=='annulee');
+    const allDone   = g.items.every(r=>r.status==='livree' || r.status==='annulee');
+    const col = allDone ? '#22C55E' : (anyUrgent ? '#EF4444' : '#3B82F6');
+    const icon = L.divIcon({ className:'res-city-pin-wrap', html:`<div class="res-city-pin" style="background:${col}">${n}</div>`, iconSize:[34,34], iconAnchor:[17,17] });
+    const popup = `<b>${esc(g.city)}</b> — ${n} demande${n>1?'s':''}<br>` +
+      g.items.slice(0,8).map(r=>`• ${esc(r.slotLabel||slotStartTime(r.slot)||'')} — ${esc(r.company||'')}${r.urgent?' 🚨':''}`).join('<br>') +
+      (n>8?`<br>…(+${n-8})`:'');
+    const m = L.marker(coords, {icon}).addTo(reservMap).bindPopup(popup);
+    reservMarkers.push(m); pts.push(coords);
   });
   setTimeout(()=>{
     if(!reservMap) return;
     try{
       reservMap.invalidateSize();
-      if(pts.length===1) reservMap.setView(pts[0], 12);
+      if(pts.length===1) reservMap.setView(pts[0], 11);
       else if(pts.length>1) reservMap.fitBounds(pts, {padding:[40,40], maxZoom:12});
     }catch(e){}
   }, 180);
@@ -4739,6 +4772,14 @@ function renderReappro(){
       <span>🚨 <b>${urg}</b> urgente${urg>1?'s':''}</span>
       <span style="margin-left:auto;color:var(--text3)">${total} demande${total>1?'s':''} au total</span>
     </div>`;
+
+  // Répartition par ville (reflète les points de la carte)
+  const cityGroups = groupReservByCity(mapList);
+  const cityChips = Object.keys(cityGroups).map(k=>({city:cityGroups[k].city, n:cityGroups[k].items.length})).sort((a,b)=>b.n-a.n);
+  if(cityChips.length){
+    html += `<div class="res-summary" style="gap:8px"><span style="color:var(--text3)">📍 Par ville :</span>` +
+      cityChips.map(c=>`<span class="res-chip">${esc(c.city)} <b style="color:var(--accent2)">${c.n}</b></span>`).join('') + `</div>`;
+  }
 
   if(!dayList.length){
     html += `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune réservation ce jour.<br>La carte montre toutes les demandes à venir. Partage le « Lien client » pour recevoir des créneaux.</div></div>`;

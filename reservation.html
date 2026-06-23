@@ -235,7 +235,7 @@ body::before{content:'';position:fixed;inset:0;background:
           <input class="inp" id="r-phone" type="tel" placeholder="+33 6 ..." oninput="updateSummary()">
         </div>
         <div class="grp">
-          <label class="lbl">Email (pour la confirmation)</label>
+          <label class="lbl">Email (facultatif)</label>
           <input class="inp" id="r-email" type="email" placeholder="vous@societe.com">
         </div>
       </div>
@@ -246,26 +246,30 @@ body::before{content:'';position:fixed;inset:0;background:
   <div class="card">
     <div class="card-head">
       <div class="card-num">2</div>
-      <div class="card-title">Où êtes-vous ?</div>
-      <div class="card-sub">Côte d'Azur</div>
+      <div class="card-title">Où vous livrer ?</div>
+      <div class="card-sub">Adresse exacte</div>
     </div>
     <div class="card-body">
       <div class="row single">
         <div class="grp">
-          <label class="lbl">Lieu / Salon <span class="req">*</span></label>
-          <select class="sel" id="r-venue" onchange="onVenueChange()"></select>
+          <label class="lbl">Adresse (n° et rue) <span class="req">*</span></label>
+          <input class="inp" id="r-address" type="text" placeholder="ex: 12 boulevard de la Croisette" oninput="updateSummary()">
         </div>
       </div>
-      <div class="row single" id="r-othercity-wrap" style="display:none;">
+      <div class="row">
         <div class="grp">
-          <label class="lbl">Ville (si autre lieu) <span class="req">*</span></label>
-          <input class="inp" id="r-othercity" type="text" placeholder="ex: Vallauris" oninput="updateSummary()">
+          <label class="lbl">Code postal <span class="req">*</span></label>
+          <input class="inp" id="r-postal" type="text" inputmode="numeric" placeholder="ex: 06400" oninput="updateSummary()">
+        </div>
+        <div class="grp">
+          <label class="lbl">Ville <span class="req">*</span></label>
+          <input class="inp" id="r-city" type="text" placeholder="ex: Cannes" oninput="updateSummary()">
         </div>
       </div>
       <div class="row single">
         <div class="grp">
-          <label class="lbl">N° de stand / précisions d'accès</label>
-          <input class="inp" id="r-stand" type="text" placeholder="ex: Stand B12 – Hall 3, entrée logistique, demander Marie">
+          <label class="lbl">Stand / salon / précisions d'accès</label>
+          <input class="inp" id="r-stand" type="text" placeholder="ex: Palais des Festivals, Stand B12 – Hall 3, demander Marie">
         </div>
       </div>
     </div>
@@ -341,7 +345,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <button class="submit-btn" onclick="submitReservation()">
       <span>Réserver mon créneau</span> <span class="arrow">→</span>
     </button>
-    <div class="submit-note">Votre demande arrive instantanément à notre équipe. Vous recevrez une confirmation et nous passons à l'heure choisie.</div>
+    <div class="submit-note">Votre demande arrive instantanément à notre équipe. Nous passons à l'heure choisie.</div>
   </div>
 
 </div>
@@ -377,43 +381,21 @@ body::before{content:'';position:fixed;inset:0;background:
 
 const pad = n => String(n).padStart(2,'0');
 
-// ---------- Lieux Côte d'Azur (coordonnées GPS pour la carte du dashboard) ----------
-const VENUES = [
-  { group:'Cannes', items:[
-    { id:'cannes_palais', name:'Palais des Festivals et des Congrès — Cannes', city:'Cannes', lat:43.5505, lng:7.0174 },
-    { id:'cannes_centre', name:'Cannes — Croisette / Centre', city:'Cannes', lat:43.5513, lng:7.0174 },
-    { id:'mandelieu',     name:'Mandelieu-la-Napoule', city:'Mandelieu-la-Napoule', lat:43.5462, lng:6.9387 },
-  ]},
-  { group:'Nice', items:[
-    { id:'nice_acropolis', name:'Palais des Expositions / Acropolis — Nice', city:'Nice', lat:43.7034, lng:7.2839 },
-    { id:'nice_allianz',   name:'Allianz Riviera — Nice', city:'Nice', lat:43.7050, lng:7.1925 },
-    { id:'nice_centre',    name:'Nice — Centre / Promenade', city:'Nice', lat:43.7102, lng:7.2620 },
-    { id:'nice_aeroport',  name:'Aéroport Nice Côte d\'Azur', city:'Nice', lat:43.6584, lng:7.2159 },
-  ]},
-  { group:'Monaco & Est', items:[
-    { id:'monaco_grimaldi', name:'Grimaldi Forum — Monaco', city:'Monaco', lat:43.7447, lng:7.4310 },
-    { id:'monaco_centre',   name:'Monaco — Centre', city:'Monaco', lat:43.7384, lng:7.4246 },
-    { id:'beaulieu',        name:'Beaulieu-sur-Mer / Cap-Ferrat', city:'Beaulieu-sur-Mer', lat:43.7065, lng:7.3320 },
-    { id:'menton',          name:'Menton', city:'Menton', lat:43.7765, lng:7.5044 },
-  ]},
-  { group:'Antibes & Ouest', items:[
-    { id:'antibes',  name:'Antibes / Juan-les-Pins', city:'Antibes', lat:43.5808, lng:7.1239 },
-    { id:'sophia',   name:'Sophia Antipolis — Valbonne', city:'Valbonne', lat:43.6157, lng:7.0489 },
-    { id:'cagnes',   name:'Cagnes-sur-Mer', city:'Cagnes-sur-Mer', lat:43.6645, lng:7.1490 },
-    { id:'grasse',   name:'Grasse', city:'Grasse', lat:43.6585, lng:6.9225 },
-  ]},
-  { group:'Var (Est)', items:[
-    { id:'saintraphael', name:'Saint-Raphaël', city:'Saint-Raphaël', lat:43.4250, lng:6.7686 },
-    { id:'frejus',       name:'Fréjus', city:'Fréjus', lat:43.4332, lng:6.7370 },
-    { id:'saintemaxime', name:'Sainte-Maxime', city:'Sainte-Maxime', lat:43.3090, lng:6.6380 },
-    { id:'sainttropez',  name:'Saint-Tropez', city:'Saint-Tropez', lat:43.2727, lng:6.6407 },
-  ]},
-];
-const VENUE_MAP = {};
-VENUES.forEach(g=>g.items.forEach(v=>VENUE_MAP[v.id]=v));
+// ---------- Géocodage (adresse -> point sur la carte), via OpenStreetMap ----------
+async function geocodeAddress(query){
+  try{
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=fr&q='+encodeURIComponent(query);
+    const r = await fetch(url, { headers:{ 'Accept':'application/json' } });
+    if(!r.ok) return null;
+    const arr = await r.json();
+    if(arr && arr.length){ return { lat: parseFloat(arr[0].lat), lng: parseFloat(arr[0].lon) }; }
+  }catch(e){ /* hors-ligne ou bloqué : on continue sans coordonnées */ }
+  return null;
+}
 
 // ---------- Café : nombre de capsules (50 → illimité) ----------
 const CAFE_OPTIONS = ['50','100','150','200','250','300','400','500','illimite'];
+
 
 // ---------- Eau ----------
 const WATER = [
@@ -433,32 +415,19 @@ const MACHINES = [
 // ---------- État ----------
 const qty = {};            // { itemId: qty } (eau + machines)
 let cafeCapsules = '';     // '' | '50'..'500' | 'illimite'
-let selVenue = '';
 let selDate = '';          // YYYY-MM-DD
 let selSlot = '';          // id créneau 'HHMM'
 let takenSlots = {};       // { 'HHMM': true } pour la date sélectionnée
 let slotsRefHandle = null; // référence Firebase écoutée
 
+// Accusé de réception au client : désactivé (le modèle d'email partagé n'est pas
+// adapté aux clients). On notifie uniquement l'équipe. Repasser à true seulement
+// avec un modèle EmailJS dédié aux clients.
+const SEND_CLIENT_ACK = false;
+
 // ============================================================
 // Construction de l'interface
 // ============================================================
-function buildVenues(){
-  const sel = document.getElementById('r-venue');
-  let html = '<option value="">— Sélectionnez votre lieu —</option>';
-  VENUES.forEach(g=>{
-    html += `<optgroup label="${g.group}">`;
-    g.items.forEach(v=>{ html += `<option value="${v.id}">${v.name}</option>`; });
-    html += `</optgroup>`;
-  });
-  html += `<optgroup label="Autre"><option value="autre">Autre lieu (à préciser)</option></optgroup>`;
-  sel.innerHTML = html;
-}
-function onVenueChange(){
-  selVenue = document.getElementById('r-venue').value;
-  document.getElementById('r-othercity-wrap').style.display = (selVenue==='autre') ? '' : 'none';
-  updateSummary();
-}
-
 function buildCafe(){
   const cont = document.getElementById('cafe-container');
   const opts = ['<option value="">— Pas de café —</option>']
@@ -588,7 +557,8 @@ function selectedItems(){
 }
 function updateSummary(){
   const chips = [];
-  if(selVenue){ const v=VENUE_MAP[selVenue]; chips.push('📍 '+(v?v.city:(document.getElementById('r-othercity').value||'Autre lieu'))); }
+  const city = (document.getElementById('r-city').value||'').trim();
+  if(city){ chips.push('📍 '+city); }
   if(selDate){ chips.push('📅 '+dayShort(selDate)); }
   if(selSlot){ chips.push('🕐 '+slotLabelFromId(selSlot)); }
   selectedItems().forEach(i=>chips.push(i.detail?('☕ '+i.detail):(i.qty+'× '+i.label)));
@@ -727,16 +697,11 @@ L'équipe EauService by Events Café`;
 async function submitReservation(){
   const phone = document.getElementById('r-phone').value.trim();
   if(!phone){ showToast('Merci d\'indiquer un téléphone pour vous recontacter','error'); return; }
-  if(!selVenue){ showToast('Merci de sélectionner votre lieu','error'); return; }
-  let city='', venueName='', lat=null, lng=null;
-  if(selVenue==='autre'){
-    city = document.getElementById('r-othercity').value.trim();
-    if(!city){ showToast('Merci de préciser la ville','error'); return; }
-    venueName = 'Autre lieu — '+city;
-  } else {
-    const v = VENUE_MAP[selVenue];
-    if(v){ city=v.city; venueName=v.name; lat=v.lat; lng=v.lng; }
-  }
+  const address = document.getElementById('r-address').value.trim();
+  const postal  = document.getElementById('r-postal').value.trim();
+  const city    = document.getElementById('r-city').value.trim();
+  if(!address){ showToast('Merci d\'indiquer l\'adresse de livraison','error'); return; }
+  if(!city){ showToast('Merci d\'indiquer la ville','error'); return; }
   if(!selDate){ showToast('Merci de choisir un jour','error'); return; }
   if(!selSlot){ showToast('Merci de choisir un créneau horaire libre','error'); return; }
   if(slotUnavailable(selSlot)){ showToast('Ce créneau n\'est plus disponible, choisissez-en un autre','error'); buildSlots(); return; }
@@ -744,6 +709,17 @@ async function submitReservation(){
   const items = selectedItems();
   const other = document.getElementById('r-other').value.trim();
   if(!items.length && !other){ showToast('Indiquez au moins un article ou une précision','error'); return; }
+
+  const stand = document.getElementById('r-stand').value.trim();
+  const venueName = [address, [postal, city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+
+  const btn = document.querySelector('.submit-btn');
+  btn.style.pointerEvents='none'; btn.style.opacity='.7';
+
+  // Géocodage : adresse exacte -> sinon code postal + ville -> sinon ville
+  let geo = await geocodeAddress(venueName+', France');
+  if(!geo && postal) geo = await geocodeAddress(postal+' '+city+', France');
+  if(!geo) geo = await geocodeAddress(city+', France');
 
   const createdAt = Date.now();
   const ref = 'RES-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(createdAt).slice(-4);
@@ -753,8 +729,10 @@ async function submitReservation(){
     contact: document.getElementById('r-contact').value.trim(),
     phone,
     email: document.getElementById('r-email').value.trim(),
-    venueId: selVenue, venueName, city, lat, lng,
-    stand: document.getElementById('r-stand').value.trim(),
+    address, postalCode: postal, city,
+    venueName,
+    lat: geo?geo.lat:null, lng: geo?geo.lng:null,
+    stand,
     date: selDate, slot: selSlot, slotLabel: slotLabelFromId(selSlot),
     items, other,
     urgent: !!document.getElementById('r-urgent').checked,
@@ -764,8 +742,6 @@ async function submitReservation(){
     createdAt
   };
 
-  const btn = document.querySelector('.submit-btn');
-  btn.style.pointerEvents='none'; btn.style.opacity='.7';
   try{
     if(fbReady){
       await ensureAnonAuth();
@@ -788,11 +764,11 @@ async function submitReservation(){
       localStorage.setItem('ec_reservations', JSON.stringify(pending));
     }
     sendTeamEmail(res);
-    sendClientAck(res);
+    if(SEND_CLIENT_ACK) sendClientAck(res);
     showSuccess(res);
   }catch(e){
     console.error(e);
-    try{ sendTeamEmail(res); sendClientAck(res); showSuccess(res); }
+    try{ sendTeamEmail(res); if(SEND_CLIENT_ACK) sendClientAck(res); showSuccess(res); }
     catch(_){ showToast('Erreur lors de l\'envoi, réessayez ou appelez-nous','error'); }
   }
   btn.style.pointerEvents=''; btn.style.opacity='';
@@ -809,18 +785,16 @@ function showSuccess(res){
     <div class="success-row"><span class="success-row-label">Créneau</span><span class="success-row-val">${fmtFull(res.date)}<br>${res.slotLabel}</span></div>
     <div class="success-row"><span class="success-row-label">Réappro</span><span class="success-row-val" style="max-width:280px">${itemsTxt}</span></div>
     ${res.urgent?'<div class="success-row"><span class="success-row-label">Priorité</span><span class="success-row-val" style="color:#fca5a5">🚨 Urgent</span></div>':''}
-    <div class="success-row"><span class="success-row-label">Confirmation</span><span class="success-row-val" style="max-width:280px">${res.email?('envoyée à '+res.email):'par téléphone'}</span></div>`;
+    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">Nous passons sur le créneau choisi</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display='block';
   document.getElementById('success-screen').classList.remove('show');
-  ['r-company','r-contact','r-phone','r-email','r-stand','r-other','r-othercity','r-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('r-venue').value='';
+  ['r-company','r-contact','r-phone','r-email','r-address','r-postal','r-city','r-stand','r-other','r-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('r-urgent').checked=false;
   document.getElementById('urgent-box').classList.remove('on');
-  document.getElementById('r-othercity-wrap').style.display='none';
   Object.keys(qty).forEach(k=>delete qty[k]);
-  cafeCapsules=''; selVenue=''; selDate=''; selSlot='';
+  cafeCapsules=''; selDate=''; selSlot='';
   if(slotsRefHandle){ try{ slotsRefHandle.off(); }catch(e){} slotsRefHandle=null; }
   takenSlots={};
   buildCafe(); buildWater(); buildMachines(); buildDayChips(); buildSlots(); updateSummary();
@@ -834,7 +808,6 @@ function showToast(msg,type='info'){
 }
 
 // INIT
-buildVenues();
 buildCafe();
 buildWater();
 buildMachines();
