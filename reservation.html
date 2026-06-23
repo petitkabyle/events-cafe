@@ -95,6 +95,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .qty-btn:hover{background:var(--gold);border-color:var(--gold);color:#06101F;}
 .qty-val{min-width:22px;text-align:center;font-weight:700;font-size:16px;font-family:var(--font-head);}
 .qty-val.on{color:var(--gold2);}
+.qty-input{width:96px;background:var(--bg4);border:1px solid var(--border2);border-radius:10px;padding:9px 11px;color:var(--text1);font-family:var(--font-head);font-weight:700;font-size:15px;text-align:center;}
+.qty-input::placeholder{color:var(--text3);font-weight:500;font-size:12px;}
+.qty-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(59,158,255,.14);}
 
 /* CAFÉ ROW */
 .cafe-row{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:all .2s;}
@@ -176,7 +179,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .wrap{padding:0 14px 70px;}
   .row{grid-template-columns:1fr;}
   .items{grid-template-columns:1fr;}
-  .inp,.sel,.txt{font-size:16px;}
+  .inp,.sel,.txt,.qty-input{font-size:16px;}
   .slots{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));}
 }
 </style>
@@ -235,7 +238,7 @@ body::before{content:'';position:fixed;inset:0;background:
           <input class="inp" id="r-phone" type="tel" placeholder="+33 6 ..." oninput="updateSummary()">
         </div>
         <div class="grp">
-          <label class="lbl">Email (facultatif)</label>
+          <label class="lbl">Email (pour mail de confirmation)</label>
           <input class="inp" id="r-email" type="email" placeholder="vous@societe.com">
         </div>
       </div>
@@ -288,7 +291,7 @@ body::before{content:'';position:fixed;inset:0;background:
       <div class="cat-title">☕ Café</div>
       <div id="cafe-container"></div>
 
-      <div class="cat-title">💧 Eau</div>
+      <div class="cat-title">💧 Eau & gobelets</div>
       <div class="items" id="water-container"></div>
 
       <div class="cat-title">⚙️ Machine à café</div>
@@ -397,10 +400,11 @@ async function geocodeAddress(query){
 const CAFE_OPTIONS = ['50','100','150','200','250','300','400','500','illimite'];
 
 
-// ---------- Eau ----------
+// ---------- Eau & gobelets ----------
 const WATER = [
   { id:'bonbonne',     icon:'🫙', name:"Bonbonnes d'eau", tag:'Le + demandé' },
   { id:'fontaine_eau', icon:'💧', name:'Fontaine à eau' },
+  { id:'gobelet',      icon:'🥤', name:'Gobelets' },
 ];
 // ---------- Machines à café (ids alignés sur le stock du dashboard) ----------
 const MACHINES = [
@@ -429,34 +433,31 @@ let slotsRefHandle = null; // référence Firebase écoutée
 // ============================================================
 function buildCafe(){
   const cont = document.getElementById('cafe-container');
-  const opts = ['<option value="">— Pas de café —</option>']
-    .concat(CAFE_OPTIONS.map(v=>`<option value="${v}"${cafeCapsules===v?' selected':''}>${v==='illimite'?'Illimité (à volonté)':v+' capsules'}</option>`));
-  cont.innerHTML = `<div class="cafe-row${cafeCapsules?' sel':''}">
+  cont.innerHTML = `<div class="item${cafeCapsules?' sel':''}" id="it-cafe">
     <div class="item-info"><span class="item-ico">☕</span><span class="item-name">Capsules / dosettes café</span></div>
-    <select class="sel" onchange="setCafe(this.value)">${opts.join('')}</select>
+    <input class="qty-input" id="q-cafe" type="number" min="0" inputmode="numeric" placeholder="Nb capsules" value="${cafeCapsules||''}" oninput="setCafe(this.value)">
   </div>`;
 }
-function setCafe(v){ cafeCapsules = v; buildCafe(); updateSummary(); }
+function setCafe(v){
+  const n = parseInt(v)||0;
+  cafeCapsules = n>0 ? String(n) : '';
+  const el = document.getElementById('it-cafe'); if(el) el.classList.toggle('sel', n>0);
+  updateSummary();
+}
 
-function stepperCardHtml(it){
-  const q = qty[it.id]||0;
-  return `<div class="item${q>0?' sel':''}" id="it-${it.id}">
+function itemRowHtml(it){
+  const q = qty[it.id]||'';
+  return `<div class="item${q?' sel':''}" id="it-${it.id}">
     <div class="item-info"><span class="item-ico">${it.icon}</span><span class="item-name">${it.name}${it.tag?`<span class="item-tag">${it.tag}</span>`:''}</span></div>
-    <div class="qty">
-      <button class="qty-btn" onclick="adjQty('${it.id}',-1)">−</button>
-      <span class="qty-val${q>0?' on':''}" id="q-${it.id}">${q}</span>
-      <button class="qty-btn" onclick="adjQty('${it.id}',1)">+</button>
-    </div>
+    <input class="qty-input" id="q-${it.id}" type="number" min="0" inputmode="numeric" placeholder="Qté" value="${q}" oninput="setQty('${it.id}',this.value)">
   </div>`;
 }
-function buildWater(){ document.getElementById('water-container').innerHTML = WATER.map(stepperCardHtml).join(''); }
-function buildMachines(){ document.getElementById('machine-container').innerHTML = MACHINES.map(stepperCardHtml).join(''); }
-function adjQty(id,d){
-  const v = Math.max(0,(qty[id]||0)+d);
-  if(v===0) delete qty[id]; else qty[id]=v;
-  const el = document.getElementById('q-'+id);
-  el.textContent = v; el.className = 'qty-val'+(v>0?' on':'');
-  document.getElementById('it-'+id).classList.toggle('sel', v>0);
+function buildWater(){ document.getElementById('water-container').innerHTML = WATER.map(itemRowHtml).join(''); }
+function buildMachines(){ document.getElementById('machine-container').innerHTML = MACHINES.map(itemRowHtml).join(''); }
+function setQty(id,v){
+  const n = parseInt(v)||0;
+  if(n>0) qty[id]=n; else delete qty[id];
+  const el = document.getElementById('it-'+id); if(el) el.classList.toggle('sel', n>0);
   updateSummary();
 }
 
@@ -575,15 +576,23 @@ const authRequired = (window.REQUIRE_AUTH === true);
 (function initFirebase(){
   const cfg = window.FIREBASE_CONFIG;
   if(cfg && cfg.apiKey && !String(cfg.apiKey).includes('COLLE')){
-    try{ firebase.initializeApp(cfg); db = firebase.database(); fbReady = true; }
-    catch(e){ console.error('Firebase init error', e); }
-    if(authRequired){ try{ fbAuth = firebase.auth(); }catch(e){ console.warn('Auth indisponible', e); fbAuth=null; } }
+    try{
+      // App Firebase ISOLÉE ("resv") : la connexion anonyme de cet outil n'écrase
+      // PAS la session admin du tableau de bord ouvert dans un autre onglet du
+      // même navigateur (c'est ce qui le faisait passer "hors ligne" au test).
+      let app; try{ app = firebase.app('resv'); }catch(e){ app = firebase.initializeApp(cfg, 'resv'); }
+      db = app.database(); fbReady = true;
+      if(authRequired){ try{ fbAuth = app.auth(); }catch(e){ console.warn('Auth indisponible', e); fbAuth=null; } }
+    }catch(e){ console.error('Firebase init error', e); }
   }
 })();
 async function ensureAnonAuth(){
   if(!authRequired || !fbAuth) return;
-  try{ if(!fbAuth.currentUser){ await fbAuth.signInAnonymously(); } }
-  catch(e){ console.warn('Connexion anonyme impossible (Anonymous Auth désactivé ?)', e); }
+  try{
+    // Persistance "en mémoire" : ne touche pas au localStorage partagé avec le dashboard
+    try{ await fbAuth.setPersistence(firebase.auth.Auth.Persistence.NONE); }catch(e){}
+    if(!fbAuth.currentUser){ await fbAuth.signInAnonymously(); }
+  }catch(e){ console.warn('Connexion anonyme impossible (Anonymous Auth désactivé ?)', e); }
 }
 
 let emailCfg = {};
@@ -661,10 +670,9 @@ async function sendClientAck(res){
   await ensureEmailCfg();
   if(typeof emailjs==='undefined' || !emailCfg.pubkey || !emailCfg.service) return;
   if(!res.email) return;
-  // Modèle DÉDIÉ au client (différent de la notif équipe). Sans lui, on n'envoie rien
-  // (pour éviter d'utiliser le modèle équipe qui contient l'en-tête "dashboard").
-  const clientTemplate = emailCfg.templateClient;
-  if(!clientTemplate || String(clientTemplate).includes('COLLE')){ console.warn('Pas de modèle client dédié (templateClient) : accusé non envoyé'); return; }
+  // Modèle dédié client s'il existe, sinon le modèle équipe (le client reçoit quand même sa confirmation).
+  const clientTemplate = (emailCfg.templateClient && !String(emailCfg.templateClient).includes('COLLE')) ? emailCfg.templateClient : emailCfg.template;
+  if(!clientTemplate) return;
   // Ne pas s'auto-envoyer l'accusé si le client a saisi une adresse de l'équipe
   const adminEmails = [emailCfg.email1, emailCfg.email2].filter(Boolean).map(e=>String(e).toLowerCase());
   if(adminEmails.includes(String(res.email).toLowerCase())){ console.warn('Email client = email équipe : accusé non envoyé'); return; }
@@ -791,7 +799,7 @@ function showSuccess(res){
     <div class="success-row"><span class="success-row-label">Créneau</span><span class="success-row-val">${fmtFull(res.date)}<br>${res.slotLabel}</span></div>
     <div class="success-row"><span class="success-row-label">Réappro</span><span class="success-row-val" style="max-width:280px">${itemsTxt}</span></div>
     ${res.urgent?'<div class="success-row"><span class="success-row-label">Priorité</span><span class="success-row-val" style="color:#fca5a5">🚨 Urgent</span></div>':''}
-    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">Nous passons sur le créneau choisi · besoin urgent ? appelez-nous</span></div>`;
+    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">${res.email?('Confirmation envoyée à '+res.email):'Nous passons sur le créneau choisi'}</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display='block';
