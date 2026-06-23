@@ -203,7 +203,7 @@ body::before{content:'';position:fixed;inset:0;background:
   <div class="phone-inner">
     <span class="pico">📞</span>
     <span>Une <b>urgence</b> ou une demande particulière ? Notre équipe reste joignable directement par téléphone :
-      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
+      <a href="tel:+33761465720">+33 7 61 46 57 20</a>
     </span>
   </div>
 </div>
@@ -304,7 +304,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <div class="card-head">
       <div class="card-num">4</div>
       <div class="card-title">Quand vous livrer ?</div>
-      <div class="card-sub">Créneaux toutes les 30 min</div>
+      <div class="card-sub">Créneaux d'1 heure</div>
     </div>
     <div class="card-body">
       <label class="lbl" style="display:block;margin-bottom:9px;">Jour souhaité <span class="req">*</span></label>
@@ -352,7 +352,7 @@ body::before{content:'';position:fixed;inset:0;background:
   <h2 class="success-title">Créneau <em>réservé !</em></h2>
   <p class="success-sub">Votre demande de réapprovisionnement a bien été transmise à notre équipe. Nous arrivons sur le créneau choisi.</p>
   <div class="success-card" id="success-details"></div>
-  <p class="success-phone">Un imprévu ? Appelez-nous directement : <a href="tel:+33600000000">+33 6 00 00 00 00</a></p>
+  <p class="success-phone">Un imprévu ? Appelez-nous directement : <a href="tel:+33761465720">+33 7 61 46 57 20</a></p>
   <button class="reset-btn" onclick="resetForm()">↩ Faire une autre demande</button>
 </div>
 
@@ -514,49 +514,46 @@ function onDatePick(v){ if(!v) return; selDate=v; selSlot=''; buildDayChips(); d
 // ---------- Créneaux (30 min, 9h → minuit) ----------
 function buildSlotTimes(){
   const arr = [];
-  for(let h=9; h<=23; h++){ arr.push(pad(h)+'00'); arr.push(pad(h)+'30'); }
+  for(let h=9; h<=23; h++){ arr.push(pad(h)+'00'); } // créneaux d'1 heure
   arr.push('0000'); // minuit
   return arr;
 }
 const SLOT_TIMES = buildSlotTimes();
 function slotLabelFromId(id){ return id.slice(0,2)+':'+id.slice(2); }
-function slotDisabledReason(id){
-  if(takenSlots[id]) return 'pris';
-  if(selDate===todayLocal()){
-    const now = new Date();
-    const nowMin = now.getHours()*60 + now.getMinutes();
-    const slotMin = (id==='0000') ? 24*60 : (parseInt(id.slice(0,2))*60 + parseInt(id.slice(2)));
-    // minuit (0000) appartient à la fin de journée ; on l'autorise si on n'est pas déjà après 23h30
-    const cmp = (id==='0000') ? 24*60 : slotMin;
-    if(cmp <= nowMin) return 'passe';
-  }
-  return '';
+// Créneau déjà passé (uniquement pour aujourd'hui) -> on le masque complètement
+function slotIsPast(id){
+  if(selDate!==todayLocal()) return false;
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const cmp = (id==='0000') ? 24*60 : (parseInt(id.slice(0,2))*60 + parseInt(id.slice(2)));
+  return cmp <= nowMin;
 }
+function slotUnavailable(id){ return !!takenSlots[id] || slotIsPast(id); }
 function buildSlots(){
   const cont = document.getElementById('slots-container');
   const hint = document.getElementById('slot-hint');
   const legend = document.getElementById('slot-legend');
   if(!selDate){
-    cont.innerHTML = '';
-    hint.style.display = '';
-    legend.style.display = 'none';
-    return;
+    cont.innerHTML = ''; hint.style.display = ''; hint.textContent = 'Choisissez d\'abord un jour pour voir les horaires disponibles (de 9h à minuit).'; legend.style.display = 'none'; return;
   }
-  hint.style.display = 'none';
-  legend.style.display = '';
-  // si le créneau choisi vient d'être pris, on le libère
-  if(selSlot && slotDisabledReason(selSlot)){ selSlot=''; }
-  cont.innerHTML = SLOT_TIMES.map(id=>{
-    const reason = slotDisabledReason(id);
-    if(reason){
-      const txt = reason==='pris' ? 'Réservé' : '—';
-      return `<div class="slot taken" title="${reason==='pris'?'Déjà réservé':'Heure passée'}"><div class="slot-t">${slotLabelFromId(id)}</div><div class="slot-d">${txt}</div></div>`;
+  // on n'affiche que les créneaux non passés (les heures passées disparaissent aujourd'hui)
+  const avail = SLOT_TIMES.filter(id=>!slotIsPast(id));
+  if(!avail.length){
+    hint.style.display = ''; hint.textContent = 'Plus de créneau disponible aujourd\'hui — choisissez « Demain » ou une autre date.';
+    legend.style.display = 'none'; cont.innerHTML = ''; return;
+  }
+  hint.style.display = 'none'; legend.style.display = '';
+  // si le créneau choisi est devenu indisponible, on le libère
+  if(selSlot && slotUnavailable(selSlot)){ selSlot=''; }
+  cont.innerHTML = avail.map(id=>{
+    if(takenSlots[id]){
+      return `<div class="slot taken" title="Déjà réservé"><div class="slot-t">${slotLabelFromId(id)}</div><div class="slot-d">Réservé</div></div>`;
     }
     const sel = (selSlot===id);
     return `<div class="slot${sel?' sel':''}" onclick="pickSlot('${id}')"><div class="slot-t">${slotLabelFromId(id)}</div><div class="slot-d">${sel?'Choisi':'Libre'}</div></div>`;
   }).join('');
 }
-function pickSlot(id){ if(slotDisabledReason(id)) return; selSlot=id; buildSlots(); updateSummary(); }
+function pickSlot(id){ if(slotUnavailable(id)) return; selSlot=id; buildSlots(); updateSummary(); }
 
 // Écoute en direct les créneaux pris pour une date donnée
 function watchSlots(date){
@@ -709,7 +706,7 @@ ${itemsText(res.items)}
 ${res.other?('\nAutre : '+res.other):''}
 
 Notre équipe passera sur le créneau choisi. En cas d'imprévu, nous vous appelons.
-Pour toute urgence, joignez-nous directement au +33 6 00 00 00 00.
+Pour toute urgence, joignez-nous directement au +33 7 61 46 57 20.
 
 À très vite,
 L'équipe EauService by Events Café`;
@@ -742,7 +739,7 @@ async function submitReservation(){
   }
   if(!selDate){ showToast('Merci de choisir un jour','error'); return; }
   if(!selSlot){ showToast('Merci de choisir un créneau horaire libre','error'); return; }
-  if(slotDisabledReason(selSlot)){ showToast('Ce créneau n\'est plus disponible, choisissez-en un autre','error'); buildSlots(); return; }
+  if(slotUnavailable(selSlot)){ showToast('Ce créneau n\'est plus disponible, choisissez-en un autre','error'); buildSlots(); return; }
 
   const items = selectedItems();
   const other = document.getElementById('r-other').value.trim();
@@ -846,6 +843,8 @@ buildSlots();
 loadEmailCfg();
 ensureAnonAuth();
 updateSummary();
+// Rafraîchit les créneaux chaque minute : à 12h, les créneaux d'avant 12h disparaissent tout seuls
+setInterval(()=>{ if(selDate===todayLocal()) buildSlots(); }, 60000);
 </script>
 </body>
 </html>
