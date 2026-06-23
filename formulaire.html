@@ -1050,7 +1050,9 @@ L'équipe EauService by Events Café`;
   }
   try{
     emailjs.init(emailCfg.pubkey);
-    await emailjs.send(emailCfg.service, emailCfg.template, {
+    // Modèle dédié au client s'il existe (sinon le modèle équipe par défaut)
+    const clientTemplate = (emailCfg.templateClient && !String(emailCfg.templateClient).includes('COLLE')) ? emailCfg.templateClient : emailCfg.template;
+    await emailjs.send(emailCfg.service, clientTemplate, {
       to_email: row.email,
       to_name: row.clientName || row.billingName || 'Client',
       subject: subject,
