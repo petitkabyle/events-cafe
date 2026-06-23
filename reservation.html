@@ -235,7 +235,7 @@ body::before{content:'';position:fixed;inset:0;background:
           <input class="inp" id="r-phone" type="tel" placeholder="+33 6 ..." oninput="updateSummary()">
         </div>
         <div class="grp">
-          <label class="lbl">Email (pour recevoir votre confirmation)</label>
+          <label class="lbl">Email (facultatif)</label>
           <input class="inp" id="r-email" type="email" placeholder="vous@societe.com">
         </div>
       </div>
@@ -791,7 +791,7 @@ function showSuccess(res){
     <div class="success-row"><span class="success-row-label">Créneau</span><span class="success-row-val">${fmtFull(res.date)}<br>${res.slotLabel}</span></div>
     <div class="success-row"><span class="success-row-label">Réappro</span><span class="success-row-val" style="max-width:280px">${itemsTxt}</span></div>
     ${res.urgent?'<div class="success-row"><span class="success-row-label">Priorité</span><span class="success-row-val" style="color:#fca5a5">🚨 Urgent</span></div>':''}
-    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">${res.email?('Confirmation envoyée à '+res.email):'Nous passons sur le créneau choisi'}</span></div>`;
+    <div class="success-row"><span class="success-row-label">Suivi</span><span class="success-row-val" style="max-width:280px">Nous passons sur le créneau choisi · besoin urgent ? appelez-nous</span></div>`;
 }
 function resetForm(){
   document.getElementById('form-wrap').style.display='block';
